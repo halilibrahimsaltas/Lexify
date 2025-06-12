@@ -5,6 +5,7 @@ import {
     Length,
     Matches,
     IsDate,
+    IsEnum,
   } from 'class-validator';
   import {
     Column,
@@ -14,6 +15,7 @@ import {
     UpdateDateColumn,
     Unique,
   } from 'typeorm';
+  import { UserRole } from '../../common/enum/user-role.enum';
   
   @Entity()
   @Unique(['email']) // Email tekrarlanmasın
@@ -31,6 +33,15 @@ import {
     @IsNotEmpty()
     @IsEmail({}, { message: 'Invalid email format.' })
     email: string;
+
+    @Column({
+      type: 'enum',
+      enum: UserRole,
+      default: UserRole.USER
+    })
+    @IsNotEmpty()
+    @IsEnum(UserRole, { message: 'Invalid role' })
+    role: UserRole;
   
     @Column()
     @IsNotEmpty()

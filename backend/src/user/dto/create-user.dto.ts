@@ -1,30 +1,50 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength, IsOptional } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty, IsString, Length, Matches, IsEnum } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { UserRole } from '../../common/enum/user-role.enum';
 
 export class CreateUserDto {
-    @ApiProperty({ description: 'User email address', example: 'user@example.com' })
-    @IsEmail()
+    @ApiProperty({
+        description: 'User full name',
+        example: 'John Doe',
+        minLength: 2,
+        maxLength: 50
+    })
     @IsNotEmpty()
+    @IsString()
+    @Length(2, 50, { message: 'Name must be between 2 and 50 characters.' })
+    name: string;
+
+    @ApiProperty({
+        description: 'User email address',
+        example: 'user@example.com'
+    })
+    @IsNotEmpty()
+    @IsEmail({}, { message: 'Invalid email format.' })
     email: string;
 
-    @ApiProperty({ description: 'User password', example: 'password123', minLength: 6 })
-    @IsString()
+    @ApiProperty({
+        description: 'User role',
+        example: UserRole.USER,
+        enum: UserRole,
+        default: UserRole.USER
+    })
     @IsNotEmpty()
-    @MinLength(6)
+    @IsEnum(UserRole, { message: 'Invalid role' })
+    role: UserRole;
+
+    @ApiProperty({
+        description: 'User password',
+        example: 'Password123!',
+        minLength: 8,
+        maxLength: 32
+    })
+    @IsNotEmpty()
+    @IsString()
+    @Length(8, 32, { message: 'Password must be 8-32 characters long.' })
+    @Matches(/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]+$/, {
+        message: 'Password must contain only letters, numbers, and allowed special characters.',
+    })
     password: string;
-
-    @ApiProperty({ description: 'User first name', example: 'John' })
-    @IsString()
-    @IsNotEmpty()
-    firstName: string;
-
-    @ApiProperty({ description: 'User last name', example: 'Doe' })
-    @IsString()
-    @IsNotEmpty()
-    lastName: string;
-
-    @ApiPropertyOptional({ description: 'User phone number', example: '+1234567890' })
-    @IsString()
-    @IsOptional()
-    phoneNumber?: string;
 }
+
+  
