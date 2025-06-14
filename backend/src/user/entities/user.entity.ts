@@ -14,9 +14,10 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     Unique,
+    ManyToMany,
   } from 'typeorm';
   import { UserRole } from '../../common/enum/user-role.enum';
-  
+  import { Word } from '../../word/entities/word.entity';
   @Entity()
   @Unique(['email']) // Email tekrarlanmasın
   export class User {
@@ -51,6 +52,9 @@ import {
        message: 'Password must contain only letters, numbers, and allowed special characters.',
      })
     password: string;
+
+    @ManyToMany(() => Word, (word) => word.users)
+    words: Word[];
   
     @CreateDateColumn()
     @IsDate()

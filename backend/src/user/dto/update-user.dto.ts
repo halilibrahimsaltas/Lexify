@@ -1,4 +1,4 @@
-import { IsEmail, IsOptional, IsString, Length, Matches, IsEnum } from 'class-validator';
+import { IsEmail, IsOptional, IsString, Length, Matches, IsEnum, IsArray } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { UserRole } from '../../common/enum/user-role.enum';
 
@@ -30,6 +30,16 @@ export class UpdateUserDto {
     @IsOptional()
     @IsEnum(UserRole, { message: 'Invalid role' })
     role?: UserRole;
+
+
+    @ApiPropertyOptional({
+        description: 'User words',
+        example: ['word1', 'word2', 'word3'],
+        type: [String]
+    })
+    @IsOptional()
+    @IsArray()
+    words?: string[];
 
     @ApiPropertyOptional({
         description: 'User password',

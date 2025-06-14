@@ -1,6 +1,6 @@
-# 📚 LexiSlate Backend (NestJS)
+# 📚 Lexify Backend (NestJS)
 
-LexiSlate, dil öğrenmeyi eğlenceli hale getiren bir e-kitap uygulamasıdır. Bu repo, mobil uygulamaya hizmet eden **NestJS tabanlı backend API**'sini içerir.
+Lexify, dil öğrenmeyi eğlenceli hale getiren bir kelime öğrenme uygulamasıdır. Bu repo, mobil uygulamaya hizmet eden **NestJS tabanlı backend API**'sini içerir.
 
 ---
 
@@ -9,11 +9,11 @@ LexiSlate, dil öğrenmeyi eğlenceli hale getiren bir e-kitap uygulamasıdır. 
 Kullanıcılara:
 
 - Kayıt ve giriş
-- Kitap listeleme ve içeriğe erişim
-- Kelime çevirisi ve telaffuz
-- Kelime kaydetme
-- Ses dosyaları yönetimi
-- Arama ve filtreleme
+- Kelime ekleme ve yönetme
+- Kelime tanımlarını güncelleme
+- Kelime listelerini görüntüleme
+- Kelime arama ve filtreleme
+- Çoklu kullanıcı kelime paylaşımı
   gibi işlemleri sunan güvenli ve ölçeklenebilir bir backend geliştirmek.
 
 ---
@@ -25,7 +25,6 @@ Kullanıcılara:
 | NestJS            | Backend uygulama çatısı     |
 | PostgreSQL        | Ana veritabanı              |
 | TypeORM           | ORM (Veritabanı etkileşimi) |
-| Redis             | Çeviri ve içerik cacheleme  |
 | JWT               | Kimlik doğrulama            |
 | Docker            | Geliştirme ortamı           |
 | Swagger           | API dokümantasyonu          |
@@ -37,16 +36,18 @@ Kullanıcılara:
 ## 📁 Proje Yapısı
 
 ```
-lexislate-backend/
+lexify-backend/
 ├── src/
 │   ├── auth/           # Kimlik doğrulama işlemleri
 │   ├── user/           # Kullanıcı yönetimi
-│   ├── book/           # Kitap işlemleri
 │   ├── word/           # Kelime işlemleri
-│   ├── audio/          # Ses dosyası işlemleri
-│   ├── search/         # Arama işlemleri
-│   ├── file/           # Dosya yönetimi
 │   ├── common/         # Ortak kullanılan kodlar
+│   │   ├── enum/       # Enum tanımlamaları
+│   │   ├── filters/    # Exception filtreleri
+│   │   ├── guards/     # Auth guard'ları
+│   │   ├── interceptors/# Interceptor'lar
+│   │   ├── types/      # Tip tanımlamaları
+│   │   └── dto/        # Ortak DTO'lar
 │   ├── app.module.ts   # Ana modül
 │   └── main.ts         # Uygulama giriş noktası
 ├── test/               # Test dosyaları
@@ -63,14 +64,13 @@ lexislate-backend/
 
 - Node.js (v16 veya üzeri)
 - PostgreSQL
-- Redis
 - Docker (opsiyonel)
 
 ### 2. Repoyu klonla
 
 ```bash
-git clone https://github.com/your-username/lexislate-backend.git
-cd lexislate-backend
+git clone https://github.com/your-username/lexify-backend.git
+cd lexify-backend
 ```
 
 ### 3. Bağımlılıkları yükle
@@ -95,10 +95,6 @@ POSTGRES_DB=lexify
 JWT_SECRET=your_jwt_secret
 JWT_EXPIRATION=1d
 
-# Redis
-REDIS_HOST=localhost
-REDIS_PORT=6379
-
 # App
 PORT=3000
 NODE_ENV=development
@@ -108,7 +104,7 @@ NODE_ENV=development
 
 ```bash
 # PostgreSQL'de veritabanını oluştur
-createdb lexiify
+createdb lexify
 ```
 
 ### 6. Uygulamayı başlat
@@ -137,6 +133,23 @@ Uygulama başlatıldıktan sonra Swagger dokümantasyonuna erişmek için:
 ```
 http://localhost:3000/api
 ```
+
+### API Endpoints
+
+#### Kullanıcı İşlemleri
+
+- `POST /users` - Yeni kullanıcı oluşturma (Admin)
+- `GET /users` - Tüm kullanıcıları listeleme (Admin)
+- `GET /users/:id` - Kullanıcı detaylarını görüntüleme (Kullanıcı/Admin)
+- `PUT /users/:id` - Kullanıcı bilgilerini güncelleme (Kullanıcı/Admin)
+- `DELETE /users/:id` - Kullanıcı silme (Admin)
+
+#### Kelime İşlemleri
+
+- `POST /words/:userId` - Kullanıcıya kelime ekleme
+- `GET /words/:userId` - Kullanıcının kelimelerini listeleme
+- `PUT /words/:wordId/definition` - Kelime tanımını güncelleme
+- `DELETE /words/:userId/:wordId` - Kelimeyi kullanıcının listesinden çıkarma
 
 ---
 
