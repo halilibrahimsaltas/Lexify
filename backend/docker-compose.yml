@@ -1,31 +1,49 @@
 version: '3.8'
 
-backend:
-  build:
-    context: .
-    dockerfile: Dockerfile
-  ports:
-    - 3000:3000
-  volumes:
-    - .:/app
-  environment:
-    - NODE_ENV=development
-    - PORT=3000
-  depends_on:
-    - postgres
-  networks:
-    - backend-network
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/app
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - LIBRETRANSLATE_API_URL=http://libretranslate:5000
+    depends_on:
+      - postgres
+      - libretranslate
+    networks:
+      - backend-network
 
-postgres:
-  image: postgres:15
-  ports:
-    - 5432:5432
-  environment:
-    - POSTGRES_USER=postgres
-    - POSTGRES_PASSWORD=postgres
-    - POSTGRES_DB=postgres
-  networks:
-    - backend-network
+  postgres:
+    image: postgres:15
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - backend-network
+
+  libretranslate:
+    image: libretranslate/libretranslate:latest
+    ports:
+      - 5000:5000
+    environment:
+      - LT_LOAD_ONLY=en,tr
+      - LT_DISABLE_WEB_UI=true
+      - LT_DISABLE_FILES_TRANSLATION=true
+      - LT_DISABLE_TELEMETRY=true
+    networks:
+      - backend-network
+
 networks:
   backend-network:
     driver: bridge

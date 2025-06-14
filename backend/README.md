@@ -10,10 +10,10 @@ Kullanıcılara:
 
 - Kayıt ve giriş
 - Kelime ekleme ve yönetme
-- Kelime tanımlarını güncelleme
+- Kelime çevirilerini güncelleme
 - Kelime listelerini görüntüleme
 - Kelime arama ve filtreleme
-- Çoklu kullanıcı kelime paylaşımı
+- İngilizce'den Türkçe'ye çeviri yapma
   gibi işlemleri sunan güvenli ve ölçeklenebilir bir backend geliştirmek.
 
 ---
@@ -30,6 +30,8 @@ Kullanıcılara:
 | Swagger           | API dokümantasyonu          |
 | Class Validator   | Veri doğrulama              |
 | Class Transformer | DTO dönüşümleri             |
+| LibreTranslate    | Çeviri servisi              |
+| Cache Manager     | Önbellek yönetimi           |
 
 ---
 
@@ -41,13 +43,16 @@ lexify-backend/
 │   ├── auth/           # Kimlik doğrulama işlemleri
 │   ├── user/           # Kullanıcı yönetimi
 │   ├── word/           # Kelime işlemleri
+│   ├── translation/    # Çeviri işlemleri
+│   │   ├── dto/        # Çeviri DTO'ları
+│   │   ├── constants/  # Çeviri sabitleri
+│   │   └── entities/   # Çeviri entity'leri
 │   ├── common/         # Ortak kullanılan kodlar
 │   │   ├── enum/       # Enum tanımlamaları
 │   │   ├── filters/    # Exception filtreleri
 │   │   ├── guards/     # Auth guard'ları
 │   │   ├── interceptors/# Interceptor'lar
-│   │   ├── types/      # Tip tanımlamaları
-│   │   └── dto/        # Ortak DTO'lar
+│   │   └── types/      # Tip tanımlamaları
 │   ├── app.module.ts   # Ana modül
 │   └── main.ts         # Uygulama giriş noktası
 ├── test/               # Test dosyaları
@@ -65,6 +70,7 @@ lexify-backend/
 - Node.js (v16 veya üzeri)
 - PostgreSQL
 - Docker (opsiyonel)
+- LibreTranslate (opsiyonel)
 
 ### 2. Repoyu klonla
 
@@ -94,6 +100,9 @@ POSTGRES_DB=lexify
 # JWT
 JWT_SECRET=your_jwt_secret
 JWT_EXPIRATION=1d
+
+# LibreTranslate
+LIBRETRANSLATE_API_URL=http://localhost:5000
 
 # App
 PORT=3000
@@ -146,10 +155,15 @@ http://localhost:3000/api
 
 #### Kelime İşlemleri
 
-- `POST /words/:userId` - Kullanıcıya kelime ekleme
-- `GET /words/:userId` - Kullanıcının kelimelerini listeleme
-- `PUT /words/:wordId/definition` - Kelime tanımını güncelleme
-- `DELETE /words/:userId/:wordId` - Kelimeyi kullanıcının listesinden çıkarma
+- `POST /words` - Yeni kelime ekleme
+- `GET /words` - Kullanıcının kelimelerini listeleme
+- `PUT /words/:id` - Kelime güncelleme
+- `DELETE /words/:id` - Kelime silme
+
+#### Çeviri İşlemleri
+
+- `POST /translation/translate` - Metin çevirisi yapma
+- `POST /translation/save-word` - Çevirilen kelimeyi kaydetme
 
 ---
 

@@ -1,34 +1,36 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
 import { TranslationService } from './translation.service';
-import { CreateTranslationDto } from './dto/create-translation.dto';
-import { UpdateTranslationDto } from './dto/update-translation.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
+@ApiTags('translation')
 @Controller('translation')
 export class TranslationController {
-  constructor(private readonly translationService: TranslationService) {}
+    constructor(private readonly translationService: TranslationService) {}
 
-  @Post()
-  create(@Body() createTranslationDto: CreateTranslationDto) {
-    return this.translationService.create(createTranslationDto);
-  }
+    @Post('translate')
+    @ApiOperation({ summary: 'Translate text from English to Turkish' })
+    @ApiResponse({ status: 200, description: 'Text successfully translated' })
+    async translate(
+        @Body('text') text: string
+    ): Promise<{ translatedText: string }> {
+        const translatedText = await this.translationService.translate(text);
+        return { translatedText };
+    }
 
-  @Get()
-  findAll() {
-    return this.translationService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.translationService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTranslationDto: UpdateTranslationDto) {
-    return this.translationService.update(+id, updateTranslationDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.translationService.remove(+id);
-  }
+    @Post('save-word')
+    @UseGuards(JwtAuthGuard)
+    @ApiOperation({ summary: 'Save translated word to user list' })
+    @ApiResponse({ status: 200, description: 'Word successfully saved to user list' })
+    async saveWord(
+        @Request() req,
+        @Body('originalText') originalText: string,
+        @Body('translatedText') translatedText: string
+    ) {
+        return this.translationService.addTranslatedWordToUserList(
+            req.user.sub,
+            originalText,
+            translatedText
+        );
+    }
 }
