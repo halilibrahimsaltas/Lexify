@@ -6,13 +6,12 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - 3000:3000
+      - ${PORT}:${PORT}
     volumes:
       - .:/app
-    environment:
-      - NODE_ENV=development
-      - PORT=3000
-      - LIBRETRANSLATE_API_URL=http://libretranslate:5000
+      - uploads:/app/uploads
+    env_file:
+      - .env
     depends_on:
       - postgres
       - libretranslate
@@ -20,13 +19,13 @@ services:
       - backend-network
 
   postgres:
-    image: postgres:15
+    image: postgres:16
     ports:
-      - 5432:5432
+      - ${POSTGRES_PORT}:5432
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=postgres
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
@@ -50,4 +49,6 @@ networks:
 
 volumes:
   postgres-data:
+    driver: local
+  uploads:
     driver: local

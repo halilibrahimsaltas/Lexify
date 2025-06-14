@@ -1,0 +1,117 @@
+@auth_token = your_jwt_token_here
+
+### Auth Endpoints ###
+
+# Kullanıcı Girişi
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+    "email": "test@example.com",
+    "password": "123456"
+}
+
+### User Endpoints ###
+
+# Kullanıcı Kaydı
+POST http://localhost:3000/users
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+    "name": "Test User",
+    "email": "test@example.com",
+    "password": "123456"
+}
+
+# Kullanıcı Bilgilerini Getir
+GET http://localhost:3000/users/me
+Authorization: Bearer {{auth_token}}
+
+### Word Endpoints ###
+
+# Yeni Kelime Ekle
+POST http://localhost:3000/words
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+    "originalText": "hello",
+    "translatedText": "merhaba",
+    "sourceLanguage": "en",
+    "targetLanguage": "tr"
+}
+
+# Kelimeleri Listele
+GET http://localhost:3000/words
+Authorization: Bearer {{auth_token}}
+
+# Kelime Detayı
+GET http://localhost:3000/words/1
+Authorization: Bearer {{auth_token}}
+
+# Kelime Güncelle
+PUT http://localhost:3000/words/1
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+    "translatedText": "selam"
+}
+
+# Kelime Sil
+DELETE http://localhost:3000/words/1
+Authorization: Bearer {{auth_token}}
+
+### Translation Endpoints ###
+
+# Metin Çevirisi
+POST http://localhost:3000/translation/translate
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+    "text": "hello world",
+    "sourceLanguage": "en",
+    "targetLanguage": "tr"
+}
+
+### Book Endpoints ###
+
+# PDF'den Kitap Oluştur
+POST http://localhost:3000/books/upload/pdf
+Content-Type: multipart/form-data
+Authorization: Bearer {{auth_token}}
+
+file: <PDF_DOSYASI>
+
+# Yeni Kitap Oluştur
+POST http://localhost:3000/books
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+    "title": "Test Book",
+    "content": "This is a test book content."
+}
+
+# Kitapları Listele
+GET http://localhost:3000/books
+Authorization: Bearer {{auth_token}}
+
+# Kitap Detayı
+GET http://localhost:3000/books/1
+Authorization: Bearer {{auth_token}}
+
+# Kitap Sil
+DELETE http://localhost:3000/books/1
+Authorization: Bearer {{auth_token}}
+
+### File Endpoints ###
+
+# PDF Yükle ve Metin Çıkar
+POST http://localhost:3000/files/upload/pdf
+Content-Type: multipart/form-data
+Authorization: Bearer {{auth_token}}
+
+file: <PDF_DOSYASI>

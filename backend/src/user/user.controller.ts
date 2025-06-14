@@ -12,23 +12,20 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 
 @ApiTags('users')
 @Controller('users')
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
 export class UserController {
     constructor(private userService: UserService) {}
 
     @Post()
-    @UseGuards(OwnerOrRolesGuard)
-    @Roles(UserRole.ADMIN)
-    @ApiOperation({ summary: 'Create a new user (Admin only)' })
+    @ApiOperation({ summary: 'Create a new user' })
     @ApiResponse({ status: 201, description: 'User successfully created' })
     createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
         return this.userService.createUser(createUserDto);
     }
 
     @Get()
-    @UseGuards(OwnerOrRolesGuard)
+    @UseGuards(JwtAuthGuard, OwnerOrRolesGuard)
     @Roles(UserRole.ADMIN)
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Get all users (Admin only)' })
     @ApiResponse({ status: 200, description: 'Return all users' })
     findAllUsers(): Promise<User[]> {
@@ -36,7 +33,8 @@ export class UserController {
     }
 
     @Get(':id')
-    @UseGuards(OwnerOrRolesGuard)
+    @UseGuards(JwtAuthGuard, OwnerOrRolesGuard)
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Get user by id (Owner or Admin)' })
     @ApiResponse({ status: 200, description: 'Return user by id' })
     findUserById(@Param('id' ,ParseIntPipe) id: number): Promise<User> {
@@ -44,7 +42,8 @@ export class UserController {
     }
 
     @Put(':id')
-    @UseGuards(OwnerOrRolesGuard)
+    @UseGuards(JwtAuthGuard, OwnerOrRolesGuard)
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Update user (Owner or Admin)' })
     @ApiResponse({ status: 200, description: 'User successfully updated' })
     updateUser(@Param('id' , ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto): Promise<User> {
@@ -52,8 +51,9 @@ export class UserController {
     }
 
     @Delete(':id')
-    @UseGuards(OwnerOrRolesGuard)
+    @UseGuards(JwtAuthGuard, OwnerOrRolesGuard)
     @Roles(UserRole.ADMIN)
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Delete user (Admin only)' })
     @ApiResponse({ status: 200, description: 'User successfully deleted' })
     deleteUser(@Param('id', ParseIntPipe) id: number): Promise<void> {
@@ -61,6 +61,8 @@ export class UserController {
     }
 
     @Get('email/:email')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
     findUserByEmail(@Param('email') email: string): Promise<User> {
         return this.userService.findUserByEmail(email);
     }

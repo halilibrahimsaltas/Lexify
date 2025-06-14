@@ -14,6 +14,8 @@ Kullanıcılara:
 - Kelime listelerini görüntüleme
 - Kelime arama ve filtreleme
 - İngilizce'den Türkçe'ye çeviri yapma
+- PDF dosyalarından metin çıkarma
+- PDF'lerden kitap oluşturma
   gibi işlemleri sunan güvenli ve ölçeklenebilir bir backend geliştirmek.
 
 ---
@@ -32,6 +34,8 @@ Kullanıcılara:
 | Class Transformer | DTO dönüşümleri             |
 | LibreTranslate    | Çeviri servisi              |
 | Cache Manager     | Önbellek yönetimi           |
+| PDF-Parse         | PDF işleme                  |
+| Multer            | Dosya yükleme               |
 
 ---
 
@@ -44,9 +48,10 @@ lexify-backend/
 │   ├── user/           # Kullanıcı yönetimi
 │   ├── word/           # Kelime işlemleri
 │   ├── translation/    # Çeviri işlemleri
-│   │   ├── dto/        # Çeviri DTO'ları
-│   │   ├── constants/  # Çeviri sabitleri
-│   │   └── entities/   # Çeviri entity'leri
+│   ├── book/           # Kitap işlemleri
+│   │   ├── dto/        # Kitap DTO'ları
+│   │   └── entities/   # Kitap entity'leri
+│   ├── file/           # Dosya işlemleri
 │   ├── common/         # Ortak kullanılan kodlar
 │   │   ├── enum/       # Enum tanımlamaları
 │   │   ├── filters/    # Exception filtreleri
@@ -56,6 +61,7 @@ lexify-backend/
 │   ├── app.module.ts   # Ana modül
 │   └── main.ts         # Uygulama giriş noktası
 ├── test/               # Test dosyaları
+├── uploads/           # Yüklenen dosyalar
 ├── docker-compose.yml  # Docker yapılandırması
 ├── .env               # Ortam değişkenleri
 └── README.md          # Proje dokümantasyonu
@@ -164,6 +170,18 @@ http://localhost:3000/api
 
 - `POST /translation/translate` - Metin çevirisi yapma
 - `POST /translation/save-word` - Çevirilen kelimeyi kaydetme
+
+#### Dosya İşlemleri
+
+- `POST /files/upload/pdf` - PDF dosyası yükleme ve metin çıkarma
+
+#### Kitap İşlemleri
+
+- `POST /books/upload/pdf` - PDF'den kitap oluşturma
+- `POST /books` - Yeni kitap oluşturma
+- `GET /books` - Kullanıcının kitaplarını listeleme
+- `GET /books/:id` - Kitap detaylarını görüntüleme
+- `DELETE /books/:id` - Kitap silme
 
 ---
 
