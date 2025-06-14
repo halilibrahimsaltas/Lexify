@@ -1,70 +1,26 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
+import { User } from '../../user/entities/user.entity';
 
-
-
-@Entity("book")
-export class Book{
-
+@Entity('books')
+export class Book {
     @PrimaryGeneratedColumn()
     id: number;
 
-
-    @Column({
-        type: "varchar",    
-        length: 255,
-        nullable: false
-    })
+    @Column()
     title: string;
 
-    @Column({
-        type: "varchar",    
-        length: 255,
-        nullable: false
-    })
-    author: string;
-
-    @Column({
-        type: "text",
-        nullable: true
-    })
+    @Column('text')
     content: string;
 
-    @Column({
-        type: "varchar",    
-        length: 255,
-        nullable: true
-    })
-    coverImage: string;
+    @Column()
+    userId: number;
 
-    @Column({
-        type: "varchar",    
-        length: 255,
-        nullable: true
-    })
-    filePath: string;
+    @ManyToOne(() => User)
+    user: User;
 
-    @Column({
-        type: "varchar",    
-        length: 50,
-        nullable: true
-    })
-    category: string;
-
-    @CreateDateColumn({
-        type: "timestamp",
-        default: () => "CURRENT_TIMESTAMP",
-        nullable: false
-    })
+    @CreateDateColumn()
     createdAt: Date;
 
-    @CreateDateColumn({
-        type: "timestamp",
-        default: () => "CURRENT_TIMESTAMP",
-        nullable: false
-    })
+    @UpdateDateColumn()
     updatedAt: Date;
-    
-
-
-
 }
