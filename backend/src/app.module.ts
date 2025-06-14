@@ -14,6 +14,7 @@ import { AudioModule } from './audio/audio.module';
 import { SearchModule } from './search/search.module';
 import { FileModule } from './file/file.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TranslationModule } from './translation/translation.module';
 
 @Module({
   imports: [
@@ -51,7 +52,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     WordModule,
     AudioModule,
     SearchModule,
-    FileModule
+    FileModule,
+    TranslationModule
   ],
   controllers: [AppController, UserController, AuthController],
   providers: [AppService, UserService, AuthService],
