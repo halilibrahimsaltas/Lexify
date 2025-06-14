@@ -5,6 +5,7 @@ import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Word } from '../word/entities/word.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -14,7 +15,11 @@ export class UserService {
     ) {}
 
     async createUser(createUserDto: CreateUserDto): Promise<User> {
-        const user = this.userRepository.create(createUserDto);
+        const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+        const user = this.userRepository.create({
+            ...createUserDto,
+            password: hashedPassword
+        });
         return this.userRepository.save(user);
     }
 
@@ -51,8 +56,11 @@ export class UserService {
             // Yeni kelimeleri ekle
             const wordEntities = words.map(wordText => {
                 const word = new Word();
-                word.word = wordText;
-                word.definition = ''; // Varsayılan boş tanım
+                word.originalText = wordText;
+                word.translatedText = ''; // Varsayılan boş çeviri
+                word.sourceLanguage = 'en';
+                word.targetLanguage = 'tr';
+                word.userId = user.id;
                 word.users = [user];
                 return word;
             });
@@ -91,6 +99,4 @@ export class UserService {
         }
         return user.words;
     }
-
-    
 }

@@ -7,7 +7,8 @@ import { AuthModule } from './auth/auth.module';
 import { WordModule } from './word/word.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TranslationModule } from './translation/translation.module';
-import { RedisModule } from './redis/redis.module';
+import { BookModule } from './book/book.module';
+import { FileModule } from './file/file.module';
 
 @Module({
   imports: [
@@ -42,7 +43,8 @@ import { RedisModule } from './redis/redis.module';
     UserModule,
     WordModule,
     TranslationModule,
-    RedisModule
+    BookModule,
+    FileModule
   ],
   controllers: [AppController],
   providers: [AppService],

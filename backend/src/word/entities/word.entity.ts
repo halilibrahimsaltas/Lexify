@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToMany } from 'typeorm';
+import { User } from '../../user/entities/user.entity';
 
 @Entity('words')
 export class Word {
@@ -19,6 +20,9 @@ export class Word {
 
     @Column()
     userId: number;
+
+    @ManyToMany(() => User, (user) => user.words)
+    users: User[];
 
     @CreateDateColumn()
     createdAt: Date;

@@ -12,6 +12,7 @@ import { Word } from '../word/entities/word.entity';
     WordModule
   ],
   controllers: [UserController],
-  providers: [UserService]
+  providers: [UserService],
+  exports: [UserService]
 })
 export class UserModule {}
