@@ -15,6 +15,7 @@ import { SearchModule } from './search/search.module';
 import { FileModule } from './file/file.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TranslationModule } from './translation/translation.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -53,7 +54,8 @@ import { TranslationModule } from './translation/translation.module';
     AudioModule,
     SearchModule,
     FileModule,
-    TranslationModule
+    TranslationModule,
+    RedisModule
   ],
   controllers: [AppController, UserController, AuthController],
   providers: [AppService, UserService, AuthService],
