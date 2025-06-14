@@ -1,26 +1,77 @@
 import { Injectable } from '@nestjs/common';
-import { CreateTranslationDto } from './dto/create-translation.dto';
-import { UpdateTranslationDto } from './dto/update-translation.dto';
+import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject } from '@nestjs/common';
+import { Cache } from 'cache-manager';
+import { TRANSLATION_CONSTANTS } from './constants/translation.constants';
+import { WordService } from '../word/word.service';
+import { CreateWordDto } from '../word/dto/create-word.dto';
 
 @Injectable()
 export class TranslationService {
-  create(createTranslationDto: CreateTranslationDto) {
-    return 'This action adds a new translation';
-  }
+    private readonly apiUrl: string;
 
-  findAll() {
-    return `This action returns all translation`;
-  }
+    constructor(
+        private readonly httpService: HttpService,
+        private readonly configService: ConfigService,
+        @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+        private readonly wordService: WordService
+    ) {
+        this.apiUrl = this.configService.get<string>('LIBRETRANSLATE_API_URL') || TRANSLATION_CONSTANTS.API.DEFAULT_URL;
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} translation`;
-  }
+    async translate(text: string) {
+        const cacheKey = `${TRANSLATION_CONSTANTS.CACHE.KEY_PREFIX}en:tr:${text}`;
+        
+        const cachedTranslation = await this.cacheManager.get<string>(cacheKey);
+        if (cachedTranslation) {
+            return cachedTranslation;
+        }
 
-  update(id: number, updateTranslationDto: UpdateTranslationDto) {
-    return `This action updates a #${id} translation`;
-  }
+        const response = await this.httpService.axiosRef.post(
+            `${this.apiUrl}${TRANSLATION_CONSTANTS.API.ENDPOINTS.TRANSLATE}`,
+            {
+                q: text,
+                source: 'en',
+                target: 'tr'
+            }
+        );
 
-  remove(id: number) {
-    return `This action removes a #${id} translation`;
-  }
+        const translation = response.data.translatedText;
+        await this.cacheManager.set(cacheKey, translation, TRANSLATION_CONSTANTS.CACHE.TTL);
+        
+        return translation;
+    }
+
+    async detectLanguage(text: string) {
+        const response = await this.httpService.axiosRef.post(
+            `${this.apiUrl}${TRANSLATION_CONSTANTS.API.ENDPOINTS.DETECT}`,
+            { q: text }
+        );
+        return response.data;
+    }
+
+    async getSupportedLanguages() {
+        const response = await this.httpService.axiosRef.get(
+            `${this.apiUrl}${TRANSLATION_CONSTANTS.API.ENDPOINTS.LANGUAGES}`
+        );
+        return response.data;
+    }
+
+    async addTranslatedWordToUserList(
+        userId: number,
+        originalText: string,
+        translatedText: string
+    ) {
+        const createWordDto: CreateWordDto = {
+            originalText,
+            translatedText,
+            sourceLanguage: 'en',
+            targetLanguage: 'tr',
+            userId
+        };
+
+        return this.wordService.create(createWordDto);
+    }
 }

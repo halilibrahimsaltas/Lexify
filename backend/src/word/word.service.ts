@@ -2,8 +2,11 @@ import { Injectable, NotFoundException, ConflictException } from '@nestjs/common
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Word } from './entities/word.entity';
-import { UserService } from '../user/user.service';
-import { RedisService } from '../redis/redis.service';
+import { CreateWordDto } from './dto/create-word.dto';
+import { UpdateWordDto } from './dto/update-word.dto';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject } from '@nestjs/common';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class WordService {
@@ -13,126 +16,95 @@ export class WordService {
 
     constructor(
         @InjectRepository(Word) private wordRepository: Repository<Word>,
-        private userService: UserService,
-        private redisService: RedisService
+        @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
     ) {}
 
-    async createWord(userId: number, word: string, definition: string): Promise<Word> {
-        const user = await this.userService.findUserById(userId);
-        
-        // Önce kelimeyi kontrol et, varsa onu kullan
-        let existingWord = await this.wordRepository.findOne({
-            where: { word },
-            relations: ['users']
+    async create(createWordDto: CreateWordDto): Promise<Word> {
+        // Kelime zaten kullanıcıya eklenmiş mi kontrol et
+        const existingWord = await this.wordRepository.findOne({
+            where: {
+                originalText: createWordDto.originalText,
+                userId: createWordDto.userId
+            }
         });
 
         if (existingWord) {
-            // Kelime zaten kullanıcıya eklenmiş mi kontrol et
-            if (existingWord.users.some(u => u.id === userId)) {
-                throw new ConflictException('Word already exists for this user');
-            }
-            // Kelimeyi kullanıcıya ekle
-            existingWord.users.push(user);
-            const savedWord = await this.wordRepository.save(existingWord);
-            
-            // Cache'i temizle
-            await this.clearUserWordsCache(userId);
-            await this.clearWordCache(savedWord.id);
-            
-            return savedWord;
+            throw new ConflictException('Word already exists for this user');
         }
 
         // Yeni kelime oluştur
-        const newWord = this.wordRepository.create({
-            word,
-            definition,
-            users: [user]
-        });
-
+        const newWord = this.wordRepository.create(createWordDto);
         const savedWord = await this.wordRepository.save(newWord);
         
         // Cache'i temizle
-        await this.clearUserWordsCache(userId);
+        await this.clearUserWordsCache(createWordDto.userId);
         
         return savedWord;
     }
 
-    async getUserWords(userId: number): Promise<Word[]> {
+    async findAllByUserId(userId: number): Promise<Word[]> {
         // Cache'den kontrol et
         const cacheKey = this.USER_WORDS_CACHE_KEY + userId;
-        const cachedWords = await this.redisService.get<Word[]>(cacheKey);
+        const cachedWords = await this.cacheManager.get<Word[]>(cacheKey);
         
         if (cachedWords) {
             return cachedWords;
         }
 
         // Cache'de yoksa veritabanından al
-        await this.userService.findUserById(userId); // Kullanıcının var olduğunu kontrol et
-        const words = await this.wordRepository
-            .createQueryBuilder('word')
-            .innerJoin('word.users', 'user', 'user.id = :userId', { userId })
-            .getMany();
+        const words = await this.wordRepository.find({
+            where: { userId }
+        });
 
         // Cache'e kaydet
-        await this.redisService.set(cacheKey, words, this.CACHE_TTL);
+        await this.cacheManager.set(cacheKey, words, this.CACHE_TTL);
         
         return words;
     }
 
-    async updateWordDefinition(wordId: number, definition: string): Promise<Word> {
+    async update(id: number, updateWordDto: UpdateWordDto): Promise<Word> {
         const word = await this.wordRepository.findOne({
-            where: { id: wordId }
+            where: { id }
         });
 
         if (!word) {
             throw new NotFoundException('Word not found');
         }
 
-        word.definition = definition;
+        // Kelimeyi güncelle
+        Object.assign(word, updateWordDto);
         const updatedWord = await this.wordRepository.save(word);
         
         // Cache'i temizle
-        await this.clearWordCache(wordId);
-        // İlgili kullanıcıların kelime listesi cache'ini temizle
-        for (const user of word.users) {
-            await this.clearUserWordsCache(user.id);
-        }
+        await this.clearWordCache(id);
+        await this.clearUserWordsCache(word.userId);
         
         return updatedWord;
     }
 
-    async removeWordFromUser(userId: number, wordId: number): Promise<void> {
+    async remove(id: number): Promise<void> {
         const word = await this.wordRepository.findOne({
-            where: { id: wordId },
-            relations: ['users']
+            where: { id }
         });
 
         if (!word) {
             throw new NotFoundException('Word not found');
         }
 
-        // Kelimeyi kullanıcının listesinden çıkar
-        word.users = word.users.filter(user => user.id !== userId);
+        await this.wordRepository.remove(word);
         
         // Cache'i temizle
-        await this.clearUserWordsCache(userId);
-        
-        // Eğer kelimeyi kullanan başka kullanıcı yoksa kelimeyi sil
-        if (word.users.length === 0) {
-            await this.wordRepository.remove(word);
-            await this.clearWordCache(wordId);
-        } else {
-            await this.wordRepository.save(word);
-        }
+        await this.clearWordCache(id);
+        await this.clearUserWordsCache(word.userId);
     }
 
     private async clearUserWordsCache(userId: number): Promise<void> {
         const cacheKey = this.USER_WORDS_CACHE_KEY + userId;
-        await this.redisService.del(cacheKey);
+        await this.cacheManager.del(cacheKey);
     }
 
     private async clearWordCache(wordId: number): Promise<void> {
         const cacheKey = this.WORD_CACHE_KEY + wordId;
-        await this.redisService.del(cacheKey);
+        await this.cacheManager.del(cacheKey);
     }
 }
