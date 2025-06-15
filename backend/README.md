@@ -2,7 +2,7 @@
 
 Lexify is a word learning application that makes language learning fun. This repository contains the **NestJS-based backend API** that serves the mobile application.
 
-![Lexify Mobile App Preview](mobileapp.png)
+![Lexify Mobile App Preview](src\common\images\mobilapp.png)
 
 ---
 
