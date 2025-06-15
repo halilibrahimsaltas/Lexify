@@ -1,5 +1,5 @@
 @baseUrl = http://localhost:3000
-@auth_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJzdWIiOjEsImlhdCI6MTc1MDAxMDI4NiwiZXhwIjoxNzUwMDk2Njg2fQ.AexOf4_fUaidedRMXVAKSibqDlcbbisbAd4rkQNHEsY
+@auth_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJzdWIiOjEsImlhdCI6MTc1MDAxOTAxMSwiZXhwIjoxNzUwMTA1NDExfQ.Xl9UMl0N6WCU-q8wMQNocu6Q-ygS3Yz0ExcnzNhP6wc
 
 ### Auth Endpoints ###
 
@@ -67,7 +67,7 @@ Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-    "text": "hello world",
+    "text": "hello",
     "sourceLanguage": "en",
     "targetLanguage": "tr"
 }

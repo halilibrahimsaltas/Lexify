@@ -1,76 +1,39 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject } from '@nestjs/common';
-import { Cache } from 'cache-manager';
-import { TRANSLATION_CONSTANTS } from './constants/translation.constants';
-import { WordService } from '../word/word.service';
-import { CreateWordDto, Language } from '../word/dto/create-word.dto';
+import { Language } from './constants/language.enum';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class TranslationService {
-    private readonly apiUrl: string;
+    private readonly logger = new Logger(TranslationService.name);
+    private readonly libreTranslateUrl: string;
 
     constructor(
         private readonly httpService: HttpService,
-        private readonly configService: ConfigService,
-        @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
-        private readonly wordService: WordService
+        private readonly configService: ConfigService
     ) {
-        this.apiUrl = this.configService.get<string>('LIBRETRANSLATE_API_URL') || TRANSLATION_CONSTANTS.API.DEFAULT_URL;
+        this.libreTranslateUrl = this.configService.get<string>('LIBRETRANSLATE_URL') || 'http://libretranslate:5000';
     }
 
-    async translate(text: string) {
-        const cacheKey = `${TRANSLATION_CONSTANTS.CACHE.KEY_PREFIX}${Language.EN}:${Language.TR}:${text}`;
-        
-        const cachedTranslation = await this.cacheManager.get<string>(cacheKey);
-        if (cachedTranslation) {
-            return cachedTranslation;
+    async translate(
+        text: string,
+        sourceLanguage: Language = Language.EN,
+        targetLanguage: Language = Language.TR
+    ): Promise<string> {
+        try {
+            const response = await firstValueFrom(
+                this.httpService.post(`${this.libreTranslateUrl}/translate`, {
+                    q: text,
+                    source: sourceLanguage,
+                    target: targetLanguage,
+                })
+            );
+
+            return response.data.translatedText;
+        } catch (error) {
+            this.logger.error(`Translation error: ${error.message}`);
+            throw error;
         }
-
-        const response = await this.httpService.axiosRef.post(
-            `${this.apiUrl}${TRANSLATION_CONSTANTS.API.ENDPOINTS.TRANSLATE}`,
-            {
-                q: text,
-                source: Language.EN,
-                target: Language.TR
-            }
-        );
-
-        const translation = response.data.translatedText;
-        await this.cacheManager.set(cacheKey, translation, TRANSLATION_CONSTANTS.CACHE.TTL);
-        
-        return translation;
-    }
-
-    async detectLanguage(text: string) {
-        const response = await this.httpService.axiosRef.post(
-            `${this.apiUrl}${TRANSLATION_CONSTANTS.API.ENDPOINTS.DETECT}`,
-            { q: text }
-        );
-        return response.data;
-    }
-
-    async getSupportedLanguages() {
-        const response = await this.httpService.axiosRef.get(
-            `${this.apiUrl}${TRANSLATION_CONSTANTS.API.ENDPOINTS.LANGUAGES}`
-        );
-        return response.data;
-    }
-
-    async addTranslatedWordToUserList(
-        userId: number,
-        originalText: string,
-        translatedText: string
-    ) {
-        const createWordDto: CreateWordDto = {
-            originalText,
-            translatedText,
-            sourceLanguage: Language.EN,
-            targetLanguage: Language.TR
-        };
-
-        return this.wordService.create(createWordDto, userId);
     }
 }
