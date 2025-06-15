@@ -1,4 +1,4 @@
-@auth_token = your_jwt_token_here
+@auth_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJzdWIiOjEsImlhdCI6MTc1MDAxMDI4NiwiZXhwIjoxNzUwMDk2Njg2fQ.AexOf4_fUaidedRMXVAKSibqDlcbbisbAd4rkQNHEsY
 
 ### Auth Endpoints ###
 
@@ -8,7 +8,7 @@ Content-Type: application/json
 
 {
     "email": "test@example.com",
-    "password": "123456"
+    "password": "Password123!"
 }
 
 ### User Endpoints ###
@@ -21,11 +21,11 @@ Authorization: Bearer {{auth_token}}
 {
     "name": "Test User",
     "email": "test@example.com",
-    "password": "123456"
+    "password": "Password123!"
 }
 
 # Kullanıcı Bilgilerini Getir
-GET http://localhost:3000/users/me
+GET http://localhost:3000/profile
 Authorization: Bearer {{auth_token}}
 
 ### Word Endpoints ###

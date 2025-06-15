@@ -60,7 +60,6 @@ export class UserService {
                 word.translatedText = ''; // Varsayılan boş çeviri
                 word.sourceLanguage = 'en';
                 word.targetLanguage = 'tr';
-                word.userId = user.id;
                 word.users = [user];
                 return word;
             });

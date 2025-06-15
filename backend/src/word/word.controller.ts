@@ -20,8 +20,7 @@ export class WordController {
         @Request() req,
         @Body() createWordDto: CreateWordDto
     ): Promise<Word> {
-        createWordDto.userId = req.user.sub;
-        return this.wordService.create(createWordDto);
+        return this.wordService.create(createWordDto, req.user.sub);
     }
 
     @Get()
@@ -35,16 +34,20 @@ export class WordController {
     @ApiOperation({ summary: 'Update a word' })
     @ApiResponse({ status: 200, description: 'Word successfully updated' })
     async update(
+        @Request() req,
         @Param('id', ParseIntPipe) id: number,
         @Body() updateWordDto: UpdateWordDto
     ): Promise<Word> {
-        return this.wordService.update(id, updateWordDto);
+        return this.wordService.update(id, updateWordDto, req.user.sub);
     }
 
     @Delete(':id')
     @ApiOperation({ summary: 'Delete a word' })
     @ApiResponse({ status: 200, description: 'Word successfully deleted' })
-    async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-        return this.wordService.remove(id);
+    async remove(
+        @Request() req,
+        @Param('id', ParseIntPipe) id: number
+    ): Promise<void> {
+        return this.wordService.remove(id, req.user.sub);
     }
 }
