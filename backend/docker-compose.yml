@@ -12,11 +12,17 @@ services:
       - uploads:/app/uploads
     env_file:
       - .env
+    environment:
+      - POSTGRES_HOST=postgres
+      - REDIS_HOST=redis
     depends_on:
-      - postgres
-      - libretranslate
+      postgres:
+        condition: service_healthy
+      libretranslate:
+        condition: service_started
     networks:
       - backend-network
+    restart: unless-stopped
 
   postgres:
     image: postgres:16
@@ -30,6 +36,12 @@ services:
       - postgres-data:/var/lib/postgresql/data
     networks:
       - backend-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
   libretranslate:
     image: libretranslate/libretranslate:latest
@@ -42,6 +54,22 @@ services:
       - LT_DISABLE_TELEMETRY=true
     networks:
       - backend-network
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - '${PGADMIN_PORT:-5050}:80'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    restart: unless-stopped
+    networks:
+      - backend-network
 
 networks:
   backend-network:
@@ -51,4 +79,6 @@ volumes:
   postgres-data:
     driver: local
   uploads:
+    driver: local
+  pgadmin:
     driver: local
