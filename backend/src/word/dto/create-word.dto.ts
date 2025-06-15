@@ -1,45 +1,52 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsEnum } from 'class-validator';
 
+export enum Language {
+    EN = 'en',
+    TR = 'tr',
+    DE = 'de',
+    FR = 'fr',
+    ES = 'es'
+}
+
 export class CreateWordDto {
     @ApiProperty({
-        description: 'Orijinal kelime (İngilizce)',
-        example: 'hello'
+        description: 'Orijinal kelime',
+        example: 'hello',
+        minLength: 1,
+        maxLength: 100
     })
     @IsString()
     @IsNotEmpty()
     originalText: string;
 
     @ApiProperty({
-        description: 'Çevrilmiş kelime (Türkçe)',
-        example: 'merhaba'
+        description: 'Çevrilmiş kelime',
+        example: 'merhaba',
+        minLength: 1,
+        maxLength: 100
     })
     @IsString()
     @IsNotEmpty()
     translatedText: string;
 
     @ApiProperty({
-        description: 'Kaynak dil (varsayılan: en)',
+        description: 'Kaynak dil kodu',
         example: 'en',
-        default: 'en'
+        default: 'en',
+        enum: Language
     })
-    @IsString()
+    @IsEnum(Language)
     @IsNotEmpty()
-    sourceLanguage: string = 'en';
+    sourceLanguage: Language = Language.EN;
 
     @ApiProperty({
-        description: 'Hedef dil (varsayılan: tr)',
+        description: 'Hedef dil kodu',
         example: 'tr',
-        default: 'tr'
+        default: 'tr',
+        enum: Language
     })
-    @IsString()
+    @IsEnum(Language)
     @IsNotEmpty()
-    targetLanguage: string = 'tr';
-
-    @ApiProperty({
-        description: 'Kullanıcı ID',
-        example: 1
-    })
-    @IsNotEmpty()
-    userId: number;
+    targetLanguage: Language = Language.TR;
 } 

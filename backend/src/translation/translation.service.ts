@@ -6,7 +6,7 @@ import { Inject } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { TRANSLATION_CONSTANTS } from './constants/translation.constants';
 import { WordService } from '../word/word.service';
-import { CreateWordDto } from '../word/dto/create-word.dto';
+import { CreateWordDto, Language } from '../word/dto/create-word.dto';
 
 @Injectable()
 export class TranslationService {
@@ -22,7 +22,7 @@ export class TranslationService {
     }
 
     async translate(text: string) {
-        const cacheKey = `${TRANSLATION_CONSTANTS.CACHE.KEY_PREFIX}en:tr:${text}`;
+        const cacheKey = `${TRANSLATION_CONSTANTS.CACHE.KEY_PREFIX}${Language.EN}:${Language.TR}:${text}`;
         
         const cachedTranslation = await this.cacheManager.get<string>(cacheKey);
         if (cachedTranslation) {
@@ -33,8 +33,8 @@ export class TranslationService {
             `${this.apiUrl}${TRANSLATION_CONSTANTS.API.ENDPOINTS.TRANSLATE}`,
             {
                 q: text,
-                source: 'en',
-                target: 'tr'
+                source: Language.EN,
+                target: Language.TR
             }
         );
 
@@ -67,11 +67,10 @@ export class TranslationService {
         const createWordDto: CreateWordDto = {
             originalText,
             translatedText,
-            sourceLanguage: 'en',
-            targetLanguage: 'tr',
-            userId
+            sourceLanguage: Language.EN,
+            targetLanguage: Language.TR
         };
 
-        return this.wordService.create(createWordDto);
+        return this.wordService.create(createWordDto, userId);
     }
 }

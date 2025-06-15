@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToMany, JoinTable } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 
 @Entity('words')
@@ -18,10 +18,18 @@ export class Word {
     @Column({ default: 'tr' })
     targetLanguage: string;
 
-    @Column()
-    userId: number;
-
     @ManyToMany(() => User, (user) => user.words)
+    @JoinTable({
+        name: 'user_words',
+        joinColumn: {
+            name: 'word_id',
+            referencedColumnName: 'id',
+        },
+        inverseJoinColumn: {
+            name: 'user_id',
+            referencedColumnName: 'id',
+        },
+    })
     users: User[];
 
     @CreateDateColumn()
