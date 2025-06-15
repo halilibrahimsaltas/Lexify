@@ -1,9 +1,10 @@
+@baseUrl = http://localhost:3000
 @auth_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJzdWIiOjEsImlhdCI6MTc1MDAxMDI4NiwiZXhwIjoxNzUwMDk2Njg2fQ.AexOf4_fUaidedRMXVAKSibqDlcbbisbAd4rkQNHEsY
 
 ### Auth Endpoints ###
 
 # Kullanıcı Girişi
-POST http://localhost:3000/auth/login
+POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
@@ -14,9 +15,8 @@ Content-Type: application/json
 ### User Endpoints ###
 
 # Kullanıcı Kaydı
-POST http://localhost:3000/users
+POST {{baseUrl}}/users
 Content-Type: application/json
-Authorization: Bearer {{auth_token}}
 
 {
     "name": "Test User",
@@ -25,13 +25,13 @@ Authorization: Bearer {{auth_token}}
 }
 
 # Kullanıcı Bilgilerini Getir
-GET http://localhost:3000/profile
+GET {{baseUrl}}/profile
 Authorization: Bearer {{auth_token}}
 
 ### Word Endpoints ###
 
 # Yeni Kelime Ekle
-POST http://localhost:3000/words
+POST {{baseUrl}}/words
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
@@ -43,15 +43,11 @@ Authorization: Bearer {{auth_token}}
 }
 
 # Kelimeleri Listele
-GET http://localhost:3000/words
-Authorization: Bearer {{auth_token}}
-
-# Kelime Detayı
-GET http://localhost:3000/words/1
+GET {{baseUrl}}/words
 Authorization: Bearer {{auth_token}}
 
 # Kelime Güncelle
-PUT http://localhost:3000/words/1
+PUT {{baseUrl}}/words/1
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
@@ -60,13 +56,13 @@ Authorization: Bearer {{auth_token}}
 }
 
 # Kelime Sil
-DELETE http://localhost:3000/words/1
+DELETE {{baseUrl}}/words/1
 Authorization: Bearer {{auth_token}}
 
 ### Translation Endpoints ###
 
 # Metin Çevirisi
-POST http://localhost:3000/translation/translate
+POST {{baseUrl}}/translation/translate
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
@@ -79,14 +75,14 @@ Authorization: Bearer {{auth_token}}
 ### Book Endpoints ###
 
 # PDF'den Kitap Oluştur
-POST http://localhost:3000/books/upload/pdf
+POST {{baseUrl}}/books/upload/pdf
 Content-Type: multipart/form-data
 Authorization: Bearer {{auth_token}}
 
 file: <PDF_DOSYASI>
 
 # Yeni Kitap Oluştur
-POST http://localhost:3000/books
+POST {{baseUrl}}/books
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
@@ -96,22 +92,41 @@ Authorization: Bearer {{auth_token}}
 }
 
 # Kitapları Listele
-GET http://localhost:3000/books
+GET {{baseUrl}}/books
 Authorization: Bearer {{auth_token}}
 
 # Kitap Detayı
-GET http://localhost:3000/books/1
+GET {{baseUrl}}/books/1
 Authorization: Bearer {{auth_token}}
 
 # Kitap Sil
-DELETE http://localhost:3000/books/1
+DELETE {{baseUrl}}/books/1
 Authorization: Bearer {{auth_token}}
 
 ### File Endpoints ###
 
 # PDF Yükle ve Metin Çıkar
-POST http://localhost:3000/files/upload/pdf
+POST {{baseUrl}}/files/upload/pdf
 Content-Type: multipart/form-data
 Authorization: Bearer {{auth_token}}
 
 file: <PDF_DOSYASI>
+
+### Audio Endpoints ###
+
+# Metin Okuma
+POST {{baseUrl}}/audio/text-to-speech
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+    "text": "Hello world",
+    "language": "en"
+}
+
+# Ses Dosyası Yükle
+POST {{baseUrl}}/audio/upload
+Content-Type: multipart/form-data
+Authorization: Bearer {{auth_token}}
+
+file: <AUDIO_DOSYASI>

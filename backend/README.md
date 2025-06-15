@@ -1,99 +1,98 @@
 # 📚 Lexify Backend (NestJS)
 
-Lexify, dil öğrenmeyi eğlenceli hale getiren bir kelime öğrenme uygulamasıdır. Bu repo, mobil uygulamaya hizmet eden **NestJS tabanlı backend API**'sini içerir.
+Lexify is a word learning application that makes language learning fun. This repository contains the **NestJS-based backend API** that serves the mobile application.
 
 ---
 
-## 🚀 Amaç
+## 🚀 Purpose
 
-Kullanıcılara:
+To develop a secure and scalable backend that provides users with:
 
-- Kayıt ve giriş
-- Kelime ekleme ve yönetme
-- Kelime çevirilerini güncelleme
-- Kelime listelerini görüntüleme
-- Kelime arama ve filtreleme
-- İngilizce'den Türkçe'ye çeviri yapma
-- PDF dosyalarından metin çıkarma
-- PDF'lerden kitap oluşturma
-  gibi işlemleri sunan güvenli ve ölçeklenebilir bir backend geliştirmek.
-
----
-
-## 🛠 Teknoloji Yığını
-
-| Teknoloji         | Açıklama                    |
-| ----------------- | --------------------------- |
-| NestJS            | Backend uygulama çatısı     |
-| PostgreSQL        | Ana veritabanı              |
-| TypeORM           | ORM (Veritabanı etkileşimi) |
-| JWT               | Kimlik doğrulama            |
-| Docker            | Geliştirme ortamı           |
-| Swagger           | API dokümantasyonu          |
-| Class Validator   | Veri doğrulama              |
-| Class Transformer | DTO dönüşümleri             |
-| LibreTranslate    | Çeviri servisi              |
-| Cache Manager     | Önbellek yönetimi           |
-| PDF-Parse         | PDF işleme                  |
-| Multer            | Dosya yükleme               |
+- Registration and login
+- Word addition and management
+- Word translation updates
+- Word list viewing
+- Word search and filtering
+- English to Turkish translation
+- Text extraction from PDF files
+- Book creation from PDFs
 
 ---
 
-## 📁 Proje Yapısı
+## 🛠 Technology Stack
+
+| Technology        | Description                   |
+| ----------------- | ----------------------------- |
+| NestJS            | Backend application framework |
+| PostgreSQL        | Main database                 |
+| TypeORM           | ORM (Database interaction)    |
+| JWT               | Authentication                |
+| Docker            | Development environment       |
+| Swagger           | API documentation             |
+| Class Validator   | Data validation               |
+| Class Transformer | DTO transformations           |
+| LibreTranslate    | Translation service           |
+| Cache Manager     | Cache management              |
+| PDF-Parse         | PDF processing                |
+| Multer            | File upload                   |
+
+---
+
+## 📁 Project Structure
 
 ```
 lexify-backend/
 ├── src/
-│   ├── auth/           # Kimlik doğrulama işlemleri
-│   ├── user/           # Kullanıcı yönetimi
-│   ├── word/           # Kelime işlemleri
-│   ├── translation/    # Çeviri işlemleri
-│   ├── book/           # Kitap işlemleri
-│   │   ├── dto/        # Kitap DTO'ları
-│   │   └── entities/   # Kitap entity'leri
-│   ├── file/           # Dosya işlemleri
-│   ├── common/         # Ortak kullanılan kodlar
-│   │   ├── enum/       # Enum tanımlamaları
-│   │   ├── filters/    # Exception filtreleri
-│   │   ├── guards/     # Auth guard'ları
-│   │   ├── interceptors/# Interceptor'lar
-│   │   └── types/      # Tip tanımlamaları
-│   ├── app.module.ts   # Ana modül
-│   └── main.ts         # Uygulama giriş noktası
-├── test/               # Test dosyaları
-├── uploads/           # Yüklenen dosyalar
-├── docker-compose.yml  # Docker yapılandırması
-├── .env               # Ortam değişkenleri
-└── README.md          # Proje dokümantasyonu
+│   ├── auth/           # Authentication operations
+│   ├── user/           # User management
+│   ├── word/           # Word operations
+│   ├── translation/    # Translation operations
+│   ├── book/           # Book operations
+│   │   ├── dto/        # Book DTOs
+│   │   └── entities/   # Book entities
+│   ├── file/           # File operations
+│   ├── common/         # Shared code
+│   │   ├── enum/       # Enum definitions
+│   │   ├── filters/    # Exception filters
+│   │   ├── guards/     # Auth guards
+│   │   ├── interceptors/# Interceptors
+│   │   └── types/      # Type definitions
+│   ├── app.module.ts   # Main module
+│   └── main.ts         # Application entry point
+├── test/               # Test files
+├── uploads/           # Uploaded files
+├── docker-compose.yml  # Docker configuration
+├── .env               # Environment variables
+└── README.md          # Project documentation
 ```
 
 ---
 
-## 🔧 Kurulum
+## 🔧 Installation
 
-### 1. Gereksinimler
+### 1. Requirements
 
-- Node.js (v16 veya üzeri)
+- Node.js (v16 or higher)
 - PostgreSQL
-- Docker (opsiyonel)
-- LibreTranslate (opsiyonel)
+- Docker (optional)
+- LibreTranslate (optional)
 
-### 2. Repoyu klonla
+### 2. Clone the repository
 
 ```bash
 git clone https://github.com/your-username/lexify-backend.git
 cd lexify-backend
 ```
 
-### 3. Bağımlılıkları yükle
+### 3. Install dependencies
 
 ```bash
 npm install
 ```
 
-### 4. Ortam değişkenlerini ayarla
+### 4. Configure environment variables
 
-`.env` dosyasını oluştur ve aşağıdaki değişkenleri ayarla:
+Create `.env` file and set the following variables:
 
 ```env
 # Database
@@ -115,25 +114,25 @@ PORT=3000
 NODE_ENV=development
 ```
 
-### 5. Veritabanını oluştur
+### 5. Create database
 
 ```bash
-# PostgreSQL'de veritabanını oluştur
+# Create database in PostgreSQL
 createdb lexify
 ```
 
-### 6. Uygulamayı başlat
+### 6. Start the application
 
 ```bash
-# Geliştirme modu
+# Development mode
 npm run start:dev
 
-# Prodüksiyon modu
+# Production mode
 npm run build
 npm run start:prod
 ```
 
-### 7. Docker ile çalıştırma (opsiyonel)
+### 7. Run with Docker (optional)
 
 ```bash
 docker-compose up -d
@@ -141,9 +140,9 @@ docker-compose up -d
 
 ---
 
-## 📚 API Dokümantasyonu
+## 📚 API Documentation
 
-Uygulama başlatıldıktan sonra Swagger dokümantasyonuna erişmek için:
+Access Swagger documentation after starting the application:
 
 ```
 http://localhost:3000/api
@@ -151,47 +150,47 @@ http://localhost:3000/api
 
 ### API Endpoints
 
-#### Kullanıcı İşlemleri
+#### User Operations
 
-- `POST /users` - Yeni kullanıcı oluşturma (Admin)
-- `GET /users` - Tüm kullanıcıları listeleme (Admin)
-- `GET /users/:id` - Kullanıcı detaylarını görüntüleme (Kullanıcı/Admin)
-- `PUT /users/:id` - Kullanıcı bilgilerini güncelleme (Kullanıcı/Admin)
-- `DELETE /users/:id` - Kullanıcı silme (Admin)
+- `POST /users` - Create new user (Admin)
+- `GET /users` - List all users (Admin)
+- `GET /users/:id` - View user details (User/Admin)
+- `PUT /users/:id` - Update user information (User/Admin)
+- `DELETE /users/:id` - Delete user (Admin)
 
-#### Kelime İşlemleri
+#### Word Operations
 
-- `POST /words` - Yeni kelime ekleme
-- `GET /words` - Kullanıcının kelimelerini listeleme
-- `PUT /words/:id` - Kelime güncelleme
-- `DELETE /words/:id` - Kelime silme
+- `POST /words` - Add new word
+- `GET /words` - List user's words
+- `PUT /words/:id` - Update word
+- `DELETE /words/:id` - Delete word
 
-#### Çeviri İşlemleri
+#### Translation Operations
 
-- `POST /translation/translate` - Metin çevirisi yapma
-- `POST /translation/save-word` - Çevirilen kelimeyi kaydetme
+- `POST /translation/translate` - Translate text
+- `POST /translation/save-word` - Save translated word
 
-#### Dosya İşlemleri
+#### File Operations
 
-- `POST /files/upload/pdf` - PDF dosyası yükleme ve metin çıkarma
+- `POST /files/upload/pdf` - Upload PDF file and extract text
 
-#### Kitap İşlemleri
+#### Book Operations
 
-- `POST /books/upload/pdf` - PDF'den kitap oluşturma
-- `POST /books` - Yeni kitap oluşturma
-- `GET /books` - Kullanıcının kitaplarını listeleme
-- `GET /books/:id` - Kitap detaylarını görüntüleme
-- `DELETE /books/:id` - Kitap silme
+- `POST /books/upload/pdf` - Create book from PDF
+- `POST /books` - Create new book
+- `GET /books` - List user's books
+- `GET /books/:id` - View book details
+- `DELETE /books/:id` - Delete book
 
 ---
 
-## 🧪 Test
+## 🧪 Testing
 
 ```bash
-# Unit testler
+# Unit tests
 npm run test
 
-# E2E testler
+# E2E tests
 npm run test:e2e
 
 # Test coverage
@@ -200,6 +199,50 @@ npm run test:cov
 
 ---
 
-## 📝 Lisans
+## 🚀 Future Development Plans
 
-Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakın.
+### Mobile Application
+
+- [ ] React Native mobile app development
+- [ ] Offline mode support
+- [ ] Push notifications
+- [ ] Mobile-specific optimizations
+- [ ] Deep linking support
+
+### AI Integration
+
+- [ ] OpenAI integration for advanced translations
+- [ ] AI-powered word suggestions
+- [ ] Smart review system
+- [ ] Personalized learning paths
+- [ ] Speech recognition for pronunciation
+
+### Enhanced Features
+
+- [ ] Spaced repetition system
+- [ ] Gamification elements
+- [ ] Social features (friends, leaderboards)
+- [ ] Multiple language support
+- [ ] Advanced statistics and progress tracking
+
+### Performance & Security
+
+- [ ] Rate limiting
+- [ ] Advanced caching strategies
+- [ ] WebSocket support for real-time features
+- [ ] Enhanced security measures
+- [ ] Performance optimizations
+
+### Infrastructure
+
+- [ ] CI/CD pipeline setup
+- [ ] Automated testing
+- [ ] Monitoring and logging
+- [ ] Scalability improvements
+- [ ] Cloud deployment
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
