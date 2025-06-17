@@ -14,6 +14,7 @@ export class TranslationService {
         private readonly configService: ConfigService
     ) {
         this.libreTranslateUrl = this.configService.get<string>('LIBRETRANSLATE_URL') || 'http://libretranslate:5000';
+        this.logger.log(`LibreTranslate URL: ${this.libreTranslateUrl}`);
     }
 
     async translate(
@@ -22,6 +23,7 @@ export class TranslationService {
         targetLanguage: Language = Language.TR
     ): Promise<string> {
         try {
+            this.logger.log(`Translating text: ${text} from ${sourceLanguage} to ${targetLanguage}`);
             const response = await firstValueFrom(
                 this.httpService.post(`${this.libreTranslateUrl}/translate`, {
                     q: text,
@@ -30,9 +32,10 @@ export class TranslationService {
                 })
             );
 
+            this.logger.log(`Translation successful: ${response.data.translatedText}`);
             return response.data.translatedText;
         } catch (error) {
-            this.logger.error(`Translation error: ${error.message}`);
+            this.logger.error(`Translation error: ${error.message}`, error.stack);
             throw error;
         }
     }

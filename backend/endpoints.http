@@ -1,6 +1,5 @@
 @baseUrl = http://localhost:3000
-@auth_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJzdWIiOjEsImlhdCI6MTc1MDAxOTAxMSwiZXhwIjoxNzUwMTA1NDExfQ.Xl9UMl0N6WCU-q8wMQNocu6Q-ygS3Yz0ExcnzNhP6wc
-
+@auth_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJzdWIiOjEsImlhdCI6MTc1MDE4OTM0MywiZXhwIjoxNzUwMjc1NzQzfQ._yp5ycJR1w4WqxL9gOJi_uUzUoqOPUylq7y1QoAVQ7g
 ### Auth Endpoints ###
 
 # Kullanıcı Girişi
@@ -19,8 +18,9 @@ POST {{baseUrl}}/users
 Content-Type: application/json
 
 {
-    "name": "Test User",
-    "email": "test@example.com",
+    "name": "John Doe",
+    "email": "user@example.com",
+    "role": "user",
     "password": "Password123!"
 }
 
