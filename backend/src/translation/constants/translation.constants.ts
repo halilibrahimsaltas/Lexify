@@ -4,7 +4,7 @@ export const TRANSLATION_CONSTANTS = {
         KEY_PREFIX: 'translation:'
     },
     API: {
-        DEFAULT_URL: 'http://localhost:5000',
+        DEFAULT_URL: process.env.LIBRETRANSLATE_URL,
         ENDPOINTS: {
             TRANSLATE: '/translate',
             DETECT: '/detect',

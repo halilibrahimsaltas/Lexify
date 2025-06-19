@@ -3,6 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { Language } from './constants/language.enum';
 import { firstValueFrom } from 'rxjs';
+import { TRANSLATION_CONSTANTS } from './constants/translation.constants';
 
 @Injectable()
 export class TranslationService {

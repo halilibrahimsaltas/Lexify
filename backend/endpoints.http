@@ -1,5 +1,5 @@
 @baseUrl = http://localhost:3000
-@auth_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJzdWIiOjEsImlhdCI6MTc1MDE4OTM0MywiZXhwIjoxNzUwMjc1NzQzfQ._yp5ycJR1w4WqxL9gOJi_uUzUoqOPUylq7y1QoAVQ7g
+@auth_token =   jwt_token
 ### Auth Endpoints ###
 
 # Kullanıcı Girişi
@@ -64,7 +64,7 @@ Authorization: Bearer {{auth_token}}
 # Metin Çevirisi
 POST {{baseUrl}}/translation/translate
 Content-Type: application/json
-Authorization: Bearer {{auth_token}}
+
 
 {
     "text": "hello",
