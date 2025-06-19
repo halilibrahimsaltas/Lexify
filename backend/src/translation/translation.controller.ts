@@ -10,8 +10,6 @@ export class TranslationController {
     constructor(private readonly translationService: TranslationService) {}
 
     @Post('translate')
-    @UseGuards(JwtAuthGuard)
-    @ApiBearerAuth()
     @ApiHeader({
         name: 'Authorization',
         description: 'Bearer token for authentication',
