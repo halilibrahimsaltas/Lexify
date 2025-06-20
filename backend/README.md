@@ -109,7 +109,7 @@ JWT_SECRET=your_jwt_secret
 JWT_EXPIRATION=1d
 
 # LibreTranslate
-LIBRETRANSLATE_API_URL=http://localhost:5000
+LIBRETRANSLATE_API_URL=http://libretranslate:5000
 
 # App
 PORT=3000
