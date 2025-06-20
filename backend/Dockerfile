@@ -12,8 +12,6 @@ COPY . .
 # Build application
 RUN npm run build
 
-# Expose port
-EXPOSE ${PORT}
 
 # Start application
 CMD ["npm", "run", "start:prod"]

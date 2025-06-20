@@ -65,13 +65,11 @@ Authorization: Bearer {{auth_token}}
 POST {{baseUrl}}/translation/translate
 Content-Type: application/json
 
-
 {
-    "text": "hello",
-    "sourceLanguage": "en",
-    "targetLanguage": "tr"
+  "text": "hello",
+  "sourceLanguage": "en",
+  "targetLanguage": "tr"
 }
-
 ### Book Endpoints ###
 
 # PDF'den Kitap Oluştur
@@ -130,3 +128,5 @@ Content-Type: multipart/form-data
 Authorization: Bearer {{auth_token}}
 
 file: <AUDIO_DOSYASI>
+
+

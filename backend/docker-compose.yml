@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - ${PORT}:${PORT}
+      - '${PORT}:${PORT}'
     volumes:
       - .:/app
       - uploads:/app/uploads
@@ -15,6 +15,7 @@ services:
     environment:
       - POSTGRES_HOST=postgres
       - REDIS_HOST=redis
+      - LIBRETRANSLATE_URL=http://libretranslate:5000
     depends_on:
       postgres:
         condition: service_healthy
@@ -27,7 +28,7 @@ services:
   postgres:
     image: postgres:16
     ports:
-      - ${POSTGRES_PORT}:5432
+      - '${POSTGRES_PORT}:5432'
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -46,7 +47,7 @@ services:
   libretranslate:
     image: libretranslate/libretranslate:latest
     ports:
-      - 5000:5000
+      - '5000:5000'
     environment:
       - LT_LOAD_ONLY=en,tr
       - LT_DISABLE_WEB_UI=true
@@ -60,16 +61,16 @@ services:
     container_name: pgadmin_container
     image: dpage/pgadmin4
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+      - PGADMIN_CONFIG_SERVER_MODE=False
     ports:
       - '${PGADMIN_PORT:-5050}:80'
     volumes:
       - pgadmin:/var/lib/pgadmin
-    restart: unless-stopped
     networks:
       - backend-network
+    restart: unless-stopped
 
 networks:
   backend-network:
@@ -77,8 +78,5 @@ networks:
 
 volumes:
   postgres-data:
-    driver: local
   uploads:
-    driver: local
   pgadmin:
-    driver: local
