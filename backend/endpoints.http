@@ -62,13 +62,13 @@ Authorization: Bearer {{auth_token}}
 ### Translation Endpoints ###
 
 # Metin Çevirisi
-POST {{baseUrl}}/translation/translate
+POST http://localhost:5000/translate
 Content-Type: application/json
 
 {
-  "text": "hello",
-  "sourceLanguage": "en",
-  "targetLanguage": "tr"
+  "q": "hello",
+  "source": "en",
+  "target": "tr"
 }
 ### Book Endpoints ###
 

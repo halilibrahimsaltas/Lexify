@@ -6,7 +6,7 @@ import { TranslateDto } from './dto/translate.dto';
 @Injectable()
 export class TranslationService {
   private readonly logger = new Logger(TranslationService.name);
-  private readonly apiUrl = 'http://libretranslate:5000';
+  private readonly apiUrl = 'http://big_bear_libretranslate:5000';
 
   constructor(private readonly httpService: HttpService) {
     this.logger.log(`🔗 LibreTranslate bağlantısı: ${this.apiUrl}`);
