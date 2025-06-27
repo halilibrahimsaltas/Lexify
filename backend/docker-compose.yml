@@ -15,7 +15,6 @@ services:
     environment:
       - POSTGRES_HOST=postgres
       - REDIS_HOST=redis
-      - LIBRETRANSLATE_URL=http://big_bear_libretranslate:5000
     depends_on:
       postgres:
         condition: service_healthy
@@ -42,21 +41,6 @@ services:
       retries: 5
     restart: unless-stopped
 
-  libretranslate:
-    container_name: big_bear_libretranslate
-    image: libretranslate/libretranslate:v1.3.9
-    restart: unless-stopped
-    ports:
-      - '5000:5000'
-    environment:
-      - LT_API_KEYS=false
-      - LT_UPDATE_MODELS=true
-      - LT_LOAD_ONLY=en,tr
-    volumes:
-      - libretranslate_models:/home/libretranslate/.local
-    networks:
-      - backend-network
-
   pgadmin:
     container_name: pgadmin_container
     image: dpage/pgadmin4
@@ -80,5 +64,3 @@ volumes:
   postgres-data:
   uploads:
   pgadmin:
-  libretranslate_models:
-    driver: local
