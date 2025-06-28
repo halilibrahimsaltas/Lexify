@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { WordModule } from './word/word.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TranslationModule } from './translation/translation.module';
+import { DictionaryModule } from './dictionary/dictionary.module';
 import { BookModule } from './book/book.module';
 import { FileModule } from './file/file.module';
 
@@ -43,6 +44,7 @@ import { FileModule } from './file/file.module';
     UserModule,
     WordModule,
     TranslationModule,
+    DictionaryModule,
     BookModule,
     FileModule
   ],

@@ -5,11 +5,14 @@ export interface Word {
   word: string;
   translation: string;
   language: string;
-  definition?: string;
-  examples?: string[];
-  difficulty?: 'easy' | 'medium' | 'hard';
-  createdAt: string;
-  updatedAt: string;
+  category?: string;
+  type?: string;
+  alternatives?: Array<{
+    word: string;
+    translation: string;
+    category: string;
+    type: string;
+  }>;
 }
 
 export interface CreateWordRequest {
@@ -22,15 +25,19 @@ export interface CreateWordRequest {
 
 export interface SearchWordsRequest {
   query: string;
-  language?: string;
   limit?: number;
-  offset?: number;
 }
 
 export interface SearchWordsResponse {
   words: Word[];
   total: number;
   hasMore: boolean;
+}
+
+export interface DictionaryStats {
+  totalWords: number;
+  categories: { [key: string]: number };
+  isLoaded: boolean;
 }
 
 class DictionaryService {
@@ -43,12 +50,21 @@ class DictionaryService {
     }
   }
 
-  async getWordById(id: string): Promise<Word> {
+  async getWord(word: string): Promise<Word> {
     try {
-      const response = await api.get(`/dictionary/words/${id}`);
+      const response = await api.get(`/dictionary/word/${word}`);
       return response.data;
     } catch (error) {
       throw new Error('Kelime bulunamadı');
+    }
+  }
+
+  async getDictionaryStats(): Promise<DictionaryStats> {
+    try {
+      const response = await api.get('/dictionary/stats');
+      return response.data;
+    } catch (error) {
+      throw new Error('Sözlük istatistikleri alınamadı');
     }
   }
 

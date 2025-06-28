@@ -2,21 +2,37 @@ import api from './api';
 
 export interface TranslationRequest {
   text: string;
-  sourceLanguage: string;
-  targetLanguage: string;
 }
 
 export interface TranslationResponse {
-  translatedText: string;
-  sourceLanguage: string;
-  targetLanguage: string;
-  confidence: number;
+  originalText: string;
+  translatedText: string | null;
+  alternatives: Array<{
+    word: string;
+    translation: string;
+    category: string;
+    type: string;
+  }>;
+  groupedResults?: any;
+  totalResults: number;
+  message?: string;
 }
 
-export interface Language {
-  code: string;
-  name: string;
-  nativeName: string;
+export interface SearchWordResponse {
+  searchTerm: string;
+  results: Array<{
+    word: string;
+    translation: string;
+    category: string;
+    type: string;
+  }>;
+  totalResults: number;
+}
+
+export interface DictionaryStats {
+  totalWords: number;
+  categories: { [key: string]: number };
+  isLoaded: boolean;
 }
 
 class TranslationService {
@@ -29,21 +45,21 @@ class TranslationService {
     }
   }
 
-  async getSupportedLanguages(): Promise<Language[]> {
+  async searchWord(word: string): Promise<SearchWordResponse> {
     try {
-      const response = await api.get('/translation/languages');
+      const response = await api.get(`/translation/search/${word}`);
       return response.data;
     } catch (error) {
-      throw new Error('Desteklenen diller alınamadı');
+      throw new Error('Kelime arama başarısız');
     }
   }
 
-  async detectLanguage(text: string): Promise<string> {
+  async getDictionaryStats(): Promise<DictionaryStats> {
     try {
-      const response = await api.post('/translation/detect', { text });
-      return response.data.language;
+      const response = await api.get('/translation/stats');
+      return response.data;
     } catch (error) {
-      throw new Error('Dil algılanamadı');
+      throw new Error('Sözlük istatistikleri alınamadı');
     }
   }
 }

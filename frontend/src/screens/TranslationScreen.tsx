@@ -1,103 +1,63 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import translationService from '../services/translation.service';
 
 const TranslationScreen = () => {
   const [inputText, setInputText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
-  const [sourceLanguage, setSourceLanguage] = useState('en');
-  const [targetLanguage, setTargetLanguage] = useState('tr');
+  const [alternatives, setAlternatives] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const languages = [
-    { code: 'en', name: 'İngilizce' },
-    { code: 'tr', name: 'Türkçe' },
-  ];
+  const handleTranslate = async () => {
+    if (!inputText.trim()) {
+      Alert.alert('Hata', 'Lütfen çevirmek istediğiniz metni girin');
+      return;
+    }
 
-  const handleTranslate = () => {
-    // Burada gerçek API çağrısı yapılacak
-    if (inputText.trim()) {
-      setTranslatedText(`Çeviri: ${inputText} (${sourceLanguage} → ${targetLanguage})`);
+    setIsLoading(true);
+    try {
+      const result = await translationService.translate({ text: inputText });
+      
+      if (result.translatedText) {
+        setTranslatedText(result.translatedText);
+        setAlternatives(result.alternatives || []);
+      } else {
+        setTranslatedText('Çeviri bulunamadı');
+        setAlternatives([]);
+      }
+    } catch (error) {
+      Alert.alert('Hata', 'Çeviri yapılırken bir hata oluştu');
+      setTranslatedText('');
+      setAlternatives([]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const swapLanguages = () => {
-    setSourceLanguage(targetLanguage);
-    setTargetLanguage(sourceLanguage);
-    setInputText(translatedText.replace('Çeviri: ', ''));
+  const clearAll = () => {
+    setInputText('');
     setTranslatedText('');
+    setAlternatives([]);
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Çeviri</Text>
+        <TouchableOpacity style={styles.clearButton} onPress={clearAll}>
+          <Text style={styles.clearButtonText}>Temizle</Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Dil Seçimi */}
-        <View style={styles.languageContainer}>
-          <View style={styles.languageSelector}>
-            <Text style={styles.languageLabel}>Kaynak Dil:</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {languages.map((lang) => (
-                <TouchableOpacity
-                  key={lang.code}
-                  style={[
-                    styles.languageButton,
-                    sourceLanguage === lang.code && styles.selectedLanguage,
-                  ]}
-                  onPress={() => setSourceLanguage(lang.code)}
-                >
-                  <Text
-                    style={[
-                      styles.languageButtonText,
-                      sourceLanguage === lang.code && styles.selectedLanguageText,
-                    ]}
-                  >
-                    {lang.name}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-
-          <TouchableOpacity style={styles.swapButton} onPress={swapLanguages}>
-            <Text style={styles.swapButtonText}>⇄</Text>
-          </TouchableOpacity>
-
-          <View style={styles.languageSelector}>
-            <Text style={styles.languageLabel}>Hedef Dil:</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {languages.map((lang) => (
-                <TouchableOpacity
-                  key={lang.code}
-                  style={[
-                    styles.languageButton,
-                    targetLanguage === lang.code && styles.selectedLanguage,
-                  ]}
-                  onPress={() => setTargetLanguage(lang.code)}
-                >
-                  <Text
-                    style={[
-                      styles.languageButtonText,
-                      targetLanguage === lang.code && styles.selectedLanguageText,
-                    ]}
-                  >
-                    {lang.name}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-        </View>
-
         {/* Çeviri Alanları */}
         <View style={styles.translationContainer}>
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Metin Girin:</Text>
             <TextInput
               style={styles.textInput}
-              placeholder="Çevirmek istediğiniz metni yazın..."
+              placeholder="Çevirmek istediğiniz kelimeyi yazın..."
               value={inputText}
               onChangeText={setInputText}
               multiline
@@ -106,8 +66,16 @@ const TranslationScreen = () => {
             />
           </View>
 
-          <TouchableOpacity style={styles.translateButton} onPress={handleTranslate}>
-            <Text style={styles.translateButtonText}>Çevir</Text>
+          <TouchableOpacity 
+            style={[styles.translateButton, isLoading && styles.disabledButton]} 
+            onPress={handleTranslate}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text style={styles.translateButtonText}>Çevir</Text>
+            )}
           </TouchableOpacity>
 
           <View style={styles.outputContainer}>
@@ -118,6 +86,20 @@ const TranslationScreen = () => {
               </Text>
             </View>
           </View>
+
+          {/* Alternatif Çeviriler */}
+          {alternatives.length > 0 && (
+            <View style={styles.alternativesContainer}>
+              <Text style={styles.alternativesLabel}>Alternatif Çeviriler:</Text>
+              {alternatives.slice(0, 5).map((alt, index) => (
+                <View key={index} style={styles.alternativeItem}>
+                  <Text style={styles.alternativeWord}>{alt.word}</Text>
+                  <Text style={styles.alternativeTranslation}>{alt.translation}</Text>
+                  <Text style={styles.alternativeCategory}>{alt.category} • {alt.type}</Text>
+                </View>
+              ))}
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -134,62 +116,29 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
   },
+  clearButton: {
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    backgroundColor: '#ff6b6b',
+    borderRadius: 8,
+  },
+  clearButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
+  },
   content: {
     flex: 1,
     padding: 20,
-  },
-  languageContainer: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
-  },
-  languageSelector: {
-    marginBottom: 15,
-  },
-  languageLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 10,
-  },
-  languageButton: {
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#f0f0f0',
-    marginRight: 10,
-  },
-  selectedLanguage: {
-    backgroundColor: '#007AFF',
-  },
-  languageButtonText: {
-    color: '#666',
-    fontSize: 14,
-  },
-  selectedLanguageText: {
-    color: 'white',
-  },
-  swapButton: {
-    alignSelf: 'center',
-    backgroundColor: '#007AFF',
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginVertical: 10,
-  },
-  swapButtonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
   },
   translationContainer: {
     backgroundColor: 'white',
@@ -221,6 +170,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 15,
   },
+  disabledButton: {
+    backgroundColor: '#ccc',
+  },
   translateButtonText: {
     color: 'white',
     fontSize: 16,
@@ -247,6 +199,36 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     lineHeight: 24,
+  },
+  alternativesContainer: {
+    marginTop: 15,
+  },
+  alternativesLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 10,
+  },
+  alternativeItem: {
+    backgroundColor: '#f8f9fa',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  alternativeWord: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+  alternativeTranslation: {
+    fontSize: 14,
+    color: '#007AFF',
+    marginTop: 2,
+  },
+  alternativeCategory: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 4,
   },
 });
 

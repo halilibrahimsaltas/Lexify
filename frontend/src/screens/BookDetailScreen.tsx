@@ -146,11 +146,20 @@ const BookDetailScreen = ({ navigation, route }: any) => {
           <TouchableOpacity
             style={styles.actionButton}
             onPress={() => {
+              navigation.navigate('BookReader', { bookId: book.id });
+            }}
+          >
+            <Text style={styles.actionButtonText}>📖 Oku</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.actionButton, styles.secondaryButton]}
+            onPress={() => {
               // Burada çeviri özelliği eklenebilir
               Alert.alert('Bilgi', 'Çeviri özelliği yakında eklenecek');
             }}
           >
-            <Text style={styles.actionButtonText}>Çevir</Text>
+            <Text style={styles.secondaryButtonText}>Çevir</Text>
           </TouchableOpacity>
 
           <TouchableOpacity

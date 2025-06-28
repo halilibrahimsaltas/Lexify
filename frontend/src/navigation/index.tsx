@@ -11,6 +11,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 import BooksScreen from '../screens/BooksScreen';
 import AddBookScreen from '../screens/AddBookScreen';
 import BookDetailScreen from '../screens/BookDetailScreen';
+import BookReaderScreen from '../screens/BookReaderScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -46,6 +47,7 @@ const Navigation = () => {
             <Stack.Screen name="Books" component={BooksScreen} />
             <Stack.Screen name="AddBook" component={AddBookScreen} />
             <Stack.Screen name="BookDetail" component={BookDetailScreen} />
+            <Stack.Screen name="BookReader" component={BookReaderScreen} />
           </>
         ) : (
           // Non-authenticated routes
