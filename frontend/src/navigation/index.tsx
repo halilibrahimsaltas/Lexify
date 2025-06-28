@@ -8,6 +8,9 @@ import HomeScreen from '../screens/HomeScreen';
 import DictionaryScreen from '../screens/DictionaryScreen';
 import TranslationScreen from '../screens/TranslationScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import BooksScreen from '../screens/BooksScreen';
+import AddBookScreen from '../screens/AddBookScreen';
+import BookDetailScreen from '../screens/BookDetailScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -40,6 +43,9 @@ const Navigation = () => {
             <Stack.Screen name="Dictionary" component={DictionaryScreen} />
             <Stack.Screen name="Translation" component={TranslationScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="Books" component={BooksScreen} />
+            <Stack.Screen name="AddBook" component={AddBookScreen} />
+            <Stack.Screen name="BookDetail" component={BookDetailScreen} />
           </>
         ) : (
           // Non-authenticated routes

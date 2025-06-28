@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Switch, ScrollView, Alert, Ac
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../contexts/AuthContext';
 import userService, { User, UpdateUserRequest } from '../services/user.service';
+import wordService, { Word } from '../services/word.service';
 
 const ProfileScreen = ({ navigation }: any) => {
   const { user, logout, updateUser } = useAuth();
@@ -16,7 +17,7 @@ const ProfileScreen = ({ navigation }: any) => {
     email: '',
     password: '',
   });
-  const [userWords, setUserWords] = useState<string[]>([]);
+  const [userWords, setUserWords] = useState<Word[]>([]);
 
   useEffect(() => {
     if (user) {
@@ -33,7 +34,7 @@ const ProfileScreen = ({ navigation }: any) => {
     if (!user) return;
     
     try {
-      const words = await userService.getUserWords(user.id);
+      const words = await wordService.getUserWords();
       setUserWords(words);
     } catch (error) {
       console.log('User words loading error:', error);
@@ -101,27 +102,34 @@ const ProfileScreen = ({ navigation }: any) => {
     },
     {
       id: '2',
+      title: 'Kitaplarım',
+      subtitle: 'Eklediğiniz kitapları görüntüleyin',
+      icon: '📚',
+      onPress: () => navigation.navigate('Books'),
+    },
+    {
+      id: '3',
       title: 'Öğrenme İstatistikleri',
       subtitle: 'İlerlemenizi görüntüleyin',
       icon: '📊',
       onPress: () => Alert.alert('Bilgi', 'Bu özellik yakında eklenecek'),
     },
     {
-      id: '3',
+      id: '4',
       title: 'Favori Kelimeler',
       subtitle: 'Kaydettiğiniz kelimeleri görün',
       icon: '❤️',
       onPress: () => navigation.navigate('Dictionary'),
     },
     {
-      id: '4',
+      id: '5',
       title: 'Ayarlar',
       subtitle: 'Uygulama ayarlarını düzenleyin',
       icon: '⚙️',
       onPress: () => Alert.alert('Bilgi', 'Bu özellik yakında eklenecek'),
     },
     {
-      id: '5',
+      id: '6',
       title: 'Yardım',
       subtitle: 'Destek ve SSS',
       icon: '❓',
@@ -189,6 +197,20 @@ const ProfileScreen = ({ navigation }: any) => {
             <Text style={styles.statNumber}>85%</Text>
             <Text style={styles.statLabel}>Doğruluk Oranı</Text>
           </View>
+        </View>
+
+        {/* Kayıtlı Kelimeler */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Kayıtlı Kelimeler</Text>
+          {userWords.length === 0 ? (
+            <Text style={{ color: '#666' }}>Henüz kelime eklenmemiş.</Text>
+          ) : (
+            userWords.slice(0, 10).map((word) => (
+              <Text key={word.id} style={{ color: '#333', fontSize: 15, marginBottom: 4 }}>
+                {word.originalText} - {word.translatedText}
+              </Text>
+            ))
+          )}
         </View>
 
         {/* Menü Öğeleri */}
@@ -565,6 +587,12 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
+  },
+  section: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    marginBottom: 20,
   },
 });
 

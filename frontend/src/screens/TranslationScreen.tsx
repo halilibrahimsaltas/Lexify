@@ -11,9 +11,6 @@ const TranslationScreen = () => {
   const languages = [
     { code: 'en', name: 'İngilizce' },
     { code: 'tr', name: 'Türkçe' },
-    { code: 'de', name: 'Almanca' },
-    { code: 'fr', name: 'Fransızca' },
-    { code: 'es', name: 'İspanyolca' },
   ];
 
   const handleTranslate = () => {

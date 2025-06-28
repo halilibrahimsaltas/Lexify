@@ -22,6 +22,9 @@ export class BookService {
     const book = this.bookRepository.create({
       title: file.originalname.replace('.pdf', ''),
       content: extractedText,
+      author: 'Bilinmeyen Yazar', // PDF'den yazar bilgisi çıkarılamadığı için varsayılan değer
+      filePath: filePath,
+      category: 'PDF Kitap', // Varsayılan kategori
       userId
     });
 

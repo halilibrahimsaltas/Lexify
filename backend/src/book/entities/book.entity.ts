@@ -13,6 +13,18 @@ export class Book {
     content: string;
 
     @Column()
+    author: string;
+
+    @Column({ nullable: true })
+    coverImage?: string;
+
+    @Column()
+    filePath: string;
+
+    @Column()
+    category: string;
+
+    @Column()
     userId: number;
 
     @ManyToOne(() => User)

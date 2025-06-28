@@ -26,6 +26,13 @@ const HomeScreen = ({ navigation }: any) => {
           
           <TouchableOpacity 
             style={styles.button}
+            onPress={() => navigation.navigate('Books')}
+          >
+            <Text style={styles.buttonText}>Kitaplarım</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.button}
             onPress={() => navigation.navigate('Profile')}
           >
             <Text style={styles.buttonText}>Profil</Text>

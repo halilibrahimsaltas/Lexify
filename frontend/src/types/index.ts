@@ -5,6 +5,9 @@ export type RootStackParamList = {
   Dictionary: undefined;
   Translation: undefined;
   Profile: undefined;
+  Books: undefined;
+  AddBook: undefined;
+  BookDetail: { bookId: number };
 };
 
 // User Types
@@ -15,6 +18,29 @@ export interface User {
   role: 'user' | 'admin';
   createdAt: string;
   updatedAt: string;
+}
+
+// Book Types
+export interface Book {
+  id: number;
+  title: string;
+  content: string;
+  author: string;
+  coverImage?: string;
+  filePath: string;
+  category: string;
+  userId: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateBookRequest {
+  title: string;
+  content: string;
+  author: string;
+  coverImage?: string;
+  filePath: string;
+  category: string;
 }
 
 // App State Types
