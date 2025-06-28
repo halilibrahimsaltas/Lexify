@@ -77,18 +77,15 @@ export class UserService {
         }
     }
 
-    async findUserByEmail(email: string): Promise<User> {
+    async findUserByEmail(email: string): Promise<User | null> {
         const user = await this.userRepository.findOne({ 
             where: { email },
             relations: ['words']
         });
-        if (!user) {
-            throw new NotFoundException('User not found');
-        }
         return user;
     }
 
-    async getUserWords(userId: number): Promise<Word[]> {
+    async getUserWords(userId: number): Promise<string[]> {
         const user = await this.userRepository.findOne({ 
             where: { id: userId },
             relations: ['words']
@@ -96,6 +93,6 @@ export class UserService {
         if (!user) {
             throw new NotFoundException('User not found');
         }
-        return user.words;
+        return user.words.map(word => word.originalText);
     }
 }

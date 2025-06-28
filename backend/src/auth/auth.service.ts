@@ -1,9 +1,11 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
 import { User } from '../user/entities/user.entity';
+import { UserRole } from '../common/enum/user-role.enum';
 
 @Injectable()
 export class AuthService {
@@ -11,6 +13,41 @@ export class AuthService {
     constructor(
         private readonly jwtService: JwtService,
         private readonly userService: UserService) {}
+
+    async register(registerDto: RegisterDto) {
+        console.log('Registration attempt for:', registerDto.email);
+        
+        // Check if user already exists
+        const existingUser = await this.userService.findUserByEmail(registerDto.email);
+        if (existingUser) {
+            console.log('Registration failed - user already exists');
+            throw new ConflictException('User with this email already exists');
+        }
+
+        // Hash password
+        const hashedPassword = await this.hashPassword(registerDto.password);
+
+        // Create user with default role
+        const createUserDto = {
+            ...registerDto,
+            role: UserRole.USER,
+        };
+
+        const newUser = await this.userService.createUser(createUserDto);
+        console.log('Registration successful for:', newUser.email);
+
+        // Generate JWT token
+        const payload = { email: newUser.email, sub: newUser.id };
+        return {
+            access_token: this.jwtService.sign(payload),
+            user: {
+                id: newUser.id,
+                email: newUser.email,
+                name: newUser.name,
+                role: newUser.role,
+            },
+        };
+    }
 
     async validateUser(email: string, password: string): Promise<Omit<User, 'password'> | null> {
         try {
@@ -57,6 +94,7 @@ export class AuthService {
                 id: user.id,
                 email: user.email,
                 name: user.name,
+                role: user.role,
             },
         };
     }

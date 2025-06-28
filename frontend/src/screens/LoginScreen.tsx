@@ -1,29 +1,76 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuth } from '../contexts/AuthContext';
 
-const LoginScreen = ({ navigation }: any) => {
+const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
   const [isLogin, setIsLogin] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = () => {
+  const { login, register } = useAuth();
+
+  const validateForm = () => {
     if (!email.trim() || !password.trim()) {
       Alert.alert('Hata', 'Lütfen tüm alanları doldurun');
-      return;
+      return false;
     }
 
-    // Burada gerçek API çağrısı yapılacak
-    console.log('Giriş yapılıyor:', { email, password });
-    
-    // Başarılı giriş sonrası ana sayfaya yönlendir
-    navigation.replace('Home');
+    if (!isLogin && !name.trim()) {
+      Alert.alert('Hata', 'Lütfen adınızı girin');
+      return false;
+    }
+
+    // Email formatı kontrolü
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert('Hata', 'Geçerli bir e-posta adresi girin');
+      return false;
+    }
+
+    // Şifre uzunluğu kontrolü (backend DTO'ya uygun)
+    if (password.length < 8) {
+      Alert.alert('Hata', 'Şifre en az 8 karakter olmalıdır');
+      return false;
+    }
+
+    // İsim uzunluğu kontrolü (backend DTO'ya uygun)
+    if (!isLogin && (name.length < 2 || name.length > 50)) {
+      Alert.alert('Hata', 'İsim 2-50 karakter arasında olmalıdır');
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+
+    setLoading(true);
+    try {
+      if (isLogin) {
+        // Giriş işlemi
+        await login(email, password);
+        Alert.alert('Başarılı', 'Giriş yapıldı');
+      } else {
+        // Kayıt işlemi
+        await register(email, password, name);
+        Alert.alert('Başarılı', 'Hesap oluşturuldu');
+      }
+    } catch (error: any) {
+      Alert.alert('Hata', error.message || 'Bir hata oluştu');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const toggleMode = () => {
     setIsLogin(!isLogin);
     setEmail('');
     setPassword('');
+    setName('');
   };
 
   return (
@@ -40,6 +87,20 @@ const LoginScreen = ({ navigation }: any) => {
 
         {/* Form */}
         <View style={styles.form}>
+          {!isLogin && (
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Ad Soyad</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Adınızı ve soyadınızı girin"
+                value={name}
+                onChangeText={setName}
+                autoCapitalize="words"
+                autoCorrect={false}
+              />
+            </View>
+          )}
+
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>E-posta</Text>
             <TextInput
@@ -57,7 +118,7 @@ const LoginScreen = ({ navigation }: any) => {
             <Text style={styles.inputLabel}>Şifre</Text>
             <TextInput
               style={styles.input}
-              placeholder="Şifrenizi girin"
+              placeholder="Şifrenizi girin (en az 8 karakter)"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -71,10 +132,18 @@ const LoginScreen = ({ navigation }: any) => {
             </TouchableOpacity>
           )}
 
-          <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-            <Text style={styles.submitButtonText}>
-              {isLogin ? 'Giriş Yap' : 'Kayıt Ol'}
-            </Text>
+          <TouchableOpacity 
+            style={[styles.submitButton, loading && styles.submitButtonDisabled]} 
+            onPress={handleSubmit}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text style={styles.submitButtonText}>
+                {isLogin ? 'Giriş Yap' : 'Kayıt Ol'}
+              </Text>
+            )}
           </TouchableOpacity>
         </View>
 
@@ -83,7 +152,7 @@ const LoginScreen = ({ navigation }: any) => {
           <Text style={styles.footerText}>
             {isLogin ? 'Hesabınız yok mu?' : 'Zaten hesabınız var mı?'}
           </Text>
-          <TouchableOpacity onPress={toggleMode}>
+          <TouchableOpacity onPress={toggleMode} disabled={loading}>
             <Text style={styles.footerLink}>
               {isLogin ? 'Kayıt olun' : 'Giriş yapın'}
             </Text>
@@ -93,7 +162,7 @@ const LoginScreen = ({ navigation }: any) => {
         {/* Sosyal Giriş */}
         <View style={styles.socialContainer}>
           <Text style={styles.socialText}>veya</Text>
-          <TouchableOpacity style={styles.socialButton}>
+          <TouchableOpacity style={styles.socialButton} disabled={loading}>
             <Text style={styles.socialButtonText}>Google ile devam et</Text>
           </TouchableOpacity>
         </View>
@@ -164,6 +233,9 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
+  },
+  submitButtonDisabled: {
+    backgroundColor: '#ccc',
   },
   submitButtonText: {
     color: 'white',

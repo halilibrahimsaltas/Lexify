@@ -63,8 +63,17 @@ export class UserController {
     @Get('email/:email')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
-    findUserByEmail(@Param('email') email: string): Promise<User> {
+    findUserByEmail(@Param('email') email: string): Promise<User | null> {
         return this.userService.findUserByEmail(email);
+    }
+
+    @Get(':id/words')
+    @UseGuards(JwtAuthGuard, OwnerOrRolesGuard)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Get user words (Owner or Admin)' })
+    @ApiResponse({ status: 200, description: 'Return user words' })
+    getUserWords(@Param('id', ParseIntPipe) id: number) {
+        return this.userService.getUserWords(id);
     }
 }
 

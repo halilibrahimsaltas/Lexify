@@ -1,6 +1,7 @@
 import { Controller, Post, Body, UseGuards, Get, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto'; 
+import { RegisterDto } from './dto/register.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
@@ -10,6 +11,15 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 export class AuthController {
 
     constructor( private readonly authService: AuthService ) {}
+
+    @Post('register')
+    @ApiOperation({ summary: 'User registration' })
+    @ApiResponse({ status: 201, description: 'Registration successful' })
+    @ApiResponse({ status: 400, description: 'Bad request' })
+    @ApiResponse({ status: 409, description: 'User already exists' })
+    async register(@Body() registerDto: RegisterDto) {
+        return this.authService.register(registerDto);
+    }
 
     @UseGuards(LocalAuthGuard)
     @Post('login')
@@ -27,6 +37,16 @@ export class AuthController {
     @ApiResponse({ status: 200, description: 'Return user profile' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     getProfile(@Request() req) {
+        return req.user;
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('me')
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Get current user info' })
+    @ApiResponse({ status: 200, description: 'Return current user info' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    getMe(@Request() req) {
         return req.user;
     }
 }
