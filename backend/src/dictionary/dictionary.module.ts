@@ -5,6 +5,5 @@ import { TranslationModule } from '../translation/translation.module';
 @Module({
   imports: [TranslationModule],
   controllers: [DictionaryController],
-  exports: [DictionaryController],
 })
 export class DictionaryModule {} 

@@ -25,11 +25,16 @@ export class FileService {
 
     async extractTextFromPdf(filePath: string): Promise<string> {
         const dataBuffer = await fs.promises.readFile(filePath);
-        const data = await pdf(dataBuffer, {
+        
+        // PDF parse options - Java'daki PdfExtractor ayarlarına benzer
+        const options = {
             pagerender: this.renderPage,
-            max: 0 // Tüm sayfaları işle
-        });
+            max: 0, // Tüm sayfaları işle
+            normalizeWhitespace: true,
+            disableCombineTextItems: false
+        };
 
+        const data = await pdf(dataBuffer, options);
         return this.formatExtractedText(data.text);
     }
 
@@ -56,13 +61,15 @@ export class FileService {
 
     private formatExtractedText(text: string): string {
         return text
-            // Birden fazla boş satırı tek satıra indir
+            // Birden fazla boş satırı tek satıra indir (Java'daki (?m)^\\s+$ mantığı)
             .replace(/^\s+$/gm, '')
             .replace(/\n{3,}/g, '\n\n')
-            // Tire ile bölünmüş kelimeleri birleştir
+            // Tire ile bölünmüş kelimeleri birleştir (Java'daki (\\w+)-\\s*\n\\s*(\\w+) mantığı)
             .replace(/(\w+)-\s*\n\s*(\w+)/g, '$1$2')
-            // Cümle ortasındaki gereksiz satır sonlarını kaldır
+            // Cümle ortasındaki gereksiz satır sonlarını kaldır (Java'daki (?<![\\.\\!\\?])\\s*\n(?!\\s*[A-Z]) mantığı)
             .replace(/(?<![\\.\\!\\?])\s*\n(?!\s*[A-Z])/g, ' ')
+            // Son temizlik
+            .replace(/\n{3,}/g, '\n\n')
             .trim();
     }
 

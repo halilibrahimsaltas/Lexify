@@ -8,17 +8,15 @@ import {
   Alert,
   ActivityIndicator,
   TextInput,
-  Modal,
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as DocumentPicker from 'expo-document-picker';
 import bookService, { CreateBookRequest } from '../services/book.service';
+import api from '../services/api';
 
 const AddBookScreen = ({ navigation }: any) => {
   const [loading, setLoading] = useState(false);
-  const [uploadLoading, setUploadLoading] = useState(false);
-  const [manualModalVisible, setManualModalVisible] = useState(false);
   const [selectedFile, setSelectedFile] = useState<any>(null);
   const [formData, setFormData] = useState<CreateBookRequest>({
     title: '',
@@ -48,38 +46,43 @@ const AddBookScreen = ({ navigation }: any) => {
     }
   };
 
-  const handleUploadPdf = async () => {
+  const handleSubmit = async () => {
     if (!selectedFile) {
       Alert.alert('Hata', 'Lütfen bir PDF dosyası seçin');
       return;
     }
 
-    setUploadLoading(true);
-    try {
-      const book = await bookService.uploadPdf(selectedFile);
-      Alert.alert('Başarılı', 'Kitap başarıyla yüklendi', [
-        {
-          text: 'Tamam',
-          onPress: () => navigation.navigate('Books'),
-        },
-      ]);
-    } catch (error: any) {
-      Alert.alert('Hata', error.message || 'Kitap yüklenirken bir hata oluştu');
-    } finally {
-      setUploadLoading(false);
-    }
-  };
-
-  const handleManualSubmit = async () => {
-    if (!formData.title || !formData.content || !formData.author || !formData.category) {
+    if (!formData.title || !formData.author || !formData.category) {
       Alert.alert('Hata', 'Lütfen tüm gerekli alanları doldurun');
       return;
     }
 
     setLoading(true);
     try {
-      await bookService.createBook(formData);
-      setManualModalVisible(false);
+      const formDataToSend = new FormData();
+      formDataToSend.append('file', {
+        uri: selectedFile.uri,
+        type: 'application/pdf',
+        name: selectedFile.name,
+      } as any);
+      
+      // Kitap bilgilerini ekle
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('author', formData.author);
+      formDataToSend.append('category', formData.category);
+      if (formData.coverImage) {
+        formDataToSend.append('coverImage', formData.coverImage);
+      }
+      if (formData.filePath) {
+        formDataToSend.append('filePath', formData.filePath);
+      }
+
+      const response = await api.post('/books/upload/pdf-with-details', formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
       Alert.alert('Başarılı', 'Kitap başarıyla eklendi', [
         {
           text: 'Tamam',
@@ -102,6 +105,7 @@ const AddBookScreen = ({ navigation }: any) => {
       filePath: '',
       category: '',
     });
+    setSelectedFile(null);
   };
 
   return (
@@ -114,11 +118,11 @@ const AddBookScreen = ({ navigation }: any) => {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* PDF Yükleme Bölümü */}
+        {/* PDF Seçme Bölümü */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>PDF Dosyası Yükle</Text>
+          <Text style={styles.sectionTitle}>PDF Dosyası Seç</Text>
           <Text style={styles.sectionDescription}>
-            PDF dosyanızı yükleyerek otomatik olarak kitap oluşturun
+            PDF dosyanızı seçin. İçerik otomatik olarak çıkarılacak ve kitap bilgileriyle birlikte kaydedilecek.
           </Text>
 
           <TouchableOpacity style={styles.filePickerButton} onPress={handleFilePick}>
@@ -135,151 +139,90 @@ const AddBookScreen = ({ navigation }: any) => {
               </Text>
             </View>
           )}
-
-          <TouchableOpacity
-            style={[styles.uploadButton, !selectedFile && styles.uploadButtonDisabled]}
-            onPress={handleUploadPdf}
-            disabled={!selectedFile || uploadLoading}
-          >
-            {uploadLoading ? (
-              <ActivityIndicator color="white" size="small" />
-            ) : (
-              <Text style={styles.uploadButtonText}>PDF'yi Yükle</Text>
-            )}
-          </TouchableOpacity>
         </View>
 
-        {/* Ayırıcı */}
-        <View style={styles.divider}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>VEYA</Text>
-          <View style={styles.dividerLine} />
-        </View>
-
-        {/* Manuel Ekleme Bölümü */}
+        {/* Kitap Bilgileri Formu */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Manuel Kitap Ekle</Text>
+          <Text style={styles.sectionTitle}>Kitap Bilgileri</Text>
           <Text style={styles.sectionDescription}>
-            Kitap bilgilerini manuel olarak girin
+            Kitap bilgilerini girin. PDF içeriği otomatik olarak çıkarılacak.
           </Text>
 
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Kitap Başlığı *</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.title}
+              onChangeText={(text) => setFormData({ ...formData, title: text })}
+              placeholder="Kitap başlığını girin"
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Yazar *</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.author}
+              onChangeText={(text) => setFormData({ ...formData, author: text })}
+              placeholder="Yazar adını girin"
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Kategori *</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.category}
+              onChangeText={(text) => setFormData({ ...formData, category: text })}
+              placeholder="Örn: Dil Öğrenimi, Roman, Bilim"
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Kapak Resmi URL (Opsiyonel)</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.coverImage}
+              onChangeText={(text) => setFormData({ ...formData, coverImage: text })}
+              placeholder="https://example.com/cover.jpg"
+              keyboardType="url"
+              autoCapitalize="none"
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Dosya Yolu (Opsiyonel)</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.filePath}
+              onChangeText={(text) => setFormData({ ...formData, filePath: text })}
+              placeholder="/uploads/books/kitap-adi.pdf"
+            />
+          </View>
+        </View>
+
+        {/* Kaydet Butonu */}
+        <View style={styles.section}>
           <TouchableOpacity
-            style={styles.manualButton}
-            onPress={() => setManualModalVisible(true)}
+            style={[styles.saveButton, (!selectedFile || !formData.title || !formData.author || !formData.category) && styles.saveButtonDisabled]}
+            onPress={handleSubmit}
+            disabled={!selectedFile || !formData.title || !formData.author || !formData.category || loading}
           >
-            <Text style={styles.manualButtonText}>Manuel Ekle</Text>
+            {loading ? (
+              <ActivityIndicator color="white" size="small" />
+            ) : (
+              <Text style={styles.saveButtonText}>PDF'yi İşle ve Kitabı Kaydet</Text>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.resetButton}
+            onPress={resetForm}
+          >
+            <Text style={styles.resetButtonText}>Formu Temizle</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
-
-      {/* Manuel Ekleme Modal */}
-      <Modal
-        visible={manualModalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setManualModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Kitap Bilgileri</Text>
-              <TouchableOpacity onPress={() => setManualModalVisible(false)}>
-                <Text style={styles.modalClose}>✕</Text>
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView style={styles.modalBody}>
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Kitap Başlığı *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={formData.title}
-                  onChangeText={(text) => setFormData({ ...formData, title: text })}
-                  placeholder="Kitap başlığını girin"
-                />
-              </View>
-
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Yazar *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={formData.author}
-                  onChangeText={(text) => setFormData({ ...formData, author: text })}
-                  placeholder="Yazar adını girin"
-                />
-              </View>
-
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Kategori *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={formData.category}
-                  onChangeText={(text) => setFormData({ ...formData, category: text })}
-                  placeholder="Örn: Dil Öğrenimi, Roman, Bilim"
-                />
-              </View>
-
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Kapak Resmi URL (Opsiyonel)</Text>
-                <TextInput
-                  style={styles.input}
-                  value={formData.coverImage}
-                  onChangeText={(text) => setFormData({ ...formData, coverImage: text })}
-                  placeholder="https://example.com/cover.jpg"
-                  keyboardType="url"
-                  autoCapitalize="none"
-                />
-              </View>
-
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Dosya Yolu *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={formData.filePath}
-                  onChangeText={(text) => setFormData({ ...formData, filePath: text })}
-                  placeholder="/uploads/books/kitap-adi.pdf"
-                />
-              </View>
-
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Kitap İçeriği *</Text>
-                <TextInput
-                  style={[styles.input, styles.textArea]}
-                  value={formData.content}
-                  onChangeText={(text) => setFormData({ ...formData, content: text })}
-                  placeholder="Kitap içeriğini girin..."
-                  multiline
-                  numberOfLines={6}
-                  textAlignVertical="top"
-                />
-              </View>
-            </ScrollView>
-
-            <View style={styles.modalFooter}>
-              <TouchableOpacity
-                style={styles.modalButton}
-                onPress={() => {
-                  setManualModalVisible(false);
-                  resetForm();
-                }}
-              >
-                <Text style={styles.modalButtonText}>İptal</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.modalButtonPrimary]}
-                onPress={handleManualSubmit}
-                disabled={loading}
-              >
-                {loading ? (
-                  <ActivityIndicator color="white" size="small" />
-                ) : (
-                  <Text style={styles.modalButtonPrimaryText}>Kaydet</Text>
-                )}
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </SafeAreaView>
   );
 };
@@ -358,80 +301,6 @@ const styles = StyleSheet.create({
     color: '#666',
     marginBottom: 5,
   },
-  uploadButton: {
-    backgroundColor: '#007AFF',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  uploadButtonDisabled: {
-    backgroundColor: '#ccc',
-  },
-  uploadButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#e0e0e0',
-  },
-  dividerText: {
-    marginHorizontal: 15,
-    color: '#666',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  manualButton: {
-    backgroundColor: '#34C759',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  manualButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  // Modal Styles
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    borderRadius: 15,
-    width: '90%',
-    maxHeight: '80%',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  modalClose: {
-    fontSize: 24,
-    color: '#666',
-  },
-  modalBody: {
-    padding: 20,
-  },
   inputContainer: {
     marginBottom: 20,
   },
@@ -449,35 +318,28 @@ const styles = StyleSheet.create({
     fontSize: 16,
     backgroundColor: 'white',
   },
-  textArea: {
-    height: 120,
-    textAlignVertical: 'top',
-  },
-  modalFooter: {
-    flexDirection: 'row',
-    padding: 20,
-    borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
-  },
-  modalButton: {
-    flex: 1,
+  saveButton: {
+    backgroundColor: '#34C759',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
-    marginHorizontal: 5,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
+    marginBottom: 10,
   },
-  modalButtonPrimary: {
-    backgroundColor: '#007AFF',
-    borderColor: '#007AFF',
+  saveButtonDisabled: {
+    backgroundColor: '#ccc',
   },
-  modalButtonText: {
-    color: '#333',
+  saveButtonText: {
+    color: 'white',
     fontSize: 16,
     fontWeight: '600',
   },
-  modalButtonPrimaryText: {
+  resetButton: {
+    backgroundColor: '#FF3B30',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  resetButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
