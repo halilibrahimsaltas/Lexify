@@ -1,4 +1,5 @@
 import api from './api';
+import storageService from './storage.service';
 
 export interface Book {
   id: number;
@@ -9,30 +10,34 @@ export interface Book {
   updatedAt: string;
 }
 
-export interface CreateBookRequest {
-  title: string;
-  content: string;
-  author: string;
-  coverImage?: string;
-  filePath: string;
-  category: string;
-}
-
 class BookService {
   async uploadPdf(file: any): Promise<Book> {
+    console.log('📁 BookService - Dosya alındı:', file);
+    
     const formData = new FormData();
-    formData.append('file', file);
+
+    formData.append('file', {
+      uri: file.uri,
+      name: file.name || 'document.pdf',
+      type: file.mimeType || 'application/pdf',
+    } as any);
+
+    console.log('📁 BookService - FormData oluşturuldu');
+    console.log('📁 BookService - Dosya URI:', file.uri);
+    console.log('📁 BookService - Dosya adı:', file.name);
+    console.log('📁 BookService - Dosya tipi:', file.mimeType);
+
+    const token = await storageService.getAuthToken();
+    console.log('📁 BookService - Token alındı:', token ? 'VAR' : 'YOK');
 
     const response = await api.post('/books/upload/pdf', formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+        // ⚠️ Content-Type manuel yazılmaz
       },
     });
-    return response.data;
-  }
-
-  async createBook(bookData: CreateBookRequest): Promise<Book> {
-    const response = await api.post('/books', bookData);
+    
+    console.log('✅ BookService - Upload başarılı');
     return response.data;
   }
 
@@ -51,4 +56,4 @@ class BookService {
   }
 }
 
-export default new BookService(); 
+export default new BookService();

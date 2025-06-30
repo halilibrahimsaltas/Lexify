@@ -69,6 +69,21 @@ export class BookController {
         @Request() req,
         @UploadedFile() file: Express.Multer.File
     ) {
+        console.log('📁 Upload PDF - File received:', file ? 'YES' : 'NO');
+        console.log('📁 File details:', file);
+        
+        if (!file) {
+            throw new Error('No file uploaded');
+        }
+        
+        if (!file.originalname) {
+            throw new Error('File has no originalname');
+        }
+        
+        if (!file.buffer) {
+            throw new Error('File has no buffer');
+        }
+        
         return this.bookService.createFromPdf(req.user.sub, file);
     }
 

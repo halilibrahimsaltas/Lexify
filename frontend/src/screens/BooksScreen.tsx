@@ -93,7 +93,12 @@ const BooksScreen = ({ navigation }: any) => {
         >
           <Text style={styles.actionButtonText}>Görüntüle</Text>
         </TouchableOpacity>
-        
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => navigation.navigate('BookReader', { bookId: book.id })}
+        >
+          <Text style={styles.actionButtonText}>Oku</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           style={[styles.actionButton, styles.deleteButton]}
           onPress={() => handleDeleteBook(book.id)}
