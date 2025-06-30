@@ -1,0 +1,97 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
+    volumes:
+      - ./backend:/app
+      - backend-uploads:/app/uploads
+    env_file:
+      - .env
+    environment:
+      # Docker network içindeki servis isimleri
+      - POSTGRES_HOST=postgres
+      - REDIS_HOST=redis
+      # Portu .env dosyasından al
+      - PORT=${BACKEND_PORT}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - lexify-network
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "${FRONTEND_PORT_WEB}:8081"
+      - "${FRONTEND_PORT_GO}:19000"
+      - "${FRONTEND_PORT_DEBUGGER}:19001"
+    volumes:
+      - ./frontend:/app
+    env_file:
+      - .env
+    networks:
+      - lexify-network
+    depends_on:
+      - backend
+
+  postgres:
+    image: postgres:16
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - lexify-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7
+    ports:
+      - "${REDIS_PORT}:6379"
+    networks:
+      - lexify-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+      - PGADMIN_CONFIG_SERVER_MODE=False
+    ports:
+      - "${PGADMIN_PORT}:80"
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    networks:
+      - lexify-network
+    restart: unless-stopped
+
+networks:
+  lexify-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  backend-uploads:
+  pgadmin:
