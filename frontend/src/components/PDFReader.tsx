@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -7,140 +7,50 @@ import {
   ScrollView,
   Dimensions,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
-
-interface PDFPage {
-  id: number;
-  content: string;
-  pageNumber: number;
-}
 
 interface PDFReaderProps {
   content: string;
   title: string;
+  currentPage: number;
+  totalPages: number;
+  isLoading?: boolean;
   onPageChange?: (pageNumber: number) => void;
   onWordSelect?: (word: string) => void;
 }
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+const { height: screenHeight } = Dimensions.get('window');
 
 const PDFReader: React.FC<PDFReaderProps> = ({
   content,
   title,
+  currentPage,
+  totalPages,
+  isLoading = false,
   onPageChange,
   onWordSelect,
 }) => {
-  const [pages, setPages] = useState<PDFPage[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
-  const [fontSize, setFontSize] = useState(16);
-  const [lineHeight, setLineHeight] = useState(24);
-
-  // Sayfa başına yaklaşık karakter sayısı (ekran boyutuna göre)
-  const charsPerPage = Math.floor((screenWidth - 40) / 10) * Math.floor((screenHeight - 200) / (lineHeight + 4));
-
-  useEffect(() => {
-    processContent();
-  }, [content, fontSize, lineHeight]);
-
-  const processContent = () => {
-    setIsLoading(true);
-    
-    try {
-      // İçeriği paragraflara böl
-      const paragraphs = content.split('\n\n').filter(p => p.trim());
-      const processedPages: PDFPage[] = [];
-      let currentPageContent = '';
-      let pageNumber = 1;
-
-      paragraphs.forEach((paragraph, index) => {
-        const paragraphWithBreaks = paragraph.replace(/\n/g, ' ');
-        
-        if ((currentPageContent + paragraphWithBreaks).length > charsPerPage) {
-          if (currentPageContent.trim()) {
-            processedPages.push({
-              id: pageNumber,
-              content: currentPageContent.trim(),
-              pageNumber,
-            });
-            pageNumber++;
-            currentPageContent = paragraphWithBreaks + '\n\n';
-          } else {
-            // Çok uzun paragraf, kelime kelime böl
-            const words = paragraphWithBreaks.split(' ');
-            let tempContent = '';
-            
-            words.forEach(word => {
-              if ((tempContent + word + ' ').length > charsPerPage) {
-                if (tempContent.trim()) {
-                  processedPages.push({
-                    id: pageNumber,
-                    content: tempContent.trim(),
-                    pageNumber,
-                  });
-                  pageNumber++;
-                  tempContent = word + ' ';
-                } else {
-                  tempContent = word + ' ';
-                }
-              } else {
-                tempContent += word + ' ';
-              }
-            });
-            
-            currentPageContent = tempContent;
-          }
-        } else {
-          currentPageContent += paragraphWithBreaks + '\n\n';
-        }
-      });
-
-      // Son sayfayı ekle
-      if (currentPageContent.trim()) {
-        processedPages.push({
-          id: pageNumber,
-          content: currentPageContent.trim(),
-          pageNumber,
-        });
-      }
-
-      setPages(processedPages);
-    } catch (error) {
-      Alert.alert('Hata', 'İçerik işlenirken bir hata oluştu');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= pages.length) {
-      setCurrentPage(newPage);
-      onPageChange?.(newPage);
-    }
-  };
+  const [fontSize, setFontSize] = React.useState(16);
+  const [lineHeight, setLineHeight] = React.useState(24);
 
   const handleWordPress = (word: string) => {
     onWordSelect?.(word);
   };
 
   const renderTextWithClickableWords = (text: string) => {
-    // Metni kelimelere böl ve tıklanabilir hale getir
     const words = text.split(/(\s+)/);
-    
     return words.map((word, index) => {
-      // Boşlukları ve noktalama işaretlerini atla
       if (word.trim() === '' || /^[^\w\s]*$/.test(word)) {
         return <Text key={index} style={[styles.pageText, { fontSize, lineHeight }]}>{word}</Text>;
       }
-      
       return (
         <TouchableOpacity
           key={index}
           onPress={() => handleWordPress(word)}
           style={styles.wordContainer}
         >
-          <Text style={[styles.pageText, styles.clickableWord, { fontSize, lineHeight }]}>
+          <Text style={[styles.pageText, styles.clickableWord, { fontSize, lineHeight }]}
+          >
             {word}
           </Text>
         </TouchableOpacity>
@@ -162,12 +72,12 @@ const PDFReader: React.FC<PDFReaderProps> = ({
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#007AFF" />
-        <Text style={styles.loadingText}>Sayfalar hazırlanıyor...</Text>
+        <Text style={styles.loadingText}>Sayfa yükleniyor...</Text>
       </View>
     );
   }
 
-  if (pages.length === 0) {
+  if (!content) {
     return (
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyText}>İçerik bulunamadı</Text>
@@ -175,34 +85,16 @@ const PDFReader: React.FC<PDFReaderProps> = ({
     );
   }
 
-  const currentPageData = pages.find(p => p.pageNumber === currentPage);
-
   return (
     <View style={styles.container}>
-      {/* Başlık */}
-      <View style={styles.header}>
-        <Text style={styles.title} numberOfLines={1}>{title}</Text>
-        <Text style={styles.pageInfo}>
-          Sayfa {currentPage} / {pages.length}
-        </Text>
-      </View>
-
-      {/* Font Boyutu Kontrolleri */}
-      <View style={styles.controls}>
-        <TouchableOpacity style={styles.controlButton} onPress={decreaseFontSize}>
-          <Text style={styles.controlButtonText}>A-</Text>
-        </TouchableOpacity>
-        <Text style={styles.fontSizeText}>{fontSize}px</Text>
-        <TouchableOpacity style={styles.controlButton} onPress={increaseFontSize}>
-          <Text style={styles.controlButtonText}>A+</Text>
-        </TouchableOpacity>
-      </View>
+    
+    
 
       {/* Sayfa İçeriği */}
       <ScrollView style={styles.pageContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.pageContent}>
           <View style={styles.textContainer}>
-            {renderTextWithClickableWords(currentPageData?.content || '')}
+            {renderTextWithClickableWords(content)}
           </View>
         </View>
       </ScrollView>
@@ -211,7 +103,7 @@ const PDFReader: React.FC<PDFReaderProps> = ({
       <View style={styles.navigation}>
         <TouchableOpacity
           style={[styles.navButton, currentPage === 1 && styles.disabledButton]}
-          onPress={() => handlePageChange(currentPage - 1)}
+          onPress={() => onPageChange && onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
           <Text style={styles.navButtonText}>← Önceki</Text>
@@ -219,14 +111,14 @@ const PDFReader: React.FC<PDFReaderProps> = ({
 
         <View style={styles.pageIndicator}>
           <Text style={styles.pageIndicatorText}>
-            {currentPage} / {pages.length}
+            {currentPage} / {totalPages}
           </Text>
         </View>
 
         <TouchableOpacity
-          style={[styles.navButton, currentPage === pages.length && styles.disabledButton]}
-          onPress={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === pages.length}
+          style={[styles.navButton, currentPage === totalPages && styles.disabledButton]}
+          onPress={() => onPageChange && onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
         >
           <Text style={styles.navButtonText}>Sonraki →</Text>
         </TouchableOpacity>
@@ -377,4 +269,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PDFReader; 
+export default PDFReader;

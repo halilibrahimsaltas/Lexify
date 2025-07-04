@@ -1,117 +1,99 @@
-import { Controller, Post, Get, Delete, Body, Param, UseGuards, UseInterceptors, UploadedFile, Request, ParseIntPipe, Query } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  Request,
+  ParseIntPipe,
+  Query,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { BookService } from './book.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+
+import {
+  ApiTags,
+  ApiOperation,
+  ApiConsumes,
+  ApiBody,
+  ApiBearerAuth,
+  ApiQuery,
+  ApiParam,
+} from '@nestjs/swagger';
 
 @ApiTags('books')
 @Controller('books')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class BookController {
-    constructor(private readonly bookService: BookService) {}
+  constructor(private readonly bookService: BookService) {}
 
-    @Post('upload/pdf-with-details')
-    @UseInterceptors(FileInterceptor('file'))
-    @ApiOperation({ summary: 'Upload PDF with book details and create book' })
-    @ApiConsumes('multipart/form-data')
-    @ApiBody({
-        schema: {
-            type: 'object',
-            properties: {
-                file: {
-                    type: 'string',
-                    format: 'binary',
-                },
-                title: {
-                    type: 'string',
-                },
-                author: {
-                    type: 'string',
-                },
-                category: {
-                    type: 'string',
-                },
-                coverImage: {
-                    type: 'string',
-                },
-                filePath: {
-                    type: 'string',
-                },
-            },
+  @Post('upload/pdf')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'Upload PDF + book details' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Kitap bilgileri ve PDF dosyası',
+    type: 'multipart/form-data',
+    schema: {
+      type: 'object',
+      properties: {
+        file: { type: 'string', format: 'binary' },
+        title: { type: 'string', example: 'English Grammar' },
+        author: { type: 'string', example: 'John Doe' },
+        category: { type: 'string', example: 'Language' },
+        coverImage: {
+          type: 'string',
+          example: 'https://example.com/cover.jpg',
         },
-    })
-    async uploadPdfWithDetails(
-        @Request() req,
-        @UploadedFile() file: Express.Multer.File,
-        @Body() bookDetails: any
-    ) {
-        return this.bookService.createFromPdfWithDetails(req.user.sub, file, bookDetails);
-    }
+      },
+      required: ['file', 'title', 'author', 'category'],
+    },
+  })
+  async uploadPdfWithDetails(
+    @Request() req,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() bookDetails: CreateBookDto,
+  ) {
+    return this.bookService.createFullBookWithPages(
+      req.user.sub,
+      file,
+      bookDetails,
+    );
+  }
 
-    @Post('upload/pdf')
-    @UseInterceptors(FileInterceptor('file'))
-    @ApiOperation({ summary: 'Upload PDF and create book' })
-    @ApiConsumes('multipart/form-data')
-    @ApiBody({
-        schema: {
-            type: 'object',
-            properties: {
-                file: {
-                    type: 'string',
-                    format: 'binary',
-                },
-            },
-        },
-    })
-    async uploadPdf(
-        @Request() req,
-        @UploadedFile() file: Express.Multer.File
-    ) {
-        return this.bookService.createFromPdf(req.user.sub, file);
-    }
+  @Get(':id')
+  @ApiOperation({ summary: 'Get a book by id' })
+  @ApiParam({ name: 'id', type: Number, description: 'Kitap ID değeri' })
+  async findOne(@Request() req, @Param('id', ParseIntPipe) id: number) {
+    return this.bookService.findOneByUser(id, req.user.sub);
+  }
 
-    @Post()
-    @ApiOperation({ summary: 'Create a new book' })
-    async create(
-        @Request() req,
-        @Body() createBookDto: CreateBookDto
-    ) {
-        return this.bookService.create(createBookDto, req.user.sub);
-    }
+  @Get(':id/content')
+  @ApiOperation({ summary: 'Get book content with pagination' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'İstenen sayfa numarası',
+  })
+  async getBookContent(
+    @Request() req,
+    @Param('id', ParseIntPipe) id: number,
+    @Query('page') page?: number,
+  ) {
+    return this.bookService.getBookPage(id, req.user.sub, Number(page) || 1);
+  }
 
-    @Get()
-    @ApiOperation({ summary: 'Get all books for current user' })
-    async findAll(@Request() req) {
-        return this.bookService.findAllByUserId(req.user.sub);
-    }
-
-    @Get(':id')
-    @ApiOperation({ summary: 'Get a book by id' })
-    async findOne(
-        @Request() req,
-        @Param('id', ParseIntPipe) id: number
-    ) {
-        return this.bookService.findOne(id, req.user.sub);
-    }
-
-    @Get(':id/content')
-    @ApiOperation({ summary: 'Get book content with pagination' })
-    async getBookContent(
-        @Request() req,
-        @Param('id', ParseIntPipe) id: number,
-        @Query('page') page?: number
-    ) {
-        return this.bookService.getBookContentWithProgress(id, req.user.sub, page);
-    }
-
-    @Delete(':id')
-    @ApiOperation({ summary: 'Delete a book' })
-    async remove(
-        @Request() req,
-        @Param('id', ParseIntPipe) id: number
-    ) {
-        return this.bookService.remove(id, req.user.sub);
-    }
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a book' })
+  async remove(@Request() req, @Param('id', ParseIntPipe) id: number) {
+    return this.bookService.remove(id, req.user.sub);
+  }
 }

@@ -12,7 +12,7 @@ export class LoginDto {
 
   @ApiProperty({
     description: 'User password',
-    example: 'password123',
+    example: 'Password123!',
     minLength: 6,
   })
   @IsString()
@@ -20,4 +20,3 @@ export class LoginDto {
   @MinLength(6)
   password: string;
 }
-

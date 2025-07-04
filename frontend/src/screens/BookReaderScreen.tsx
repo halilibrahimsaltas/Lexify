@@ -212,10 +212,10 @@ const styles = StyleSheet.create({
   },
   bookContentContainer: {
     flex: 1,
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    backgroundColor: '#FFF8E1',
+    borderRadius: 8,
     margin: 16,
-    padding: 24,
+    padding: 15,
     elevation: 2,
     shadowColor: '#000',
     shadowOpacity: 0.06,
@@ -226,11 +226,10 @@ const styles = StyleSheet.create({
   },
   bookContentText: {
     fontSize: 18,
-    color: '#2c3e50',
-    lineHeight: 32,
-    fontFamily: 'serif',
+    color: '#4B3F2F', // koyu kahverengi
+    lineHeight: 28,
     textAlign: 'justify',
-    letterSpacing: 0.2,
+    fontFamily: 'serif', // varsayılan serif fontu, istersen Google Fonts ile özel font entegre edilir
   },
   wordText: {
     fontSize: 18,

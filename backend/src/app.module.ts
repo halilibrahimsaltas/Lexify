@@ -10,6 +10,7 @@ import { TranslationModule } from './translation/translation.module';
 import { DictionaryModule } from './dictionary/dictionary.module';
 import { BookModule } from './book/book.module';
 import { FileModule } from './file/file.module';
+import { BookProgressModule } from './book-progress/book-progress.module';
 
 @Module({
   imports: [
@@ -46,7 +47,8 @@ import { FileModule } from './file/file.module';
     TranslationModule,
     DictionaryModule,
     BookModule,
-    FileModule
+    FileModule,
+    BookProgressModule
   ],
   controllers: [AppController],
   providers: [AppService],

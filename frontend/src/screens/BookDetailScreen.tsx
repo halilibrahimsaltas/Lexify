@@ -1,60 +1,86 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
   Alert,
   ActivityIndicator,
-  Share,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import bookService, { Book } from '../services/book.service';
+import bookService from '../services/book.service';
+import WordSelector from '../components/WordSelector';
 
-const BookDetailScreen = ({ navigation, route }: any) => {
+const { height: screenHeight } = Dimensions.get('window');
+
+const BookReaderScreen = ({ navigation, route }: any) => {
   const { bookId } = route.params;
-  const [book, setBook] = useState<Book | null>(null);
+  const [book, setBook] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [pageContent, setPageContent] = useState('');
+  const [selectedWord, setSelectedWord] = useState('');
+  const [wordSelectorVisible, setWordSelectorVisible] = useState(false);
 
   useEffect(() => {
-    loadBook();
+    fetchAll();
   }, [bookId]);
 
-  const loadBook = async () => {
+  useEffect(() => {
+    if (book && !loading) {
+      fetchPage(currentPage);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage]);
+
+  const fetchAll = async () => {
+    setLoading(true);
+    setError(null);
     try {
       const bookData = await bookService.getBook(bookId);
       setBook(bookData);
-    } catch (error: any) {
-      Alert.alert('Hata', error.message || 'Kitap yüklenirken bir hata oluştu');
+      const response = await bookService.getBookContent(bookId, 1);
+      setPageContent(response.content);
+      setTotalPages(response.totalPages);
+      setCurrentPage(1);
+    } catch (err: any) {
+      setError('Kitap veya ilk sayfa yüklenemedi.');
       navigation.goBack();
     } finally {
       setLoading(false);
     }
   };
 
-  const handleShare = async () => {
-    if (!book) return;
-
+  const fetchPage = async (page: number) => {
+    setLoading(true);
+    setError(null);
     try {
-      await Share.share({
-        message: `${book.title}\n\n${book.content.substring(0, 200)}...`,
-        title: book.title,
-      });
-    } catch (error) {
-      Alert.alert('Hata', 'Paylaşım sırasında bir hata oluştu');
+      const response = await bookService.getBookContent(bookId, page);
+      setPageContent(response.content);
+      setTotalPages(response.totalPages);
+    } catch (err: any) {
+      setError('Sayfa yüklenemedi.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('tr-TR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+  const handleWordPress = (word: string) => {
+    const cleanWord = word.replace(/[^\w\s]/g, '').trim();
+    if (cleanWord.length > 0) {
+      setSelectedWord(cleanWord);
+      setWordSelectorVisible(true);
+    }
+  };
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
   };
 
   if (loading) {
@@ -62,17 +88,17 @@ const BookDetailScreen = ({ navigation, route }: any) => {
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#007AFF" />
-          <Text style={styles.loadingText}>Kitap yükleniyor...</Text>
+          <Text style={styles.loadingText}>Yükleniyor...</Text>
         </View>
       </SafeAreaView>
     );
   }
 
-  if (!book) {
+  if (error) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>Kitap bulunamadı</Text>
+          <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity
             style={styles.errorButton}
             onPress={() => navigation.goBack()}
@@ -87,92 +113,76 @@ const BookDetailScreen = ({ navigation, route }: any) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
           <Text style={styles.backButtonText}>← Geri</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>Kitap Detayı</Text>
-        <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
-          <Text style={styles.shareButtonText}>📤</Text>
+        <Text style={styles.title} numberOfLines={1}>
+          {book?.title}
+        </Text>
+        <View style={styles.headerRight} />
+      </View>
+
+      <ScrollView
+        style={styles.pageContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.pageContent}>
+          {pageContent.split('\n\n').map((paragraph, pIndex) => (
+            <Text key={pIndex} style={styles.bookContentText}>
+              {paragraph
+                .trim()
+                .split(/\s+/)
+                .map((word, wIndex) => (
+                  <Text
+                    key={`${pIndex}-${wIndex}`}
+                    style={styles.wordText}
+                    onPress={() => handleWordPress(word)}
+                  >
+                    {word + ' '}
+                  </Text>
+                ))}
+            </Text>
+          ))}
+        </View>
+      </ScrollView>
+
+      {/* Sayfa Navigasyonu */}
+      <View style={styles.pageControls}>
+        <TouchableOpacity
+          style={[
+            styles.pageButton,
+            currentPage === 1 && styles.pageButtonDisabled,
+          ]}
+          onPress={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          <Text style={styles.pageButtonText}>Önceki Sayfa</Text>
+        </TouchableOpacity>
+        <Text style={styles.pageIndicator}>
+          Sayfa {currentPage} / {totalPages}
+        </Text>
+        <TouchableOpacity
+          style={[
+            styles.pageButton,
+            currentPage === totalPages && styles.pageButtonDisabled,
+          ]}
+          onPress={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          <Text style={styles.pageButtonText}>Sonraki Sayfa</Text>
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Kitap Başlığı ve Meta Bilgiler */}
-        <View style={styles.bookHeader}>
-          <Text style={styles.bookTitle}>{book.title}</Text>
-          <View style={styles.metaInfo}>
-            <Text style={styles.metaText}>
-              Eklenme: {formatDate(book.createdAt)}
-            </Text>
-            <Text style={styles.metaText}>
-              Güncelleme: {formatDate(book.updatedAt)}
-            </Text>
-          </View>
-        </View>
-
-        {/* Kitap İçeriği */}
-        <View style={styles.contentSection}>
-          <Text style={styles.contentTitle}>Kitap İçeriği</Text>
-          <View style={styles.contentContainer}>
-            <Text style={styles.bookContent}>{book.content}</Text>
-          </View>
-        </View>
-
-        {/* İstatistikler */}
-        <View style={styles.statsSection}>
-          <Text style={styles.statsTitle}>İstatistikler</Text>
-          <View style={styles.statsGrid}>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{book.content.length}</Text>
-              <Text style={styles.statLabel}>Karakter</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>
-                {book.content.split(' ').length}
-              </Text>
-              <Text style={styles.statLabel}>Kelime</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>
-                {book.content.split('\n').length}
-              </Text>
-              <Text style={styles.statLabel}>Satır</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Aksiyon Butonları */}
-        <View style={styles.actionsSection}>
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => {
-              navigation.navigate('BookReader', { bookId: book.id });
-            }}
-          >
-            <Text style={styles.actionButtonText}>📖 Oku</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.actionButton, styles.secondaryButton]}
-            onPress={() => {
-              // Burada çeviri özelliği eklenebilir
-              Alert.alert('Bilgi', 'Çeviri özelliği yakında eklenecek');
-            }}
-          >
-            <Text style={styles.secondaryButtonText}>Çevir</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.actionButton, styles.secondaryButton]}
-            onPress={() => {
-              // Burada kelime kaydetme özelliği eklenebilir
-              Alert.alert('Bilgi', 'Kelime kaydetme özelliği yakında eklenecek');
-            }}
-          >
-            <Text style={styles.secondaryButtonText}>Kelimeleri Kaydet</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+      {/* Word Selector */}
+      <WordSelector
+        visible={wordSelectorVisible}
+        selectedWord={selectedWord}
+        onClose={() => setWordSelectorVisible(false)}
+        onWordSave={undefined}
+      />
     </SafeAreaView>
   );
 };
@@ -180,40 +190,114 @@ const BookDetailScreen = ({ navigation, route }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f8f9fa',
   },
   header: {
-    padding: 20,
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    backgroundColor: '#fff',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
     flexDirection: 'row',
     alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    zIndex: 10,
   },
   backButton: {
-    marginRight: 15,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    backgroundColor: '#fff',
+    marginRight: 12,
   },
   backButtonText: {
-    color: '#007AFF',
+    color: '#666',
     fontSize: 16,
     fontWeight: '600',
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
     flex: 1,
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#2c3e50',
+    textAlign: 'center',
+    fontFamily: 'serif',
   },
-  shareButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
+  headerRight: {
+    flexDirection: 'row',
     alignItems: 'center',
   },
-  shareButtonText: {
+  pageContainer: {
+    flex: 1,
+    padding: 20,
+  },
+  pageContent: {
+    backgroundColor: '#FFF8E1',
+    borderRadius: 8,
+    padding: 15,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    maxWidth: 800,
+    alignSelf: 'center',
+  },
+  bookContentText: {
     fontSize: 18,
+    color: '#4B3F2F',
+    lineHeight: 28,
+    textAlign: 'justify',
+    fontFamily: 'serif',
+  },
+  wordText: {
+    fontSize: 18,
+    color: '#2c3e50',
+    lineHeight: 32,
+    fontFamily: 'serif',
+    marginRight: 2,
+    marginBottom: 2,
+    borderRadius: 3,
+    paddingHorizontal: 2,
+    paddingVertical: 1,
+  },
+  pageControls: {
+    backgroundColor: '#fff',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 16,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: -2 },
+  },
+  pageButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    backgroundColor: '#3b82f6',
+    borderRadius: 4,
+    marginHorizontal: 4,
+  },
+  pageButtonDisabled: {
+    backgroundColor: '#cbd5e1',
+  },
+  pageButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  pageIndicator: {
+    color: '#666',
+    fontSize: 15,
+    marginHorizontal: 8,
   },
   loadingContainer: {
     flex: 1,
@@ -247,109 +331,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  content: {
-    flex: 1,
-    padding: 20,
-  },
-  bookHeader: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    marginBottom: 20,
-  },
-  bookTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-  metaInfo: {
-    gap: 5,
-  },
-  metaText: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-  },
-  contentSection: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    marginBottom: 20,
-  },
-  contentTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 15,
-  },
-  contentContainer: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 8,
-    padding: 15,
-  },
-  bookContent: {
-    fontSize: 16,
-    color: '#333',
-    lineHeight: 24,
-    textAlign: 'justify',
-  },
-  statsSection: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    marginBottom: 20,
-  },
-  statsTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 15,
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  statItem: {
-    alignItems: 'center',
-  },
-  statNumber: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#007AFF',
-    marginBottom: 5,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#666',
-    textAlign: 'center',
-  },
-  actionsSection: {
-    gap: 15,
-    marginBottom: 20,
-  },
-  actionButton: {
-    backgroundColor: '#007AFF',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  actionButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  secondaryButton: {
-    backgroundColor: 'white',
-    borderWidth: 1,
-    borderColor: '#007AFF',
-  },
-  secondaryButtonText: {
-    color: '#007AFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
 });
 
-export default BookDetailScreen; 
+export default BookReaderScreen;

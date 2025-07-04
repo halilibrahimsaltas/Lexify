@@ -1,38 +1,55 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 import { User } from '../../user/entities/user.entity';
+import { BookPage } from './book-page.entity';
+import { BookProgress } from '../../book-progress/entities/book-progress.entity';
 
 @Entity('books')
 export class Book {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    title: string;
+  @Column()
+  title: string;
+  @Column()
+  author: string;
 
-    @Column('text')
-    content: string;
+  @Column({ nullable: true })
+  coverImage?: string;
 
-    @Column()
-    author: string;
+  @Column()
+  filePath: string;
 
-    @Column({ nullable: true })
-    coverImage?: string;
+  @Column()
+  category: string;
 
-    @Column()
-    filePath: string;
+  @Column()
+  userId: number;
 
-    @Column()
-    category: string;
+  @ManyToOne(() => User, (user) => user.books, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' }) // Book.userId ile eşle
+  user: User;
 
-    @Column()
-    userId: number;
+  @OneToMany(() => BookPage, (page) => page.book, {
+    cascade: true,
+    eager: true, // kitap getirilince sayfaları da getirsin (isteğe bağlı)
+  })
+  pages: BookPage[];
 
-    @ManyToOne(() => User)
-    user: User;
+  @OneToMany(() => BookProgress, (progress) => progress.book)
+  progress: BookProgress[];
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @UpdateDateColumn()
-    updatedAt: Date;
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
