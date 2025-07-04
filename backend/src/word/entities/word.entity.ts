@@ -1,40 +1,54 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToMany, JoinTable } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 
 @Entity('words')
 export class Word {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    originalText: string;
+  @Column()
+  originalText: string; // Örn: hello
 
-    @Column()
-    translatedText: string;
+  @Column()
+  translatedText: string; // Örn: merhaba
 
-    @Column({ default: 'en' })
-    sourceLanguage: string;
+  @Column({ default: 'en' })
+  sourceLanguage: string;
 
-    @Column({ default: 'tr' })
-    targetLanguage: string;
+  @Column({ default: 'tr' })
+  targetLanguage: string;
 
-    @ManyToMany(() => User, (user) => user.words)
-    @JoinTable({
-        name: 'user_words',
-        joinColumn: {
-            name: 'word_id',
-            referencedColumnName: 'id',
-        },
-        inverseJoinColumn: {
-            name: 'user_id',
-            referencedColumnName: 'id',
-        },
-    })
-    users: User[];
+  @Column({ nullable: true })
+  type?: string; // Örn: interj.
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @Column({ nullable: true })
+  category?: string; // Örn: General, Speaking vs.
 
-    @UpdateDateColumn()
-    updatedAt: Date;
+  @ManyToMany(() => User, (user) => user.words)
+  @JoinTable({
+    name: 'user_words',
+    joinColumn: {
+      name: 'word_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'user_id',
+      referencedColumnName: 'id',
+    },
+  })
+  users: User[];
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

@@ -1,132 +1,68 @@
-import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Word } from './entities/word.entity';
 import { CreateWordDto } from './dto/create-word.dto';
-import { UpdateWordDto } from './dto/update-word.dto';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject } from '@nestjs/common';
-import { Cache } from 'cache-manager';
 import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class WordService {
-    private readonly CACHE_TTL = 3600; // 1 saat
-    private readonly USER_WORDS_CACHE_KEY = 'user_words:';
-    private readonly WORD_CACHE_KEY = 'word:';
+  constructor(
+    @InjectRepository(Word)
+    private readonly wordRepo: Repository<Word>,
 
-    constructor(
-        @InjectRepository(Word) private wordRepository: Repository<Word>,
-        @InjectRepository(User) private userRepository: Repository<User>,
-        @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
-    ) {}
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
+  ) {}
 
-    async create(createWordDto: CreateWordDto, userId: number): Promise<Word> {
-        const user = await this.userRepository.findOne({
-            where: { id: userId }
-        });
+  async addToFavorites(userId: number, dto: CreateWordDto): Promise<Word> {
+    const user = await this.userRepo.findOne({
+      where: { id: userId },
+      relations: ['words'],
+    });
+    if (!user) throw new NotFoundException('User not found');
 
-        if (!user) {
-            throw new NotFoundException('User not found');
-        }
+    let whereClause: any = {
+      originalText: dto.originalText,
+      translatedText: dto.translatedText,
+    };
+    if (dto.type !== undefined) whereClause.type = dto.type;
+    if (dto.category !== undefined) whereClause.category = dto.category;
 
-        // Kelime zaten kullanıcıya eklenmiş mi kontrol et
-        const existingWord = await this.wordRepository
-            .createQueryBuilder('word')
-            .innerJoin('word.users', 'user', 'user.id = :userId', { userId })
-            .where('word.originalText = :originalText', { originalText: createWordDto.originalText })
-            .getOne();
+    let word = await this.wordRepo.findOne({
+      where: whereClause,
+    });
 
-        if (existingWord) {
-            throw new ConflictException('Word already exists for this user');
-        }
-
-        // Yeni kelime oluştur
-        const newWord = this.wordRepository.create(createWordDto);
-        newWord.users = [user];
-        const savedWord = await this.wordRepository.save(newWord);
-        
-        // Cache'i temizle
-        await this.clearUserWordsCache(userId);
-        
-        return savedWord;
+    if (!word) {
+      word = this.wordRepo.create({ ...dto });
+      word = await this.wordRepo.save(word);
     }
 
-    async findAllByUserId(userId: number): Promise<Word[]> {
-        // Cache'den kontrol et
-        const cacheKey = this.USER_WORDS_CACHE_KEY + userId;
-        const cachedWords = await this.cacheManager.get<Word[]>(cacheKey);
-        
-        if (cachedWords) {
-            return cachedWords;
-        }
-
-        // Cache'de yoksa veritabanından al
-        const words = await this.wordRepository
-            .createQueryBuilder('word')
-            .innerJoin('word.users', 'user', 'user.id = :userId', { userId })
-            .getMany();
-
-        // Cache'e kaydet
-        await this.cacheManager.set(cacheKey, words, this.CACHE_TTL);
-        
-        return words;
+    const alreadySaved = user.words.some((w) => w.id === word.id);
+    if (!alreadySaved) {
+      user.words.push(word);
+      await this.userRepo.save(user);
     }
 
-    async update(id: number, updateWordDto: UpdateWordDto, userId: number): Promise<Word> {
-        const word = await this.wordRepository
-            .createQueryBuilder('word')
-            .innerJoin('word.users', 'user', 'user.id = :userId', { userId })
-            .where('word.id = :id', { id })
-            .getOne();
+    return word;
+  }
 
-        if (!word) {
-            throw new NotFoundException('Word not found');
-        }
+  async getFavorites(userId: number): Promise<Word[]> {
+    const user = await this.userRepo.findOne({
+      where: { id: userId },
+      relations: ['words'],
+    });
+    return user?.words || [];
+  }
 
-        // Kelimeyi güncelle
-        Object.assign(word, updateWordDto);
-        const updatedWord = await this.wordRepository.save(word);
-        
-        // Cache'i temizle
-        await this.clearWordCache(id);
-        await this.clearUserWordsCache(userId);
-        
-        return updatedWord;
-    }
+  async removeFavorite(userId: number, wordId: number): Promise<void> {
+    const user = await this.userRepo.findOne({
+      where: { id: userId },
+      relations: ['words'],
+    });
+    if (!user) throw new NotFoundException('User not found');
 
-    async remove(id: number, userId: number): Promise<void> {
-        const word = await this.wordRepository
-            .createQueryBuilder('word')
-            .innerJoin('word.users', 'user', 'user.id = :userId', { userId })
-            .where('word.id = :id', { id })
-            .getOne();
-
-        if (!word) {
-            throw new NotFoundException('Word not found');
-        }
-
-        // Kelimeyi kullanıcının listesinden kaldır
-        word.users = word.users.filter(user => user.id !== userId);
-        await this.wordRepository.save(word);
-
-        // Eğer kelimeyi hiç kimse kullanmıyorsa tamamen sil
-        if (word.users.length === 0) {
-            await this.wordRepository.remove(word);
-        }
-        
-        // Cache'i temizle
-        await this.clearWordCache(id);
-        await this.clearUserWordsCache(userId);
-    }
-
-    private async clearUserWordsCache(userId: number): Promise<void> {
-        const cacheKey = this.USER_WORDS_CACHE_KEY + userId;
-        await this.cacheManager.del(cacheKey);
-    }
-
-    private async clearWordCache(wordId: number): Promise<void> {
-        const cacheKey = this.WORD_CACHE_KEY + wordId;
-        await this.cacheManager.del(cacheKey);
-    }
+    user.words = user.words.filter((w) => w.id !== wordId);
+    await this.userRepo.save(user);
+  }
 }

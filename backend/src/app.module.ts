@@ -48,7 +48,7 @@ import { BookProgressModule } from './book-progress/book-progress.module';
     DictionaryModule,
     BookModule,
     FileModule,
-    BookProgressModule
+    BookProgressModule,
   ],
   controllers: [AppController],
   providers: [AppService],
