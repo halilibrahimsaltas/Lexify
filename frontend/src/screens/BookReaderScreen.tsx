@@ -8,36 +8,55 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import PDFReader from '../components/PDFReader';
 import WordSelector from '../components/WordSelector';
-import bookService, { Book } from '../services/book.service';
+import { Book } from '../types';
+import bookService from '../services/book.service';
+import { ScrollView } from 'react-native'; // Import ScrollView for content scrolling
+
 
 const BookReaderScreen = ({ navigation, route }: any) => {
   const { bookId } = route.params;
+
   const [book, setBook] = useState<Book | null>(null);
+  const [content, setContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [selectedWord, setSelectedWord] = useState('');
   const [wordSelectorVisible, setWordSelectorVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState<number>(1); // opsiyonel olarak güncellenebilir
 
   useEffect(() => {
-    loadBook();
+    loadBookMetadata();
   }, [bookId]);
 
-  const loadBook = async () => {
+  useEffect(() => {
+    loadBookPage();
+  }, [currentPage]);
+
+  const loadBookMetadata = async () => {
     try {
       const bookData = await bookService.getBook(bookId);
       setBook(bookData);
     } catch (error: any) {
-      Alert.alert('Hata', error.message || 'Kitap yüklenirken bir hata oluştu');
+      Alert.alert('Hata', error.message || 'Kitap bilgisi yüklenemedi');
       navigation.goBack();
+    }
+  };
+
+  const loadBookPage = async () => {
+    setLoading(true);
+    try {
+      const data = await bookService.getBookContent(bookId, currentPage);
+      setContent(data.content);
+      setTotalPages(data.totalPages || 1); // Eğer backend gönderiyorsa
+    } catch (error: any) {
+      Alert.alert('Hata', error.message || 'Sayfa yüklenemedi');
     } finally {
       setLoading(false);
     }
   };
 
   const handleWordSelect = (word: string) => {
-    // Kelimeyi temizle (noktalama işaretlerini kaldır)
     const cleanWord = word.replace(/[^\w\s]/g, '').trim();
     if (cleanWord.length > 0) {
       setSelectedWord(cleanWord);
@@ -46,40 +65,29 @@ const BookReaderScreen = ({ navigation, route }: any) => {
   };
 
   const handleWordSave = (word: string, translation: string) => {
-    // Burada kelimeyi kaydetme işlemi yapılabilir
-    console.log('Kelime kaydedildi:', { word, translation });
+    console.log('✅ Favoriye eklendi:', { word, translation });
+    // backend’e post edilecek kısım sonra eklenecek
   };
 
-  const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
+  const renderWords = (text: string) => {
+    return text.split(/\s+/).map((word, index) => (
+      <Text
+        key={index}
+        style={styles.wordText}
+        onPress={() => handleWordSelect(word)}
+      >
+        {word + ' '}
+      </Text>
+    ));
   };
 
-  if (loading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
-          <Text style={styles.loadingText}>Kitap yükleniyor...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  if (!book) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>Kitap bulunamadı</Text>
-          <TouchableOpacity
-            style={styles.errorButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Text style={styles.errorButtonText}>Geri Dön</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
+  const goToPage = (direction: 'next' | 'prev') => {
+    if (direction === 'next' && currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    } else if (direction === 'prev' && currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -88,14 +96,14 @@ const BookReaderScreen = ({ navigation, route }: any) => {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Text style={styles.backButtonText}>← Geri</Text>
         </TouchableOpacity>
-        <Text style={styles.title} numberOfLines={1}>{book.title}</Text>
+        <Text style={styles.title} numberOfLines={1}>{book?.title || 'Kitap'}</Text>
         <View style={styles.headerRight}>
           <TouchableOpacity
             style={styles.infoButton}
             onPress={() => {
               Alert.alert(
-                'Kitap Bilgileri',
-                `Başlık: ${book.title}\nKarakter: ${book.content.length}\nKelime: ${book.content.split(' ').length}\nSatır: ${book.content.split('\n').length}`
+                'Kitap Bilgisi',
+                `Başlık: ${book?.title}\nYazar: ${book?.author}`
               );
             }}
           >
@@ -104,15 +112,35 @@ const BookReaderScreen = ({ navigation, route }: any) => {
         </View>
       </View>
 
-      {/* PDF Reader */}
-      <PDFReader
-        content={book.content}
-        title={book.title}
-        onPageChange={handlePageChange}
-        onWordSelect={handleWordSelect}
-      />
+      {/* İçerik */}
+      {loading ? (
+        <ActivityIndicator size="large" color="#007AFF" style={{ marginTop: 20 }} />
+      ) : (
+        <ScrollView contentContainerStyle={styles.bookContentContainer}>
+          <Text style={styles.bookContentText}>{renderWords(content)}</Text>
+        </ScrollView>
+      )}
 
-      {/* Word Selector Modal */}
+      {/* Sayfa Kontrolleri */}
+      <View style={styles.pageControls}>
+        <TouchableOpacity
+          style={[styles.pageButton, currentPage === 1 && styles.pageButtonDisabled]}
+          onPress={() => goToPage('prev')}
+          disabled={currentPage === 1}
+        >
+          <Text style={styles.pageButtonText}>◀</Text>
+        </TouchableOpacity>
+        <Text style={styles.pageIndicator}>{currentPage} / {totalPages}</Text>
+        <TouchableOpacity
+          style={[styles.pageButton, currentPage === totalPages && styles.pageButtonDisabled]}
+          onPress={() => goToPage('next')}
+          disabled={currentPage === totalPages}
+        >
+          <Text style={styles.pageButtonText}>▶</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Kelime Seçici */}
       <WordSelector
         visible={wordSelectorVisible}
         selectedWord={selectedWord}

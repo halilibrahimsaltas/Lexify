@@ -8,15 +8,26 @@ export type RootStackParamList = {
   Books: undefined;
   AddBook: undefined;
   BookDetail: { bookId: number };
+  BookReader: { bookId: number };
+  SavedWords: undefined;
 };
 
 // User Types
 export interface User {
-  id: string;
+  id: number;
   email: string;
   name: string;
-  role: 'user' | 'admin';
+  role: "user" | "admin";
   createdAt: string;
+  updatedAt: string;
+}
+
+// Book Progress Type
+export interface BookProgress {
+  id: number;
+  userId?: number;
+  bookId?: number;
+  currentPage: number;
   updatedAt: string;
 }
 
@@ -24,23 +35,30 @@ export interface User {
 export interface Book {
   id: number;
   title: string;
-  content: string;
   author: string;
+  category: string;
   coverImage?: string;
   filePath: string;
-  category: string;
   userId: number;
   createdAt: string;
   updatedAt: string;
+  pages?: BookPage[]; // Sayfalar varsa
+  progress?: BookProgress[]; // Kitap ilerlemeleri
 }
 
 export interface CreateBookRequest {
   title: string;
-  content: string;
   author: string;
-  coverImage?: string;
-  filePath: string;
   category: string;
+  coverImage?: string;
+}
+
+// Book Page Type
+export interface BookPage {
+  id: number;
+  pageNumber: number;
+  content: string;
+  bookId: number;
 }
 
 // App State Types
@@ -99,4 +117,4 @@ export interface ApiError {
   message: string;
   code?: string;
   status?: number;
-} 
+}

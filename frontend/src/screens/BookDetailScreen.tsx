@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Alert,
   ActivityIndicator,
@@ -8,22 +8,23 @@ import {
   StyleSheet,
   ScrollView,
   Dimensions,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import bookService from '../services/book.service';
-import WordSelector from '../components/WordSelector';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import bookService from "../services/book.service";
+import WordSelector from "../components/WordSelector";
+import type { Book } from "../types";
 
-const { height: screenHeight } = Dimensions.get('window');
+const { height: screenHeight } = Dimensions.get("window");
 
 const BookReaderScreen = ({ navigation, route }: any) => {
   const { bookId } = route.params;
-  const [book, setBook] = useState<any>(null);
+  const [book, setBook] = useState<Book | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [pageContent, setPageContent] = useState('');
-  const [selectedWord, setSelectedWord] = useState('');
+  const [pageContent, setPageContent] = useState("");
+  const [selectedWord, setSelectedWord] = useState("");
   const [wordSelectorVisible, setWordSelectorVisible] = useState(false);
 
   useEffect(() => {
@@ -48,7 +49,7 @@ const BookReaderScreen = ({ navigation, route }: any) => {
       setTotalPages(response.totalPages);
       setCurrentPage(1);
     } catch (err: any) {
-      setError('Kitap veya ilk sayfa yüklenemedi.');
+      setError("Kitap veya ilk sayfa yüklenemedi.");
       navigation.goBack();
     } finally {
       setLoading(false);
@@ -63,14 +64,14 @@ const BookReaderScreen = ({ navigation, route }: any) => {
       setPageContent(response.content);
       setTotalPages(response.totalPages);
     } catch (err: any) {
-      setError('Sayfa yüklenemedi.');
+      setError("Sayfa yüklenemedi.");
     } finally {
       setLoading(false);
     }
   };
 
   const handleWordPress = (word: string) => {
-    const cleanWord = word.replace(/[^\w\s]/g, '').trim();
+    const cleanWord = word.replace(/[^\w\s]/g, "").trim();
     if (cleanWord.length > 0) {
       setSelectedWord(cleanWord);
       setWordSelectorVisible(true);
@@ -80,6 +81,16 @@ const BookReaderScreen = ({ navigation, route }: any) => {
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
+    }
+  };
+
+  const handleWordSave = async (word: string, translation: string) => {
+    try {
+      // Buraya backend'e kaydetme isteği yazılabilir
+      console.log("✅ Favori kaydedildi:", { word, translation });
+      Alert.alert("Başarılı", `"${word}" favorilere eklendi.`);
+    } catch (error) {
+      Alert.alert("Hata", "Kelime kaydedilemedi");
     }
   };
 
@@ -130,7 +141,7 @@ const BookReaderScreen = ({ navigation, route }: any) => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.pageContent}>
-          {pageContent.split('\n\n').map((paragraph, pIndex) => (
+          {pageContent.split("\n\n").map((paragraph, pIndex) => (
             <Text key={pIndex} style={styles.bookContentText}>
               {paragraph
                 .trim()
@@ -141,7 +152,7 @@ const BookReaderScreen = ({ navigation, route }: any) => {
                     style={styles.wordText}
                     onPress={() => handleWordPress(word)}
                   >
-                    {word + ' '}
+                    {word + " "}
                   </Text>
                 ))}
             </Text>
@@ -181,7 +192,7 @@ const BookReaderScreen = ({ navigation, route }: any) => {
         visible={wordSelectorVisible}
         selectedWord={selectedWord}
         onClose={() => setWordSelectorVisible(false)}
-        onWordSave={undefined}
+        onWordSave={handleWordSave}
       />
     </SafeAreaView>
   );
@@ -190,16 +201,16 @@ const BookReaderScreen = ({ navigation, route }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
   },
   header: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingVertical: 16,
     paddingHorizontal: 24,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.06,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
@@ -210,55 +221,55 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: '#ddd',
-    backgroundColor: '#fff',
+    borderColor: "#ddd",
+    backgroundColor: "#fff",
     marginRight: 12,
   },
   backButtonText: {
-    color: '#666',
+    color: "#666",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   title: {
     flex: 1,
     fontSize: 20,
-    fontWeight: '700',
-    color: '#2c3e50',
-    textAlign: 'center',
-    fontFamily: 'serif',
+    fontWeight: "700",
+    color: "#2c3e50",
+    textAlign: "center",
+    fontFamily: "serif",
   },
   headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   pageContainer: {
     flex: 1,
     padding: 20,
   },
   pageContent: {
-    backgroundColor: '#FFF8E1',
+    backgroundColor: "#FFF8E1",
     borderRadius: 8,
     padding: 15,
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.06,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
     maxWidth: 800,
-    alignSelf: 'center',
+    alignSelf: "center",
   },
   bookContentText: {
     fontSize: 18,
-    color: '#4B3F2F',
+    color: "#4B3F2F",
     lineHeight: 28,
-    textAlign: 'justify',
-    fontFamily: 'serif',
+    textAlign: "justify",
+    fontFamily: "serif",
   },
   wordText: {
     fontSize: 18,
-    color: '#2c3e50',
+    color: "#2c3e50",
     lineHeight: 32,
-    fontFamily: 'serif',
+    fontFamily: "serif",
     marginRight: 2,
     marginBottom: 2,
     borderRadius: 3,
@@ -266,15 +277,15 @@ const styles = StyleSheet.create({
     paddingVertical: 1,
   },
   pageControls: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingVertical: 16,
     paddingHorizontal: 24,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     gap: 16,
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.06,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: -2 },
@@ -282,54 +293,54 @@ const styles = StyleSheet.create({
   pageButton: {
     paddingVertical: 8,
     paddingHorizontal: 20,
-    backgroundColor: '#3b82f6',
+    backgroundColor: "#3b82f6",
     borderRadius: 4,
     marginHorizontal: 4,
   },
   pageButtonDisabled: {
-    backgroundColor: '#cbd5e1',
+    backgroundColor: "#cbd5e1",
   },
   pageButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   pageIndicator: {
-    color: '#666',
+    color: "#666",
     fontSize: 15,
     marginHorizontal: 8,
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: '#666',
+    color: "#666",
   },
   errorContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
   errorText: {
     fontSize: 18,
-    color: '#666',
+    color: "#666",
     marginBottom: 20,
   },
   errorButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: "#007AFF",
     paddingHorizontal: 30,
     paddingVertical: 15,
     borderRadius: 10,
   },
   errorButtonText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });
 

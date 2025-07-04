@@ -3,9 +3,12 @@ import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import wordService, { Word } from '../services/word.service';
 
+
+
 const SavedWordsScreen = ({ navigation }: any) => {
   const [words, setWords] = useState<Word[]>([]);
   const [loading, setLoading] = useState(true);
+  const languageNames: Record<string, string> = { en: 'İngilizce', tr: 'Türkçe', de: 'Almanca', fr: 'Fransızca', es: 'İspanyolca' };
 
   useEffect(() => {
     fetchWords();
@@ -14,7 +17,9 @@ const SavedWordsScreen = ({ navigation }: any) => {
   const fetchWords = async () => {
     setLoading(true);
     try {
-      const data = await wordService.getUserWords();
+      const data = (await wordService.getUserWords()).sort((a, b) =>
+     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
       setWords(data);
     } catch (error) {
       Alert.alert('Hata', 'Kaydedilmiş kelimeler alınamadı');
@@ -27,7 +32,9 @@ const SavedWordsScreen = ({ navigation }: any) => {
     <View style={styles.wordItem}>
       <Text style={styles.wordText}>{item.originalText}</Text>
       <Text style={styles.translationText}>{item.translatedText}</Text>
-      <Text style={styles.metaText}>{item.sourceLanguage} → {item.targetLanguage}</Text>
+      <Text style={styles.metaText}>
+        {(languageNames[item.sourceLanguage] || item.sourceLanguage) + ' → ' + (languageNames[item.targetLanguage] || item.targetLanguage)}
+      </Text>
       <Text style={styles.dateText}>{new Date(item.createdAt).toLocaleString('tr-TR')}</Text>
     </View>
   );
@@ -135,4 +142,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SavedWordsScreen; 
+export default SavedWordsScreen;
