@@ -68,6 +68,12 @@ export class BookController {
     );
   }
 
+  @Get()
+  @ApiOperation({ summary: 'Get all books for current user' })
+  async findAll(@Request() req) {
+    return this.bookService.findAllByUser(req.user.sub);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get a book by id' })
   @ApiParam({ name: 'id', type: Number, description: 'Kitap ID değeri' })

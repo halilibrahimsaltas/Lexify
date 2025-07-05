@@ -1,9 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Switch, ScrollView, Alert, ActivityIndicator, TextInput, Modal } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useAuth } from '../contexts/AuthContext';
-import userService, { User, UpdateUserRequest } from '../services/user.service';
-import wordService, { Word } from '../services/word.service';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Switch,
+  ScrollView,
+  Alert,
+  ActivityIndicator,
+  TextInput,
+  Modal,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useAuth } from "../contexts/AuthContext";
+import userService, { User, UpdateUserRequest } from "../services/user.service";
+import wordService, { Word } from "../services/word.service";
 
 const ProfileScreen = ({ navigation }: any) => {
   const { user, logout, updateUser } = useAuth();
@@ -13,9 +24,9 @@ const ProfileScreen = ({ navigation }: any) => {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
   const [editForm, setEditForm] = useState({
-    name: '',
-    email: '',
-    password: '',
+    name: "",
+    email: "",
+    password: "",
   });
   const [userWords, setUserWords] = useState<Word[]>([]);
 
@@ -24,7 +35,7 @@ const ProfileScreen = ({ navigation }: any) => {
       setEditForm({
         name: user.name,
         email: user.email,
-        password: '',
+        password: "",
       });
       loadUserWords();
     }
@@ -32,12 +43,12 @@ const ProfileScreen = ({ navigation }: any) => {
 
   const loadUserWords = async () => {
     if (!user) return;
-    
+
     try {
       const words = await wordService.getUserWords();
       setUserWords(words);
     } catch (error) {
-      console.log('User words loading error:', error);
+      console.log("User words loading error:", error);
     }
   };
 
@@ -50,14 +61,14 @@ const ProfileScreen = ({ navigation }: any) => {
     if (editForm.password.trim()) updateData.password = editForm.password;
 
     if (Object.keys(updateData).length === 0) {
-      Alert.alert('Bilgi', 'Değişiklik yapılmadı');
+      Alert.alert("Bilgi", "Değişiklik yapılmadı");
       return;
     }
 
     setEditLoading(true);
     try {
       const updatedUser = await userService.updateUser(user.id, updateData);
-      
+
       // AuthContext'teki kullanıcı verilerini güncelle
       updateUser({
         id: updatedUser.id,
@@ -65,80 +76,80 @@ const ProfileScreen = ({ navigation }: any) => {
         email: updatedUser.email,
         role: updatedUser.role,
       });
-      
+
       setEditModalVisible(false);
-      Alert.alert('Başarılı', 'Profil güncellendi');
+      Alert.alert("Başarılı", "Profil güncellendi");
     } catch (error: any) {
-      Alert.alert('Hata', error.message);
+      Alert.alert("Hata", error.message);
     } finally {
       setEditLoading(false);
     }
   };
 
   const handleLogout = async () => {
-    Alert.alert(
-      'Çıkış Yap',
-      'Çıkış yapmak istediğinizden emin misiniz?',
-      [
-        { text: 'İptal', style: 'cancel' },
-        {
-          text: 'Çıkış Yap',
-          style: 'destructive',
-          onPress: async () => {
-            await logout();
-          },
+    Alert.alert("Çıkış Yap", "Çıkış yapmak istediğinizden emin misiniz?", [
+      { text: "İptal", style: "cancel" },
+      {
+        text: "Çıkış Yap",
+        style: "destructive",
+        onPress: async () => {
+          await logout();
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const menuItems = [
     {
-      id: '1',
-      title: 'Hesap Bilgileri',
-      subtitle: 'Kişisel bilgilerinizi düzenleyin',
-      icon: '👤',
+      id: "1",
+      title: "Hesap Bilgileri",
+      subtitle: "Kişisel bilgilerinizi düzenleyin",
+      icon: "👤",
       onPress: () => setEditModalVisible(true),
     },
     {
-      id: '2',
-      title: 'Kitaplarım',
-      subtitle: 'Eklediğiniz kitapları görüntüleyin',
-      icon: '📚',
-      onPress: () => navigation.navigate('Books'),
+      id: "2",
+      title: "Kitaplarım",
+      subtitle: "Eklediğiniz kitapları görüntüleyin",
+      icon: "📚",
+      onPress: () => navigation.navigate("MainDrawer"),
     },
     {
-      id: '3',
-      title: 'Öğrenme İstatistikleri',
-      subtitle: 'İlerlemenizi görüntüleyin',
-      icon: '📊',
-      onPress: () => Alert.alert('Bilgi', 'Bu özellik yakında eklenecek'),
+      id: "3",
+      title: "Öğrenme İstatistikleri",
+      subtitle: "İlerlemenizi görüntüleyin",
+      icon: "📊",
+      onPress: () => Alert.alert("Bilgi", "Bu özellik yakında eklenecek"),
     },
     {
-      id: '4',
-      title: 'Favori Kelimeler',
-      subtitle: 'Kaydettiğiniz kelimeleri görün',
-      icon: '❤️',
-      onPress: () => navigation.navigate('Dictionary'),
+      id: "4",
+      title: "Favori Kelimeler",
+      subtitle: "Kaydettiğiniz kelimeleri görün",
+      icon: "❤️",
+      onPress: () => navigation.navigate("Dictionary"),
     },
     {
-      id: '5',
-      title: 'Ayarlar',
-      subtitle: 'Uygulama ayarlarını düzenleyin',
-      icon: '⚙️',
-      onPress: () => Alert.alert('Bilgi', 'Bu özellik yakında eklenecek'),
+      id: "5",
+      title: "Ayarlar",
+      subtitle: "Uygulama ayarlarını düzenleyin",
+      icon: "⚙️",
+      onPress: () => Alert.alert("Bilgi", "Bu özellik yakında eklenecek"),
     },
     {
-      id: '6',
-      title: 'Yardım',
-      subtitle: 'Destek ve SSS',
-      icon: '❓',
-      onPress: () => Alert.alert('Bilgi', 'Bu özellik yakında eklenecek'),
+      id: "6",
+      title: "Yardım",
+      subtitle: "Destek ve SSS",
+      icon: "❓",
+      onPress: () => Alert.alert("Bilgi", "Bu özellik yakında eklenecek"),
     },
   ];
 
   const renderMenuItem = (item: any) => (
-    <TouchableOpacity key={item.id} style={styles.menuItem} onPress={item.onPress}>
+    <TouchableOpacity
+      key={item.id}
+      style={styles.menuItem}
+      onPress={item.onPress}
+    >
       <View style={styles.menuItemLeft}>
         <Text style={styles.menuIcon}>{item.icon}</Text>
         <View style={styles.menuTextContainer}>
@@ -155,7 +166,9 @@ const ProfileScreen = ({ navigation }: any) => {
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#007AFF" />
-          <Text style={styles.loadingText}>Kullanıcı bilgileri yükleniyor...</Text>
+          <Text style={styles.loadingText}>
+            Kullanıcı bilgileri yükleniyor...
+          </Text>
         </View>
       </SafeAreaView>
     );
@@ -164,9 +177,6 @@ const ProfileScreen = ({ navigation }: any) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← Ana Sayfa</Text>
-        </TouchableOpacity>
         <Text style={styles.title}>Profil</Text>
       </View>
 
@@ -179,7 +189,9 @@ const ProfileScreen = ({ navigation }: any) => {
           <View style={styles.userInfo}>
             <Text style={styles.userName}>{user.name}</Text>
             <Text style={styles.userEmail}>{user.email}</Text>
-            <Text style={styles.userLevel}>Seviye: {user.role === 'ADMIN' ? 'Yönetici' : 'Kullanıcı'}</Text>
+            <Text style={styles.userLevel}>
+              Seviye: {user.role === "ADMIN" ? "Yönetici" : "Kullanıcı"}
+            </Text>
           </View>
         </View>
 
@@ -203,10 +215,13 @@ const ProfileScreen = ({ navigation }: any) => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Kayıtlı Kelimeler</Text>
           {userWords.length === 0 ? (
-            <Text style={{ color: '#666' }}>Henüz kelime eklenmemiş.</Text>
+            <Text style={{ color: "#666" }}>Henüz kelime eklenmemiş.</Text>
           ) : (
             userWords.slice(0, 10).map((word) => (
-              <Text key={word.id} style={{ color: '#333', fontSize: 15, marginBottom: 4 }}>
+              <Text
+                key={word.id}
+                style={{ color: "#333", fontSize: 15, marginBottom: 4 }}
+              >
                 {word.originalText} - {word.translatedText}
               </Text>
             ))
@@ -214,14 +229,12 @@ const ProfileScreen = ({ navigation }: any) => {
         </View>
 
         {/* Menü Öğeleri */}
-        <View style={styles.menuSection}>
-          {menuItems.map(renderMenuItem)}
-        </View>
+        <View style={styles.menuSection}>{menuItems.map(renderMenuItem)}</View>
 
         {/* Ayarlar */}
         <View style={styles.settingsSection}>
           <Text style={styles.sectionTitle}>Ayarlar</Text>
-          
+
           <View style={styles.settingItem}>
             <View style={styles.settingLeft}>
               <Text style={styles.settingIcon}>🔔</Text>
@@ -230,8 +243,8 @@ const ProfileScreen = ({ navigation }: any) => {
             <Switch
               value={notificationsEnabled}
               onValueChange={setNotificationsEnabled}
-              trackColor={{ false: '#767577', true: '#007AFF' }}
-              thumbColor={notificationsEnabled ? '#f4f3f4' : '#f4f3f4'}
+              trackColor={{ false: "#767577", true: "#007AFF" }}
+              thumbColor={notificationsEnabled ? "#f4f3f4" : "#f4f3f4"}
             />
           </View>
 
@@ -243,8 +256,8 @@ const ProfileScreen = ({ navigation }: any) => {
             <Switch
               value={darkModeEnabled}
               onValueChange={setDarkModeEnabled}
-              trackColor={{ false: '#767577', true: '#007AFF' }}
-              thumbColor={darkModeEnabled ? '#f4f3f4' : '#f4f3f4'}
+              trackColor={{ false: "#767577", true: "#007AFF" }}
+              thumbColor={darkModeEnabled ? "#f4f3f4" : "#f4f3f4"}
             />
           </View>
         </View>
@@ -277,7 +290,9 @@ const ProfileScreen = ({ navigation }: any) => {
                 <TextInput
                   style={styles.input}
                   value={editForm.name}
-                  onChangeText={(text) => setEditForm({ ...editForm, name: text })}
+                  onChangeText={(text) =>
+                    setEditForm({ ...editForm, name: text })
+                  }
                   placeholder="Adınızı ve soyadınızı girin"
                 />
               </View>
@@ -287,7 +302,9 @@ const ProfileScreen = ({ navigation }: any) => {
                 <TextInput
                   style={styles.input}
                   value={editForm.email}
-                  onChangeText={(text) => setEditForm({ ...editForm, email: text })}
+                  onChangeText={(text) =>
+                    setEditForm({ ...editForm, email: text })
+                  }
                   placeholder="E-posta adresinizi girin"
                   keyboardType="email-address"
                   autoCapitalize="none"
@@ -299,7 +316,9 @@ const ProfileScreen = ({ navigation }: any) => {
                 <TextInput
                   style={styles.input}
                   value={editForm.password}
-                  onChangeText={(text) => setEditForm({ ...editForm, password: text })}
+                  onChangeText={(text) =>
+                    setEditForm({ ...editForm, password: text })
+                  }
                   placeholder="Yeni şifrenizi girin"
                   secureTextEntry
                 />
@@ -335,51 +354,51 @@ const ProfileScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   header: {
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    flexDirection: 'row',
-    alignItems: 'center',
+    borderBottomColor: "#e0e0e0",
+    flexDirection: "row",
+    alignItems: "center",
   },
   backButton: {
     marginRight: 15,
   },
   backButtonText: {
-    color: '#007AFF',
+    color: "#007AFF",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     flex: 1,
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: '#666',
+    color: "#666",
   },
   content: {
     flex: 1,
     padding: 20,
   },
   userSection: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 10,
     padding: 20,
     marginBottom: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   avatarContainer: {
     marginRight: 15,
@@ -392,58 +411,58 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 5,
   },
   userEmail: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginBottom: 5,
   },
   userLevel: {
     fontSize: 14,
-    color: '#007AFF',
-    fontWeight: '600',
+    color: "#007AFF",
+    fontWeight: "600",
   },
   statsSection: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 10,
     padding: 20,
     marginBottom: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
   },
   statItem: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   statNumber: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#007AFF',
+    fontWeight: "bold",
+    color: "#007AFF",
     marginBottom: 5,
   },
   statLabel: {
     fontSize: 12,
-    color: '#666',
-    textAlign: 'center',
+    color: "#666",
+    textAlign: "center",
   },
   menuSection: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 10,
     marginBottom: 20,
   },
   menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     padding: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: "#f0f0f0",
   },
   menuItemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     flex: 1,
   },
   menuIcon: {
@@ -455,39 +474,39 @@ const styles = StyleSheet.create({
   },
   menuTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 2,
   },
   menuSubtitle: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
   },
   menuArrow: {
     fontSize: 18,
-    color: '#ccc',
+    color: "#ccc",
   },
   settingsSection: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 10,
     padding: 20,
     marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 15,
   },
   settingItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingVertical: 10,
   },
   settingLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   settingIcon: {
     fontSize: 20,
@@ -495,49 +514,49 @@ const styles = StyleSheet.create({
   },
   settingTitle: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
   },
   logoutButton: {
-    backgroundColor: '#FF3B30',
+    backgroundColor: "#FF3B30",
     padding: 15,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 20,
   },
   logoutButtonText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   // Modal Styles
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 15,
-    width: '90%',
-    maxHeight: '80%',
+    width: "90%",
+    maxHeight: "80%",
   },
   modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: "#e0e0e0",
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
   },
   modalClose: {
     fontSize: 24,
-    color: '#666',
+    color: "#666",
   },
   modalBody: {
     padding: 20,
@@ -547,53 +566,53 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 8,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: "#e0e0e0",
     borderRadius: 10,
     padding: 15,
     fontSize: 16,
-    backgroundColor: 'white',
+    backgroundColor: "white",
   },
   modalFooter: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 20,
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: "#e0e0e0",
   },
   modalButton: {
     flex: 1,
     padding: 15,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
     marginHorizontal: 5,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: "#e0e0e0",
   },
   modalButtonPrimary: {
-    backgroundColor: '#007AFF',
-    borderColor: '#007AFF',
+    backgroundColor: "#007AFF",
+    borderColor: "#007AFF",
   },
   modalButtonText: {
-    color: '#333',
+    color: "#333",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   modalButtonPrimaryText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   section: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 10,
     padding: 20,
     marginBottom: 20,
   },
 });
 
-export default ProfileScreen; 
+export default ProfileScreen;

@@ -36,7 +36,18 @@ const BookCard: React.FC<BookCardProps> = ({
             <Text style={styles.deleteText}>🗑</Text>
           </TouchableOpacity>
         </View>
-
+        <Text
+          style={{ color: "#666", fontSize: 13, marginTop: 2 }}
+          numberOfLines={1}
+        >
+          {book.author}
+        </Text>
+        <Text
+          style={{ color: "#999", fontSize: 12, marginTop: 2 }}
+          numberOfLines={1}
+        >
+          {book.category}
+        </Text>
         <View style={styles.progressBarContainer}>
           <View style={[styles.progressBar, { width: `${progress * 100}%` }]} />
         </View>

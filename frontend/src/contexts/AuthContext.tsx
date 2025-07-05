@@ -1,6 +1,12 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import authService from '../services/auth.service';
-import { StoredUserData } from '../services/storage.service';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import authService from "../services/auth.service";
+import { StoredUserData } from "../services/storage.service";
 
 interface AuthContextType {
   user: StoredUserData | null;
@@ -17,7 +23,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
@@ -34,22 +40,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initializeAuth();
   }, []);
 
-  const initializeAuth = () => {
+  const initializeAuth = async () => {
     try {
       setIsLoading(true);
-      
-      // Storage'dan auth durumunu kontrol et
-      const isLoggedIn = authService.isLoggedIn();
+      // Storage'dan auth durumunu kontrol et (async)
+      const isLoggedIn = await authService.isLoggedIn();
       if (isLoggedIn) {
-        const storedUser = authService.getStoredUserData();
+        const storedUser = await authService.getStoredUserData();
         if (storedUser) {
           // Token'ı API'ye restore et
-          authService.restoreAuthToken();
+          await authService.restoreAuthToken();
           setUser(storedUser);
         }
       }
     } catch (error) {
-      console.error('Auth initialization error:', error);
+      console.error("Auth initialization error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -78,7 +83,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await authService.logout();
       setUser(null);
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
       // Hata olsa bile local state'i temizle
       setUser(null);
     }
@@ -98,9 +103,5 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updateUser,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
-}; 
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};

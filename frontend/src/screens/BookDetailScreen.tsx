@@ -7,14 +7,11 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Dimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import bookService from "../services/book.service";
 import WordSelector from "../components/WordSelector";
 import type { Book } from "../types";
-
-const { height: screenHeight } = Dimensions.get("window");
 
 const BookReaderScreen = ({ navigation, route }: any) => {
   const { bookId } = route.params;
@@ -94,33 +91,6 @@ const BookReaderScreen = ({ navigation, route }: any) => {
     }
   };
 
-  if (loading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
-          <Text style={styles.loadingText}>Yükleniyor...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  if (error) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity
-            style={styles.errorButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Text style={styles.errorButtonText}>Geri Dön</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -136,29 +106,47 @@ const BookReaderScreen = ({ navigation, route }: any) => {
         <View style={styles.headerRight} />
       </View>
 
-      <ScrollView
-        style={styles.pageContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.pageContent}>
-          {pageContent.split("\n\n").map((paragraph, pIndex) => (
-            <Text key={pIndex} style={styles.bookContentText}>
-              {paragraph
-                .trim()
-                .split(/\s+/)
-                .map((word, wIndex) => (
-                  <Text
-                    key={`${pIndex}-${wIndex}`}
-                    style={styles.wordText}
-                    onPress={() => handleWordPress(word)}
-                  >
-                    {word + " "}
-                  </Text>
-                ))}
-            </Text>
-          ))}
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#007AFF" />
+          <Text style={styles.loadingText}>Yükleniyor...</Text>
         </View>
-      </ScrollView>
+      ) : error ? (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity
+            style={styles.errorButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.errorButtonText}>Geri Dön</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <ScrollView
+          style={styles.pageContainer}
+          contentContainerStyle={styles.pageContentContainer}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.pageContent}>
+            {pageContent.split("\n\n").map((paragraph, pIndex) => (
+              <Text key={pIndex} style={styles.bookContentText}>
+                {paragraph
+                  .trim()
+                  .split(/\s+/)
+                  .map((word, wIndex) => (
+                    <Text
+                      key={`${pIndex}-${wIndex}`}
+                      style={styles.wordText}
+                      onPress={() => handleWordPress(word)}
+                    >
+                      {word + " "}
+                    </Text>
+                  ))}
+              </Text>
+            ))}
+          </View>
+        </ScrollView>
+      )}
 
       {/* Sayfa Navigasyonu */}
       <View style={styles.pageControls}>
@@ -170,7 +158,7 @@ const BookReaderScreen = ({ navigation, route }: any) => {
           onPress={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
-          <Text style={styles.pageButtonText}>Önceki Sayfa</Text>
+          <Text style={styles.pageButtonText}>◀</Text>
         </TouchableOpacity>
         <Text style={styles.pageIndicator}>
           Sayfa {currentPage} / {totalPages}
@@ -183,7 +171,7 @@ const BookReaderScreen = ({ navigation, route }: any) => {
           onPress={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
-          <Text style={styles.pageButtonText}>Sonraki Sayfa</Text>
+          <Text style={styles.pageButtonText}>▶</Text>
         </TouchableOpacity>
       </View>
 
@@ -244,7 +232,14 @@ const styles = StyleSheet.create({
   },
   pageContainer: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 10,
+    paddingTop: 10,
+  },
+  pageContentContainer: {
+    flexGrow: 1,
+    justifyContent: "flex-start",
+    minHeight: 200,
+    paddingBottom: 20,
   },
   pageContent: {
     backgroundColor: "#FFF8E1",
@@ -257,6 +252,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     maxWidth: 800,
     alignSelf: "center",
+    minHeight: 120,
   },
   bookContentText: {
     fontSize: 18,

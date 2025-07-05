@@ -1,6 +1,6 @@
+import * as FileSystem from "expo-file-system";
 import api from "./api";
 import storageService from "./storage.service";
-import * as FileSystem from "expo-file-system";
 import { Book } from "../types/index";
 
 class BookService {
@@ -13,7 +13,7 @@ class BookService {
   }): Promise<Book> {
     const { file, title, author, category, coverImage } = data;
 
-    // Dosyayı güvenli bir dizine kopyala
+    // Dosya güvenli dizine kopyalanıyor
     const fileUri = FileSystem.cacheDirectory + file.name;
     await FileSystem.copyAsync({
       from: file.uri,
@@ -21,30 +21,38 @@ class BookService {
     });
 
     const formData = new FormData();
+
     formData.append("file", {
       uri: fileUri,
       name: file.name || "document.pdf",
       type: file.mimeType || "application/pdf",
     } as any);
 
-    // Gerekli alanları ekle
     formData.append("title", title);
     formData.append("author", author);
     formData.append("category", category);
-    if (coverImage) {
-      formData.append("coverImage", coverImage);
-    }
+
+    // Boş bile olsa coverImage eklenmeli (Swagger ile uyumlu olması için)
+    formData.append("coverImage", coverImage || "");
 
     const token = await storageService.getAuthToken();
 
-    const response = await api.post("/books/upload/pdf", formData, {
+    const response = await fetch("http://10.0.2.2:3000/books/upload/pdf", {
+      method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
+        // Content-Type YAZMA!
       },
+      body: formData,
     });
 
-    return response.data;
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Upload failed: ${response.status} - ${errorText}`);
+    }
+
+    const result = await response.json();
+    return result;
   }
   async getUserBooks(): Promise<Book[]> {
     const response = await api.get("/books");

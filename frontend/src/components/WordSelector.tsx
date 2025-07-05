@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,8 +7,8 @@ import {
   Modal,
   ActivityIndicator,
   Alert,
-} from 'react-native';
-import translationService from '../services/translation.service';
+} from "react-native";
+import translationService from "../services/translation.service";
 
 interface WordSelectorProps {
   visible: boolean;
@@ -39,16 +39,26 @@ const WordSelector: React.FC<WordSelectorProps> = ({
     setIsLoading(true);
     try {
       const result = await translationService.translate({ text: selectedWord });
-      let allAlternatives: { word: string; translation: string; category: string; type: string }[] = [];
+      let allAlternatives: {
+        word: string;
+        translation: string;
+        category: string;
+        type: string;
+      }[] = [];
       if (result.translatedText) {
         allAlternatives = [
-          { word: selectedWord, translation: result.translatedText, category: '', type: '' },
-          ...(result.alternatives || [])
+          {
+            word: selectedWord,
+            translation: result.translatedText,
+            category: "",
+            type: "",
+          },
+          ...(result.alternatives || []),
         ];
       }
       setAlternatives(allAlternatives);
     } catch (error) {
-      Alert.alert('Hata', 'Çeviri yapılırken bir hata oluştu');
+      Alert.alert("Hata", "Çeviri yapılırken bir hata oluştu");
       setAlternatives([]);
     } finally {
       setIsLoading(false);
@@ -58,7 +68,7 @@ const WordSelector: React.FC<WordSelectorProps> = ({
   const handleSaveWord = () => {
     if (alternatives.length > 0) {
       onWordSave?.(selectedWord, alternatives[currentIndex].translation);
-      Alert.alert('Başarılı', 'Kelime kaydedildi');
+      Alert.alert("Başarılı", "Kelime kaydedildi");
       onClose();
     }
   };
@@ -68,7 +78,9 @@ const WordSelector: React.FC<WordSelectorProps> = ({
   };
 
   const handleNext = () => {
-    setCurrentIndex((prev) => (prev < alternatives.length - 1 ? prev + 1 : prev));
+    setCurrentIndex((prev) =>
+      prev < alternatives.length - 1 ? prev + 1 : prev
+    );
   };
 
   const current = alternatives[currentIndex];
@@ -100,34 +112,49 @@ const WordSelector: React.FC<WordSelectorProps> = ({
             <View style={styles.translationSection}>
               <View style={styles.altNavRow}>
                 <TouchableOpacity
-                  style={[styles.arrowButton, currentIndex === 0 && styles.disabledButton]}
+                  style={[
+                    styles.arrowButton,
+                    currentIndex === 0 && styles.disabledButton,
+                  ]}
                   onPress={handlePrev}
                   disabled={currentIndex === 0}
                 >
-                  <Text style={styles.arrowText}>{'<'}</Text>
+                  <Text style={styles.arrowText}>{"<"}</Text>
                 </TouchableOpacity>
                 <View style={styles.translationBox}>
                   <Text style={styles.translationText}>
-                    {current ? current.translation : 'Çeviri bulunamadı'}
+                    {current ? current.translation : "Çeviri bulunamadı"}
                   </Text>
                   {current && (current.category || current.type) ? (
-                    <Text style={styles.categoryText}>{current.category} {current.type && `• ${current.type}`}</Text>
+                    <Text style={styles.categoryText}>
+                      {current.category}
+                      {current.type ? ` • ${current.type}` : ""}
+                    </Text>
                   ) : null}
                 </View>
                 <TouchableOpacity
-                  style={[styles.arrowButton, currentIndex === alternatives.length - 1 && styles.disabledButton]}
+                  style={[
+                    styles.arrowButton,
+                    currentIndex === alternatives.length - 1 &&
+                      styles.disabledButton,
+                  ]}
                   onPress={handleNext}
                   disabled={currentIndex === alternatives.length - 1}
                 >
-                  <Text style={styles.arrowText}>{'>'}</Text>
+                  <Text style={styles.arrowText}>{">"}</Text>
                 </TouchableOpacity>
               </View>
               {/* Kaydet Butonu */}
-              {current && current.translation && current.translation !== 'Çeviri bulunamadı' && (
-                <TouchableOpacity style={styles.saveButton} onPress={handleSaveWord}>
-                  <Text style={styles.saveButtonText}>Kaydet</Text>
-                </TouchableOpacity>
-              )}
+              {current &&
+                current.translation &&
+                current.translation !== "Çeviri bulunamadı" && (
+                  <TouchableOpacity
+                    style={styles.saveButton}
+                    onPress={handleSaveWord}
+                  >
+                    <Text style={styles.saveButtonText}>Kaydet</Text>
+                  </TouchableOpacity>
+                )}
             </View>
           )}
         </View>
@@ -139,110 +166,110 @@ const WordSelector: React.FC<WordSelectorProps> = ({
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 12,
     padding: 20,
     width: 260,
-    alignItems: 'center',
+    alignItems: "center",
     elevation: 10,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
     marginBottom: 10,
   },
   headerTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
   },
   closeButton: {
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#f0f0f0",
+    justifyContent: "center",
+    alignItems: "center",
   },
   closeButtonText: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
   },
   selectedWord: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#007AFF',
+    fontWeight: "bold",
+    color: "#007AFF",
     marginVertical: 10,
-    textAlign: 'center',
+    textAlign: "center",
   },
   translationSection: {
-    alignItems: 'center',
-    width: '100%',
+    alignItems: "center",
+    width: "100%",
   },
   altNavRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 10,
-    width: '100%',
-    justifyContent: 'center',
+    width: "100%",
+    justifyContent: "center",
   },
   arrowButton: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#f0f0f0",
+    justifyContent: "center",
+    alignItems: "center",
     marginHorizontal: 5,
   },
   disabledButton: {
-    backgroundColor: '#e0e0e0',
+    backgroundColor: "#e0e0e0",
   },
   arrowText: {
     fontSize: 18,
-    color: '#007AFF',
-    fontWeight: 'bold',
+    color: "#007AFF",
+    fontWeight: "bold",
   },
   translationBox: {
     minWidth: 120,
     maxWidth: 150,
     padding: 10,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
   translationText: {
     fontSize: 16,
-    color: '#333',
-    fontWeight: '600',
-    textAlign: 'center',
+    color: "#333",
+    fontWeight: "600",
+    textAlign: "center",
   },
   categoryText: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
     marginTop: 4,
-    textAlign: 'center',
+    textAlign: "center",
   },
   saveButton: {
-    backgroundColor: '#28a745',
+    backgroundColor: "#28a745",
     paddingVertical: 10,
     paddingHorizontal: 30,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 10,
   },
   saveButtonText: {
-    color: 'white',
+    color: "white",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });
 
-export default WordSelector; 
+export default WordSelector;

@@ -113,12 +113,6 @@ const BooksScreen = ({ navigation }: any) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("Home")}
-          style={styles.backButton}
-        >
-          <Text style={styles.backButtonText}>← Ana Sayfa</Text>
-        </TouchableOpacity>
         <Text style={styles.title}>Kitaplarım</Text>
         <TouchableOpacity
           style={styles.addButton}

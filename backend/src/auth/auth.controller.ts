@@ -50,4 +50,12 @@ export class AuthController {
   getMe(@Request() req) {
     return req.user;
   }
+
+  @Post('logout')
+  @ApiOperation({ summary: 'User logout' })
+  @ApiResponse({ status: 200, description: 'Logout successful' })
+  logout() {
+    // If you want, you can implement token blacklist logic here.
+    return { message: 'Logout successful' };
+  }
 }

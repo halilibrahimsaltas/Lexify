@@ -1,4 +1,4 @@
-import api from './api';
+import api from "./api";
 
 export interface Word {
   id: number;
@@ -12,7 +12,7 @@ export interface Word {
 
 class WordService {
   async getUserWords(): Promise<Word[]> {
-    const response = await api.get('/words');
+    const response = await api.get("/favorites");
     return response.data;
   }
 }
