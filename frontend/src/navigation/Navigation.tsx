@@ -12,6 +12,7 @@ import BookDetailScreen from '../screens/BookDetailScreen';
 import BookReaderScreen from '../screens/BookReaderScreen';
 import LoginScreen from '../screens/LoginScreen';
 import LogoutScreen from '../screens/LogoutScreen';// logout işlemini burada yapacağız
+import LoadingScreen from '../components/LoadingScreen';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -29,7 +30,7 @@ const Navigation = () => {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
-    return null; // veya SplashScreen koyabilirsin
+    return <LoadingScreen />;
   }
 
   return (

@@ -24,19 +24,8 @@ export interface AuthResponse {
 
 class AuthService {
   constructor() {
-    // Uygulama başladığında stored token'ı API'ye set et
-    this.initializeAuth();
-  }
-
-  private async initializeAuth(): Promise<void> {
-    try {
-      const token = await storageService.getAuthToken();
-      if (token) {
-        this.setAuthToken(token);
-      }
-    } catch (error) {
-      console.error("Auth initialization error:", error);
-    }
+    // Constructor'da async işlem yapmıyoruz
+    // Auth initialization AuthContext'te yapılıyor
   }
 
   async login(credentials: LoginRequest): Promise<AuthResponse> {

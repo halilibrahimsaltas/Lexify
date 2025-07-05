@@ -43,18 +43,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const initializeAuth = async () => {
     try {
       setIsLoading(true);
-      // Storage'dan auth durumunu kontrol et (async)
+      // Storage'dan auth durumunu kontrol et
       const isLoggedIn = await authService.isLoggedIn();
       if (isLoggedIn) {
         const storedUser = await authService.getStoredUserData();
         if (storedUser) {
           // Token'ı API'ye restore et
-          await authService.restoreAuthToken();
-          setUser(storedUser);
+          const tokenRestored = await authService.restoreAuthToken();
+          if (tokenRestored) {
+            setUser(storedUser);
+          } else {
+            // Token restore başarısızsa storage'ı temizle
+            await authService.logout();
+          }
         }
       }
     } catch (error) {
       console.error("Auth initialization error:", error);
+      // Hata durumunda storage'ı temizle
+      try {
+        await authService.logout();
+      } catch (logoutError) {
+        console.error("Logout error during initialization:", logoutError);
+      }
     } finally {
       setIsLoading(false);
     }
