@@ -190,7 +190,8 @@ const ProfileScreen = ({ navigation }: any) => {
             <Text style={styles.userName}>{user.name}</Text>
             <Text style={styles.userEmail}>{user.email}</Text>
             <Text style={styles.userLevel}>
-              Seviye: {user.role === "ADMIN" ? "Yönetici" : "Kullanıcı"}
+              <Text>Seviye: </Text>
+              <Text>{user.role === "ADMIN" ? "Yönetici" : "Kullanıcı"}</Text>
             </Text>
           </View>
         </View>
@@ -222,7 +223,9 @@ const ProfileScreen = ({ navigation }: any) => {
                 key={word.id}
                 style={{ color: "#333", fontSize: 15, marginBottom: 4 }}
               >
-                {word.originalText} - {word.translatedText}
+                <Text>{word.originalText}</Text>
+                <Text> - </Text>
+                <Text>{word.translatedText}</Text>
               </Text>
             ))
           )}

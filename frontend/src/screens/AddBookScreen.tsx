@@ -122,7 +122,11 @@ const AddBookScreen = ({ navigation }: any) => {
 
         <TouchableOpacity style={styles.fileButton} onPress={handleFilePick}>
           <Text style={styles.fileButtonText}>
-            {selectedFile ? selectedFile.name : "PDF Dosyası Seç"}
+            {selectedFile ? (
+              <Text>{selectedFile.name}</Text>
+            ) : (
+              <Text>PDF Dosyası Seç</Text>
+            )}
           </Text>
         </TouchableOpacity>
 

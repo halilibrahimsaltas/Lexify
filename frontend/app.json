@@ -28,6 +28,16 @@
     "web": {
       "favicon": "./src/assets/favicon.png",
       "bundler": "metro"
-    }
+    },
+    "fonts": [
+      {
+        "asset": "./src/assets/fonts/Merriweather-VariableFont_opsz,wdth,wght.ttf",
+        "family": "Merriweather"
+      },
+      {
+        "asset": "./src/assets/fonts/Merriweather-Italic-VariableFont_opsz,wdth,wght.ttf",
+        "family": "Merriweather-Italic"
+      }
+    ]
   }
 }

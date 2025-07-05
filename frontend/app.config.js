@@ -14,6 +14,9 @@ export default {
       resizeMode: 'contain',
       backgroundColor: '#ffffff',
     },
+    plugins: [
+      "expo-font"
+    ],
     assetBundlePatterns: ['**/*'],
     ios: {
       supportsTablet: true,

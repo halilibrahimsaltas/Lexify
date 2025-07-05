@@ -123,12 +123,21 @@ const WordSelector: React.FC<WordSelectorProps> = ({
                 </TouchableOpacity>
                 <View style={styles.translationBox}>
                   <Text style={styles.translationText}>
-                    {current ? current.translation : "Çeviri bulunamadı"}
+                    {current ? (
+                      <Text>{current.translation}</Text>
+                    ) : (
+                      <Text>Çeviri bulunamadı</Text>
+                    )}
                   </Text>
                   {current && (current.category || current.type) ? (
                     <Text style={styles.categoryText}>
-                      {current.category}
-                      {current.type ? ` • ${current.type}` : ""}
+                      <Text>{current.category}</Text>
+                      {current.type ? (
+                        <>
+                          <Text> • </Text>
+                          <Text>{current.type}</Text>
+                        </>
+                      ) : null}
                     </Text>
                   ) : null}
                 </View>

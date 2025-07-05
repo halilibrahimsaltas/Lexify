@@ -33,7 +33,9 @@ const SavedWordsScreen = ({ navigation }: any) => {
       <Text style={styles.wordText}>{item.originalText}</Text>
       <Text style={styles.translationText}>{item.translatedText}</Text>
       <Text style={styles.metaText}>
-        {(languageNames[item.sourceLanguage] || item.sourceLanguage) + ' → ' + (languageNames[item.targetLanguage] || item.targetLanguage)}
+        <Text>{languageNames[item.sourceLanguage] || item.sourceLanguage}</Text>
+        <Text> → </Text>
+        <Text>{languageNames[item.targetLanguage] || item.targetLanguage}</Text>
       </Text>
       <Text style={styles.dateText}>{new Date(item.createdAt).toLocaleString('tr-TR')}</Text>
     </View>

@@ -139,7 +139,8 @@ const BookReaderScreen = ({ navigation, route }: any) => {
                       style={styles.wordText}
                       onPress={() => handleWordPress(word)}
                     >
-                      {word + " "}
+                      {word}
+                      <Text> </Text>
                     </Text>
                   ))}
               </Text>
@@ -189,7 +190,9 @@ const BookReaderScreen = ({ navigation, route }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "#FFF8E1",
+    width: "100%",
+    height: "100%",
   },
   header: {
     backgroundColor: "#fff",
@@ -224,7 +227,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#2c3e50",
     textAlign: "center",
-    fontFamily: "serif",
+    fontFamily: "Merriweather",
   },
   headerRight: {
     flexDirection: "row",
@@ -232,40 +235,45 @@ const styles = StyleSheet.create({
   },
   pageContainer: {
     flex: 1,
-    paddingHorizontal: 10,
-    paddingTop: 10,
+    paddingHorizontal: 0,
+    paddingTop: 0,
+    width: "100%",
+    backgroundColor: "#FFF8E1",
   },
   pageContentContainer: {
     flexGrow: 1,
-    justifyContent: "flex-start",
+    justifyContent: "center",
+    alignItems: "center",
     minHeight: 200,
-    paddingBottom: 20,
+    paddingBottom: 0,
+    width: "100%",
   },
   pageContent: {
     backgroundColor: "#FFF8E1",
-    borderRadius: 8,
+    borderRadius: 0,
     padding: 15,
     elevation: 2,
     shadowColor: "#000",
     shadowOpacity: 0.06,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
-    maxWidth: 800,
+    maxWidth: "100%",
     alignSelf: "center",
     minHeight: 120,
+    width: "100%",
   },
   bookContentText: {
-    fontSize: 18,
+    fontSize: 17,
     color: "#4B3F2F",
-    lineHeight: 28,
+    lineHeight: 26,
     textAlign: "justify",
-    fontFamily: "serif",
+    fontFamily: "Merriweather",
   },
   wordText: {
-    fontSize: 18,
+    fontSize: 17,
     color: "#2c3e50",
-    lineHeight: 32,
-    fontFamily: "serif",
+    lineHeight: 26,
+    fontFamily: "Merriweather",
     marginRight: 2,
     marginBottom: 2,
     borderRadius: 3,
