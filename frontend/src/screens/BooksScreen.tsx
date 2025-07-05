@@ -8,6 +8,7 @@ import {
   Alert,
   ActivityIndicator,
   RefreshControl,
+  TextInput,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import bookService from "../services/book.service";
@@ -19,6 +20,8 @@ const BooksScreen = ({ navigation }: any) => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState<number | null>(null);
+  const [search, setSearch] = useState("");
+  const [searchResults, setSearchResults] = useState<Book[] | null>(null);
 
   useEffect(() => {
     loadBooks();
@@ -69,14 +72,28 @@ const BooksScreen = ({ navigation }: any) => {
     ]);
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("tr-TR", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+  const handleSearch = async () => {
+    if (!search.trim()) {
+      setSearchResults(null);
+      return;
+    }
+    try {
+      // Varsayalım ki bookService'de bir arama fonksiyonu var:
+      const results = await bookService.searchBooks(search.trim());
+      setSearchResults(results);
+    } catch (error: any) {
+      Alert.alert("Hata", error.message || "Arama sırasında hata oluştu");
+    }
   };
+
+  const filteredBooks = searchResults !== null
+    ? searchResults
+    : search.trim()
+      ? books.filter((book) =>
+          book.title.toLowerCase().includes(search.toLowerCase()) ||
+          book.author.toLowerCase().includes(search.toLowerCase())
+        )
+      : books;
 
   const renderBookItem = (book: Book) => {
     const userProgress =
@@ -94,7 +111,6 @@ const BooksScreen = ({ navigation }: any) => {
         book={book}
         onPress={() => navigation.navigate("BookReader", { bookId: book.id })}
         onDelete={() => handleDeleteBook(book.id)}
-        progress={progress}
       />
     );
   };
@@ -112,8 +128,15 @@ const BooksScreen = ({ navigation }: any) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Kitaplarım</Text>
+      <View style={styles.searchRow}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Kitap veya yazar ara..."
+          value={search}
+          onChangeText={setSearch}
+          onSubmitEditing={handleSearch}
+          returnKeyType="search"
+        />
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => navigation.navigate("AddBook")}
@@ -121,7 +144,6 @@ const BooksScreen = ({ navigation }: any) => {
           <Text style={styles.addButtonText}>+</Text>
         </TouchableOpacity>
       </View>
-
       <ScrollView
         style={styles.content}
         showsVerticalScrollIndicator={false}
@@ -129,28 +151,16 @@ const BooksScreen = ({ navigation }: any) => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {books.length === 0 ? (
+        {filteredBooks.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyIcon}>📚</Text>
-            <Text style={styles.emptyTitle}>Henüz kitap eklenmemiş</Text>
+            <Text style={styles.emptyTitle}>Hiç kitap bulunamadı</Text>
             <Text style={styles.emptyDescription}>
-              İlk kitabınızı eklemek için yukarıdaki + butonuna tıklayın
+              Yeni kitap eklemek için sağdaki + butonunu kullanabilirsin
             </Text>
-            <TouchableOpacity
-              style={styles.emptyButton}
-              onPress={() => navigation.navigate("AddBook")}
-            >
-              <Text style={styles.emptyButtonText}>Kitap Ekle</Text>
-            </TouchableOpacity>
           </View>
         ) : (
-          <>
-            <View style={styles.statsContainer}>
-              <Text style={styles.statsText}>Toplam {books.length} kitap</Text>
-            </View>
-
-            <View style={styles.booksList}>{books.map(renderBookItem)}</View>
-          </>
+          <View style={styles.booksList}>{filteredBooks.map(renderBookItem)}</View>
         )}
       </ScrollView>
     </SafeAreaView>
@@ -160,42 +170,49 @@ const BooksScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#FFF8E1",
   },
-  header: {
-    padding: 20,
-    backgroundColor: "white",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
+  searchRow: {
     flexDirection: "row",
     alignItems: "center",
+    padding: 16,
+    backgroundColor: "#FFF8E1",
+    gap: 10,
   },
-  backButton: {
-    marginRight: 15,
-  },
-  backButtonText: {
-    color: "#007AFF",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#333",
+  searchInput: {
     flex: 1,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    fontSize: 16,
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: "#F7C873",
   },
   addButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#007AFF",
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "#F7C873",
     justifyContent: "center",
     alignItems: "center",
+    shadowColor: "#F7C873",
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
   },
   addButtonText: {
-    color: "white",
-    fontSize: 24,
+    color: "#4B3F2F",
+    fontSize: 28,
     fontWeight: "bold",
+  },
+  content: {
+    flex: 1,
+    padding: 20,
+  },
+  booksList: {
+    gap: 18,
   },
   loadingContainer: {
     flex: 1,
@@ -206,80 +223,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 16,
     color: "#666",
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-  },
-  statsContainer: {
-    backgroundColor: "white",
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
-  },
-  statsText: {
-    fontSize: 16,
-    color: "#666",
-    textAlign: "center",
-  },
-  booksList: {
-    gap: 15,
-  },
-  bookItem: {
-    backgroundColor: "white",
-    borderRadius: 10,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  bookInfo: {
-    marginBottom: 15,
-  },
-  bookTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 5,
-  },
-  bookDate: {
-    fontSize: 12,
-    color: "#666",
-    marginBottom: 10,
-  },
-  bookContent: {
-    fontSize: 14,
-    color: "#666",
-    lineHeight: 20,
-  },
-  bookActions: {
-    flexDirection: "row",
-    gap: 10,
-  },
-  actionButton: {
-    flex: 1,
-    padding: 10,
-    borderRadius: 8,
-    alignItems: "center",
-    backgroundColor: "#007AFF",
-  },
-  actionButtonText: {
-    color: "white",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  deleteButton: {
-    backgroundColor: "#FF3B30",
-  },
-  deleteButtonText: {
-    color: "white",
-    fontSize: 14,
-    fontWeight: "600",
   },
   emptyContainer: {
     flex: 1,
@@ -304,17 +247,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 30,
     lineHeight: 24,
-  },
-  emptyButton: {
-    backgroundColor: "#007AFF",
-    paddingHorizontal: 30,
-    paddingVertical: 15,
-    borderRadius: 10,
-  },
-  emptyButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "600",
   },
 });
 

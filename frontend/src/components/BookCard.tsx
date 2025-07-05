@@ -6,15 +6,22 @@ interface BookCardProps {
   book: Book;
   onPress: () => void;
   onDelete: () => void;
-  progress?: number; // 0-1 arası değer
 }
 
 const BookCard: React.FC<BookCardProps> = ({
   book,
   onPress,
   onDelete,
-  progress = 0,
 }) => {
+  const userProgress =
+    Array.isArray(book.progress) && book.progress.length > 0
+      ? book.progress[0]
+      : null;
+  const totalPages = book.pages?.length || 1;
+  const progress = userProgress
+    ? (userProgress.currentPage || 0) / totalPages
+    : 0;
+
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.8}>
       <Image
@@ -32,8 +39,17 @@ const BookCard: React.FC<BookCardProps> = ({
           <Text style={styles.title} numberOfLines={1}>
             {book.title}
           </Text>
-          <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
-            <Text style={styles.deleteText}>🗑</Text>
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#FFE0B2",
+              borderRadius: 8,
+              padding: 8,
+              alignItems: "center",
+              marginLeft: 8,
+            }}
+            onPress={onDelete}
+          >
+            <Text style={{ color: "#B85C38", fontWeight: "bold" }}>🗑</Text>
           </TouchableOpacity>
         </View>
         <Text
@@ -48,8 +64,15 @@ const BookCard: React.FC<BookCardProps> = ({
         >
           {book.category}
         </Text>
-        <View style={styles.progressBarContainer}>
-          <View style={[styles.progressBar, { width: `${progress * 100}%` }]} />
+        <View style={{ height: 8, backgroundColor: "#F3E6C4", borderRadius: 4, marginTop: 10 }}>
+          <View
+            style={{
+              width: `${Math.round(progress * 100)}%`,
+              height: 8,
+              backgroundColor: "#F7C873",
+              borderRadius: 4,
+            }}
+          />
         </View>
       </View>
     </TouchableOpacity>

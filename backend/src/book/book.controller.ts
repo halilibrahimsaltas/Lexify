@@ -102,4 +102,9 @@ export class BookController {
   async remove(@Request() req, @Param('id', ParseIntPipe) id: number) {
     return this.bookService.remove(id, req.user.sub);
   }
+
+  @Get('search')
+  async searchBooks(@Request() req, @Query('query') query: string) {
+    return this.bookService.searchBooks(req.user.sub, query);
+  }
 }

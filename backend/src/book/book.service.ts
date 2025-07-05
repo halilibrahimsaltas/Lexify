@@ -5,6 +5,7 @@ import { Book } from './entities/book.entity';
 import { BookPage } from './entities/book-page.entity';
 import { CreateBookDto } from './dto/create-book.dto';
 import { FileService } from '../file/file.service';
+import { ILike } from 'typeorm';
 
 @Injectable()
 export class BookService {
@@ -125,11 +126,17 @@ export class BookService {
   }
 
   async findAllByUser(userId: number): Promise<Book[]> {
-    return await this.bookRepository.find({ where: { userId } });
+    return await this.bookRepository.find({
+      where: { userId },
+      relations: ['progress'], // progress ilişkisini ekle
+    });
   }
-
+  
   async findOneByUser(id: number, userId: number): Promise<Book> {
-    const book = await this.bookRepository.findOne({ where: { id, userId } });
+    const book = await this.bookRepository.findOne({
+      where: { id, userId },
+      relations: ['progress'], // progress ilişkisini ekle
+    });
     if (!book) throw new NotFoundException('Book not found');
     return book;
   }
@@ -144,5 +151,15 @@ export class BookService {
       }
     }
     await this.bookRepository.remove(book);
+  }
+
+  async searchBooks(userId: number, query: string): Promise<Book[]> {
+    return this.bookRepository.find({
+      where: [
+        { userId, title: ILike(`%${query}%`) },
+        { userId, author: ILike(`%${query}%`) },
+      ],
+      relations: ['progress'],
+    });
   }
 }

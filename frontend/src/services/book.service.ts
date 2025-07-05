@@ -87,6 +87,16 @@ class BookService {
     });
     return response.data; // { chapters: [ ... ] }
   }
+
+  async searchBooks(query: string): Promise<Book[]> {
+    const token = await storageService.getAuthToken();
+    const response = await api.get(`/books/search?query=${encodeURIComponent(query)}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  }
 }
 
 export default new BookService();

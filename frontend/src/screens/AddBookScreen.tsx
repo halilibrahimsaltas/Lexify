@@ -25,11 +25,7 @@ const AddBookScreen = ({ navigation }: any) => {
   const handleFilePick = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
-        type: [
-          "application/pdf",
-          "application/epub+zip",
-          ".epub"
-        ],
+        type: "*/*",
         copyToCacheDirectory: true,
       });
 
@@ -129,7 +125,7 @@ const AddBookScreen = ({ navigation }: any) => {
             {selectedFile ? (
               <Text>{selectedFile.name}</Text>
             ) : (
-              <Text>PDF Dosyası Seç</Text>
+              <Text>Dosyası Seç</Text>
             )}
           </Text>
         </TouchableOpacity>
@@ -151,9 +147,18 @@ const AddBookScreen = ({ navigation }: any) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  container: {
+    flex: 1,
+    backgroundColor: "#FFF8E1",
+  },
   scrollContent: { padding: 20 },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
+  title: {
+    fontSize: 26,
+    fontWeight: "bold",
+    color: "#4B3F2F",
+    flex: 1,
+    fontFamily: "Merriweather",
+  },
   input: {
     backgroundColor: "#f1f1f1",
     padding: 14,
