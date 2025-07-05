@@ -77,6 +77,16 @@ class BookService {
     });
     return response.data;
   }
+
+  async getBookChapters(bookId: number) {
+    const token = await storageService.getAuthToken();
+    const response = await api.get(`/books/${bookId}/chapters`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data; // { chapters: [ ... ] }
+  }
 }
 
 export default new BookService();

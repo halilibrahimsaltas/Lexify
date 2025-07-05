@@ -24,7 +24,7 @@ export class BookService {
     details: CreateBookDto,
   ): Promise<Book> {
     const filePath = await this.fileService.saveFile(file);
-    const rawText = await this.fileService.extractTextFromPdf(filePath);
+    const rawText = await this.fileService.extractText(filePath);
 
     const pageSize = 1000;
     const paragraphs = rawText.split(/\n\n|\r\n\r\n/).filter((p) => p.trim());

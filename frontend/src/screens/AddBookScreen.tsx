@@ -25,7 +25,11 @@ const AddBookScreen = ({ navigation }: any) => {
   const handleFilePick = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
-        type: "application/pdf",
+        type: [
+          "application/pdf",
+          "application/epub+zip",
+          ".epub"
+        ],
         copyToCacheDirectory: true,
       });
 
@@ -33,7 +37,7 @@ const AddBookScreen = ({ navigation }: any) => {
 
       const file = result.assets[0];
       setSelectedFile(file);
-      Alert.alert("Başarılı", "PDF dosyası seçildi");
+      Alert.alert("Başarılı", `${file.name} dosyası seçildi`);
     } catch (error) {
       Alert.alert("Hata", "Dosya seçilirken bir hata oluştu");
     }

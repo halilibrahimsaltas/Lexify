@@ -23,6 +23,8 @@ const BookReaderScreen = ({ navigation, route }: any) => {
   const [pageContent, setPageContent] = useState("");
   const [selectedWord, setSelectedWord] = useState("");
   const [wordSelectorVisible, setWordSelectorVisible] = useState(false);
+  const [chapters, setChapters] = useState<string[]>([]);
+  const [currentChapter, setCurrentChapter] = useState(0);
 
   useEffect(() => {
     fetchAll();
@@ -34,6 +36,16 @@ const BookReaderScreen = ({ navigation, route }: any) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage]);
+
+  useEffect(() => {
+    // Kitap bölümlerini çek
+    const fetchChapters = async () => {
+      const data = await bookService.getBookChapters(bookId);
+      setChapters(data.chapters);
+      setCurrentChapter(0);
+    };
+    fetchChapters();
+  }, [bookId]);
 
   const fetchAll = async () => {
     setLoading(true);
@@ -91,6 +103,13 @@ const BookReaderScreen = ({ navigation, route }: any) => {
     }
   };
 
+  // Paragrafları göster
+  const renderParagraphs = (chapterText: string) => (
+    chapterText.split('\n\n').map((para, i) => (
+      <Text key={i} style={styles.bookContentText}>{para}</Text>
+    ))
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -122,57 +141,27 @@ const BookReaderScreen = ({ navigation, route }: any) => {
           </TouchableOpacity>
         </View>
       ) : (
-        <ScrollView
-          style={styles.pageContainer}
-          contentContainerStyle={styles.pageContentContainer}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.pageContent}>
-            {pageContent.split("\n\n").map((paragraph, pIndex) => (
-              <Text key={pIndex} style={styles.bookContentText}>
-                {paragraph
-                  .trim()
-                  .split(/\s+/)
-                  .map((word, wIndex) => (
-                    <Text
-                      key={`${pIndex}-${wIndex}`}
-                      style={styles.wordText}
-                      onPress={() => handleWordPress(word)}
-                    >
-                      {word}
-                      <Text> </Text>
-                    </Text>
-                  ))}
-              </Text>
-            ))}
-          </View>
+        <ScrollView style={styles.pageContainer}>
+          {chapters.length > 0 && renderParagraphs(chapters[currentChapter])}
         </ScrollView>
       )}
 
-      {/* Sayfa Navigasyonu */}
+      {/* Bölüm/Sayfa navigasyonu */}
       <View style={styles.pageControls}>
         <TouchableOpacity
-          style={[
-            styles.pageButton,
-            currentPage === 1 && styles.pageButtonDisabled,
-          ]}
-          onPress={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
+          onPress={() => setCurrentChapter((prev) => Math.max(prev - 1, 0))}
+          disabled={currentChapter === 0}
         >
-          <Text style={styles.pageButtonText}>◀</Text>
+          <Text>◀</Text>
         </TouchableOpacity>
-        <Text style={styles.pageIndicator}>
-          Sayfa {currentPage} / {totalPages}
+        <Text>
+          Bölüm {currentChapter + 1} / {chapters.length}
         </Text>
         <TouchableOpacity
-          style={[
-            styles.pageButton,
-            currentPage === totalPages && styles.pageButtonDisabled,
-          ]}
-          onPress={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
+          onPress={() => setCurrentChapter((prev) => Math.min(prev + 1, chapters.length - 1))}
+          disabled={currentChapter === chapters.length - 1}
         >
-          <Text style={styles.pageButtonText}>▶</Text>
+          <Text>▶</Text>
         </TouchableOpacity>
       </View>
 

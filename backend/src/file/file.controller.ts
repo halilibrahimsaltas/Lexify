@@ -3,6 +3,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from './file.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiTags, ApiOperation, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import * as epubParser from 'epub-parser';
 
 @ApiTags('files')
 @Controller('files')
@@ -27,7 +28,7 @@ export class FileController {
     })
     async uploadPdf(@UploadedFile() file: Express.Multer.File) {
         const filePath = await this.fileService.saveFile(file);
-        const extractedText = await this.fileService.extractTextFromPdf(filePath);
+        const extractedText = await this.fileService.extractText(filePath);
         
         // İşlem bittikten sonra dosyayı sil
         await this.fileService.deleteFile(filePath);
