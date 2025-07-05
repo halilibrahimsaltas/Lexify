@@ -7,7 +7,9 @@ import {
   Modal,
   ActivityIndicator,
   Alert,
+  Pressable,
 } from "react-native";
+import { BlurView } from 'expo-blur';
 import translationService from "../services/translation.service";
 
 interface WordSelectorProps {
@@ -92,82 +94,69 @@ const WordSelector: React.FC<WordSelectorProps> = ({
       transparent={true}
       onRequestClose={onClose}
     >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>Çeviri</Text>
-            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-              <Text style={styles.closeButtonText}>✕</Text>
-            </TouchableOpacity>
-          </View>
+      <Pressable style={styles.modalOverlay} onPress={onClose}>
+        <BlurView intensity={20} tint="dark" style={styles.blurCard}>
+          <View style={styles.modalContent} pointerEvents="box-none">
+            {/* Seçilen Kelime */}
+            <Text style={styles.selectedWord}>{selectedWord}</Text>
 
-          {/* Seçilen Kelime */}
-          <Text style={styles.selectedWord}>{selectedWord}</Text>
-
-          {/* Çeviri ve Alternatifler */}
-          {isLoading ? (
-            <ActivityIndicator style={{ marginVertical: 20 }} color="#007AFF" />
-          ) : (
-            <View style={styles.translationSection}>
-              <View style={styles.altNavRow}>
-                <TouchableOpacity
-                  style={[
-                    styles.arrowButton,
-                    currentIndex === 0 && styles.disabledButton,
-                  ]}
-                  onPress={handlePrev}
-                  disabled={currentIndex === 0}
-                >
-                  <Text style={styles.arrowText}>{"<"}</Text>
-                </TouchableOpacity>
-                <View style={styles.translationBox}>
-                  <Text style={styles.translationText}>
-                    {current ? (
-                      <Text>{current.translation}</Text>
-                    ) : (
-                      <Text>Çeviri bulunamadı</Text>
-                    )}
-                  </Text>
-                  {current && (current.category || current.type) ? (
-                    <Text style={styles.categoryText}>
-                      <Text>{current.category}</Text>
-                      {current.type ? (
-                        <>
-                          <Text> • </Text>
-                          <Text>{current.type}</Text>
-                        </>
-                      ) : null}
-                    </Text>
-                  ) : null}
-                </View>
-                <TouchableOpacity
-                  style={[
-                    styles.arrowButton,
-                    currentIndex === alternatives.length - 1 &&
-                      styles.disabledButton,
-                  ]}
-                  onPress={handleNext}
-                  disabled={currentIndex === alternatives.length - 1}
-                >
-                  <Text style={styles.arrowText}>{">"}</Text>
-                </TouchableOpacity>
-              </View>
-              {/* Kaydet Butonu */}
-              {current &&
-                current.translation &&
-                current.translation !== "Çeviri bulunamadı" && (
+            {/* Çeviri ve Alternatifler */}
+            {isLoading ? (
+              <ActivityIndicator style={{ marginVertical: 20 }} color="#fff" />
+            ) : (
+              <View style={styles.translationSection}>
+                <View style={styles.altNavRow}>
                   <TouchableOpacity
-                    style={styles.saveButton}
-                    onPress={handleSaveWord}
+                    style={styles.arrowButton}
+                    onPress={handlePrev}
+                    disabled={currentIndex === 0}
                   >
-                    <Text style={styles.saveButtonText}>Kaydet</Text>
+                    <Text style={currentIndex === 0 ? styles.arrowTextDisabled : styles.arrowText}>{"‹"}</Text>
                   </TouchableOpacity>
-                )}
-            </View>
-          )}
-        </View>
-      </View>
+                  <View style={styles.translationBox}>
+                    <Text style={styles.translationText}>
+                      {current ? (
+                        <Text>{current.translation}</Text>
+                      ) : (
+                        <Text>Çeviri bulunamadı</Text>
+                      )}
+                    </Text>
+                    {current && (current.category || current.type) ? (
+                      <Text style={styles.categoryText}>
+                        <Text>{current.category}</Text>
+                        {current.type ? (
+                          <>
+                            <Text> • </Text>
+                            <Text>{current.type}</Text>
+                          </>
+                        ) : null}
+                      </Text>
+                    ) : null}
+                  </View>
+                  <TouchableOpacity
+                    style={styles.arrowButton}
+                    onPress={handleNext}
+                    disabled={currentIndex === alternatives.length - 1}
+                  >
+                    <Text style={currentIndex === alternatives.length - 1 ? styles.arrowTextDisabled : styles.arrowText}>{"›"}</Text>
+                  </TouchableOpacity>
+                </View>
+                {/* Kaydet Butonu */}
+                {current &&
+                  current.translation &&
+                  current.translation !== "Çeviri bulunamadı" && (
+                    <TouchableOpacity
+                      style={styles.saveButton}
+                      onPress={handleSaveWord}
+                    >
+                      <Text style={styles.saveButtonText}>Kaydet</Text>
+                    </TouchableOpacity>
+                  )}
+              </View>
+            )}
+          </View>
+        </BlurView>
+      </Pressable>
     </Modal>
   );
 };
@@ -175,48 +164,33 @@ const WordSelector: React.FC<WordSelectorProps> = ({
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    backgroundColor: "transparent",
     justifyContent: "center",
     alignItems: "center",
+  },
+  blurCard: {
+    borderRadius: 16,
+    overflow: "hidden",
   },
   modalContent: {
-    backgroundColor: "white",
-    borderRadius: 12,
-    padding: 20,
-    width: 260,
+    backgroundColor: "rgba(30,30,30,0.7)",
+    borderRadius: 16,
+    padding: 16,
+    width: 240,
     alignItems: "center",
     elevation: 10,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "100%",
-    marginBottom: 10,
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  closeButton: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: "#f0f0f0",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  closeButtonText: {
-    fontSize: 16,
-    color: "#666",
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
   },
   selectedWord: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
-    color: "#007AFF",
-    marginVertical: 10,
+    color: "#fff",
+    marginVertical: 6,
     textAlign: "center",
+    fontFamily: "Merriweather",
   },
   translationSection: {
     alignItems: "center",
@@ -225,59 +199,72 @@ const styles = StyleSheet.create({
   altNavRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 8,
     width: "100%",
     justifyContent: "center",
   },
   arrowButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#f0f0f0",
-    justifyContent: "center",
+    backgroundColor: "transparent",
+    borderWidth: 0,
+    marginHorizontal: 8,
+    padding: 0,
+    minWidth: 32,
+    minHeight: 32,
     alignItems: "center",
-    marginHorizontal: 5,
-  },
-  disabledButton: {
-    backgroundColor: "#e0e0e0",
+    justifyContent: "center",
   },
   arrowText: {
-    fontSize: 18,
-    color: "#007AFF",
+    fontSize: 32,
+    color: "#fff",
     fontWeight: "bold",
+    fontFamily: "Merriweather",
+    opacity: 1,
+  },
+  arrowTextDisabled: {
+    fontSize: 32,
+    color: "#444",
+    fontWeight: "bold",
+    fontFamily: "Merriweather",
+    opacity: 0.5,
   },
   translationBox: {
-    minWidth: 120,
-    maxWidth: 150,
-    padding: 10,
-    backgroundColor: "#f8f9fa",
+    minWidth: 160,
+    maxWidth: 220,
+    padding: 12,
+    backgroundColor: "rgba(30,30,30,0.92)",
     borderRadius: 8,
     alignItems: "center",
+    marginHorizontal: 8,
   },
   translationText: {
-    fontSize: 16,
-    color: "#333",
-    fontWeight: "600",
+    fontSize: 18,
+    color: "#fff",
+    fontWeight: "bold",
     textAlign: "center",
+    fontFamily: "Merriweather",
   },
   categoryText: {
-    fontSize: 12,
-    color: "#666",
-    marginTop: 4,
+    fontSize: 13,
+    color: "#fff",
+    marginTop: 2,
     textAlign: "center",
+    fontWeight: "bold",
+    fontFamily: "Merriweather",
   },
   saveButton: {
-    backgroundColor: "#28a745",
-    paddingVertical: 10,
-    paddingHorizontal: 30,
+    backgroundColor: "#fff",
+    paddingVertical: 7,
+    paddingHorizontal: 24,
     borderRadius: 8,
     alignItems: "center",
     marginTop: 10,
+    minWidth: 80,
   },
   saveButtonText: {
-    color: "white",
-    fontSize: 14,
-    fontWeight: "600",
+    color: "#222",
+    fontSize: 16,
+    fontWeight: "bold",
+    fontFamily: "Merriweather",
   },
 });
 

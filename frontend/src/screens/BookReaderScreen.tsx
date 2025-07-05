@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   View,
   StyleSheet,
@@ -26,6 +26,8 @@ const BookReaderScreen = ({ route }: any) => {
   const [wordSelectorVisible, setWordSelectorVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [showPagination, setShowPagination] = useState(true);
+  const hideTimer = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     loadBookMetadata();
@@ -67,6 +69,23 @@ const BookReaderScreen = ({ route }: any) => {
 
   const handleWordSave = (word: string, translation: string) => {
     console.log("✅ Favoriye eklendi:", { word, translation });
+  };
+
+  // Pagination'ı otomatik gizle/göster
+  const resetPaginationTimer = useCallback(() => {
+    setShowPagination(true);
+    if (hideTimer.current) clearTimeout(hideTimer.current);
+    hideTimer.current = setTimeout(() => setShowPagination(false), 4000);
+  }, []);
+
+  useEffect(() => {
+    resetPaginationTimer();
+    return () => { if (hideTimer.current) clearTimeout(hideTimer.current); };
+  }, [currentPage, resetPaginationTimer]);
+
+  // Ekrana dokununca pagination tekrar göster
+  const handleScreenTouch = () => {
+    resetPaginationTimer();
   };
 
   // Paragrafları ve kelimeleri iki yana yaslı ve kelime tıklanabilir şekilde göster
@@ -113,51 +132,55 @@ const BookReaderScreen = ({ route }: any) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {loading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
-          <Text style={styles.loadingText}>Yükleniyor...</Text>
-        </View>
-      ) : (
-        <>
-          <View
-            {...panResponder.panHandlers}
-            style={styles.contentWrapper}
-          >
-            <View style={styles.pageContent}>{renderWords(content)}</View>
+      <View style={{ flex: 1 }} onTouchStart={handleScreenTouch}>
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#007AFF" />
+            <Text style={styles.loadingText}>Yükleniyor...</Text>
           </View>
-
-          <View style={styles.pagination}>
-            <TouchableOpacity
-              style={[styles.navButton, currentPage === 1 && styles.disabled]}
-              onPress={() => goToPage("prev")}
-              disabled={currentPage === 1}
+        ) : (
+          <>
+            <View
+              {...panResponder.panHandlers}
+              style={styles.contentWrapper}
             >
-              <Text style={styles.navButtonText}>‹</Text>
-            </TouchableOpacity>
-            <Text style={styles.pageText}>
-              {currentPage} / {totalPages}
-            </Text>
-            <TouchableOpacity
-              style={[
-                styles.navButton,
-                currentPage === totalPages && styles.disabled,
-              ]}
-              onPress={() => goToPage("next")}
-              disabled={currentPage === totalPages}
-            >
-              <Text style={styles.navButtonText}>›</Text>
-            </TouchableOpacity>
-          </View>
-        </>
-      )}
+              <View style={styles.pageContent}>{renderWords(content)}</View>
+            </View>
 
-      <WordSelector
-        visible={wordSelectorVisible}
-        selectedWord={selectedWord}
-        onClose={() => setWordSelectorVisible(false)}
-        onWordSave={handleWordSave}
-      />
+            {showPagination && (
+              <View style={styles.pagination}>
+                <TouchableOpacity
+                  style={[styles.navButton, currentPage === 1 && styles.disabled]}
+                  onPress={() => goToPage("prev")}
+                  disabled={currentPage === 1}
+                >
+                  <Text style={currentPage === 1 ? styles.navButtonTextDisabled : styles.navButtonText}>‹</Text>
+                </TouchableOpacity>
+                <Text style={styles.pageText}>
+                  {currentPage} / {totalPages}
+                </Text>
+                <TouchableOpacity
+                  style={[
+                    styles.navButton,
+                    currentPage === totalPages && styles.disabled,
+                  ]}
+                  onPress={() => goToPage("next")}
+                  disabled={currentPage === totalPages}
+                >
+                  <Text style={currentPage === totalPages ? styles.navButtonTextDisabled : styles.navButtonText}>›</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </>
+        )}
+
+        <WordSelector
+          visible={wordSelectorVisible}
+          selectedWord={selectedWord}
+          onClose={() => setWordSelectorVisible(false)}
+          onWordSave={handleWordSave}
+        />
+      </View>
     </SafeAreaView>
   );
 };
@@ -221,29 +244,40 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 8,
-    backgroundColor: "#ffffff",
-    borderTopWidth: 1,
-    borderColor: "#e5e7eb",
+    paddingVertical: 0,
+    backgroundColor: "transparent",
+    borderTopWidth: 0,
+    borderColor: "transparent",
     gap: 8,
+    position: "absolute",
+    bottom: 24,
+    left: 0,
+    right: 0,
+    zIndex: 100,
   },
   navButton: {
     paddingHorizontal: 10,
     paddingVertical: 6,
-    backgroundColor: "#2563eb",
-    borderRadius: 6,
+    backgroundColor: "#FFF8E1",
+    borderRadius: 10,
     marginHorizontal: 2,
     minWidth: 36,
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#007AFF",
   },
   disabled: {
-    backgroundColor: "#cbd5e1",
+    backgroundColor: "#FFF8E1",
+    borderColor: "#bdbdbd",
   },
   navButtonText: {
-    color: "#fff",
+    color: "#007AFF",
     fontSize: 18,
     fontWeight: "bold",
     fontFamily: "Merriweather",
+  },
+  navButtonTextDisabled: {
+    color: "#bdbdbd",
   },
   pageText: {
     fontSize: 15,

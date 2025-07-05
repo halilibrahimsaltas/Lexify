@@ -56,13 +56,17 @@ const styles = StyleSheet.create({
   },
   // Variants
   primary: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#FFF8E1',
+    borderWidth: 1,
+    borderColor: '#007AFF',
   },
   secondary: {
-    backgroundColor: '#6c757d',
+    backgroundColor: '#FAF3DD',
+    borderWidth: 1,
+    borderColor: '#bdbdbd',
   },
   outline: {
-    backgroundColor: 'transparent',
+    backgroundColor: '#FFF8E1',
     borderWidth: 1,
     borderColor: '#007AFF',
   },
@@ -84,10 +88,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   primaryText: {
-    color: 'white',
+    color: '#007AFF',
   },
   secondaryText: {
-    color: 'white',
+    color: '#333',
   },
   outlineText: {
     color: '#007AFF',
