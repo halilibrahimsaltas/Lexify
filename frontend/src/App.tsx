@@ -3,13 +3,10 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from './contexts/AuthContext';
 import AppContent from './AppContent';
-import { useFonts } from 'expo-font';
+import { useRobotoFonts } from './hooks/useFonts';
 
 export default function App() {
-  const [fontsLoaded] = useFonts({
-    'Merriweather': require('./assets/fonts/Merriweather-VariableFont_opsz,wdth,wght.ttf'),
-    'Merriweather-Italic': require('./assets/fonts/Merriweather-Italic-VariableFont_opsz,wdth,wght.ttf'),
-  });
+  const fontsLoaded = useRobotoFonts();
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {

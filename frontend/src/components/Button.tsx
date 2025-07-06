@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   },
   // Variants
   primary: {
-    backgroundColor: '#FFF8E1',
+    backgroundColor: '#FEC84B',
     borderWidth: 1,
     borderColor: '#007AFF',
   },

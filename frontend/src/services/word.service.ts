@@ -15,6 +15,10 @@ class WordService {
     const response = await api.get("/favorites");
     return response.data;
   }
+
+  async deleteUserWord(id: number): Promise<void> {
+    await api.delete(`/favorites/${id}`);
+  }
 }
 
 export default new WordService();

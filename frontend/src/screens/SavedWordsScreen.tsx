@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity }
 import { SafeAreaView } from 'react-native-safe-area-context';
 import wordService, { Word } from '../services/word.service';
 import Alert from '../components/Alert';
-
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 
 const SavedWordsScreen = ({ navigation }: any) => {
@@ -15,6 +15,8 @@ const SavedWordsScreen = ({ navigation }: any) => {
     message: '',
     type: 'info' as 'success' | 'error' | 'warning' | 'info',
   });
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<{ id: number; word: string } | null>(null);
   const languageNames: Record<string, string> = { en: 'İngilizce', tr: 'Türkçe', de: 'Almanca', fr: 'Fransızca', es: 'İspanyolca' };
 
   const showAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
@@ -24,6 +26,25 @@ const SavedWordsScreen = ({ navigation }: any) => {
 
   const handleCloseAlert = () => {
     setAlertVisible(false);
+  };
+
+  const handleDeletePress = (id: number, word: string) => {
+    setConfirmDelete({ id, word });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!confirmDelete) return;
+    setDeletingId(confirmDelete.id);
+    setConfirmDelete(null);
+    try {
+      await wordService.deleteUserWord(confirmDelete.id);
+      setWords((prev) => prev.filter((w) => w.id !== confirmDelete.id));
+      showAlert('Başarılı', 'Kelime favorilerden kaldırıldı.', 'success');
+    } catch (error) {
+      showAlert('Hata', 'Kelime silinemedi.', 'error');
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   useEffect(() => {
@@ -46,6 +67,17 @@ const SavedWordsScreen = ({ navigation }: any) => {
 
   const renderItem = ({ item }: { item: Word }) => (
     <View style={styles.wordItem}>
+      <TouchableOpacity
+        style={styles.deleteIcon}
+        onPress={() => handleDeletePress(item.id, item.originalText)}
+        disabled={deletingId === item.id}
+      >
+        {deletingId === item.id ? (
+          <ActivityIndicator size={20} color="#FF3B30" />
+        ) : (
+          <MaterialIcons name="delete" size={24} color="#FF3B30" />
+        )}
+      </TouchableOpacity>
       <Text style={styles.wordText}>{item.originalText}</Text>
       <Text style={styles.translationText}>{item.translatedText}</Text>
       <Text style={styles.metaText}>
@@ -74,7 +106,6 @@ const SavedWordsScreen = ({ navigation }: any) => {
           contentContainerStyle={words.length === 0 ? styles.emptyContainer : undefined}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyIcon}>❤️</Text>
               <Text style={styles.emptyTitle}>Henüz kelime kaydetmediniz</Text>
               <Text style={styles.emptyText}>
                 Kitap okurken kelimeleri favorilere ekleyerek burada görüntüleyebilirsiniz.
@@ -92,6 +123,30 @@ const SavedWordsScreen = ({ navigation }: any) => {
         message={alertConfig.message}
         type={alertConfig.type}
         onClose={handleCloseAlert}
+      />
+      {/* Delete confirm Alert */}
+      <Alert
+        visible={!!confirmDelete}
+        title="Favoriden Sil"
+        message={`"${confirmDelete?.word}" kelimesini favorilerden kaldırmak istediğinize emin misiniz?`}
+        type="warning"
+        onClose={() => setConfirmDelete(null)}
+        buttons={[
+          {
+            text: 'İptal',
+            onPress: () => setConfirmDelete(null),
+            variant: 'secondary',
+            iconName: 'close',
+            iconFamily: 'MaterialIcons',
+          },
+          {
+            text: 'Sil',
+            onPress: handleConfirmDelete,
+            variant: 'primary',
+            iconName: 'delete',
+            iconFamily: 'MaterialIcons',
+          },
+        ]}
       />
     </SafeAreaView>
   );
@@ -114,12 +169,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#4B3F2F',
     marginBottom: 6,
-    fontFamily: 'Merriweather',
+    fontFamily: 'Roboto_500Medium',
   },
   subtitle: {
     fontSize: 15,
     color: '#666',
-    fontFamily: 'Merriweather',
+    fontFamily: 'Roboto_400Regular',
   },
   loadingContainer: {
     flex: 1,
@@ -131,7 +186,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 16,
     color: '#666',
-    fontFamily: 'Merriweather',
+    fontFamily: 'Roboto_400Regular',
   },
   wordItem: {
     backgroundColor: 'white',
@@ -144,31 +199,41 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 6,
+    position: 'relative',
+  },
+  deleteIcon: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    zIndex: 2,
+    backgroundColor: '#FFF8E1',
+    borderRadius: 16,
+    padding: 4,
   },
   wordText: {
     fontSize: 19,
     fontWeight: '600',
     color: '#4B3F2F',
-    fontFamily: 'Merriweather',
+    fontFamily: 'Roboto_500Medium',
   },
   translationText: {
     fontSize: 17,
     color: '#007AFF',
     marginTop: 6,
-    fontFamily: 'Merriweather',
+    fontFamily: 'Roboto_400Regular',
   },
   metaText: {
     fontSize: 13,
     color: '#666',
     marginTop: 6,
-    fontFamily: 'Merriweather',
+    fontFamily: 'Roboto_400Regular',
   },
   dateText: {
     fontSize: 12,
     color: '#999',
     marginTop: 4,
     textAlign: 'right',
-    fontFamily: 'Merriweather',
+    fontFamily: 'Roboto_400Regular',
   },
   emptyContainer: {
     flex: 1,
@@ -186,14 +251,14 @@ const styles = StyleSheet.create({
     color: '#4B3F2F',
     marginBottom: 10,
     textAlign: 'center',
-    fontFamily: 'Merriweather',
+    fontFamily: 'Roboto_500Medium',
   },
   emptyText: {
     fontSize: 16,
     color: '#666',
     textAlign: 'center',
     lineHeight: 24,
-    fontFamily: 'Merriweather',
+    fontFamily: 'Roboto_400Regular',
   },
 });
 

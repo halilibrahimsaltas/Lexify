@@ -100,7 +100,7 @@ const DrawerNavigator = () => (
       headerTitleStyle: {
         fontWeight: 'bold',
         fontSize: 20,
-        fontFamily: 'Merriweather',
+        fontFamily: 'Roboto_500Medium',
       },
       drawerActiveTintColor: '#007AFF',
       drawerInactiveTintColor: '#4B3F2F',
@@ -163,13 +163,13 @@ const styles = StyleSheet.create({
   drawerAppName: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#4B3F2F',
-    fontFamily: 'Merriweather',
+    color: '#5D4037', // burada kullanabilirsin
+    fontFamily: 'Roboto_500Medium',
   },
   drawerAppDesc: {
     fontSize: 13,
     color: '#666',
-    fontFamily: 'Merriweather',
+    fontFamily: 'Roboto_400Regular',
     marginTop: 2,
   },
   menuSection: {
@@ -180,6 +180,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     marginLeft: -10,
+    color: '#5D4037', // burada da kullanabilirsin
+    fontFamily: 'Roboto_500Medium',
   },
   divider: {
     height: 1,

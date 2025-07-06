@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#4B3F2F',
     marginBottom: 8,
-    fontFamily: 'Merriweather',
+    fontFamily: 'Roboto_500Medium',
   },
   statsContainer: {
     marginTop: 8,
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   statsText: {
     fontSize: 15,
     color: '#666',
-    fontFamily: 'Merriweather',
+    fontFamily: 'Roboto_400Regular',
   },
   searchContainer: {
     padding: 20,
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#333',
-    fontFamily: 'Merriweather',
+    fontFamily: 'Roboto_400Regular',
   },
   clearButton: {
     width: 24,
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: '#666',
     textAlign: 'center',
-    fontFamily: 'Merriweather',
+    fontFamily: 'Roboto_400Regular',
   },
   wordItem: {
     backgroundColor: 'white',
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     fontSize: 19,
     fontWeight: '600',
     color: '#4B3F2F',
-    fontFamily: 'Merriweather',
+    fontFamily: 'Roboto_500Medium',
   },
   languageTag: {
     backgroundColor: '#007AFF',
@@ -266,19 +266,19 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     fontSize: 12,
     fontWeight: '600',
-    fontFamily: 'Merriweather',
+    fontFamily: 'Roboto_500Medium',
   },
   translationText: {
     fontSize: 17,
     color: '#666',
     marginBottom: 6,
-    fontFamily: 'Merriweather',
+    fontFamily: 'Roboto_400Regular',
   },
   categoryText: {
     fontSize: 13,
     color: '#999',
     fontStyle: 'italic',
-    fontFamily: 'Merriweather',
+    fontFamily: 'Roboto_400Regular',
   },
 });
 

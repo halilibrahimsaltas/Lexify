@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#4B3F2F",
     flex: 1,
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_500Medium",
   },
   loadingContainer: {
     flex: 1,
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 16,
     color: "#666",
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_400Regular",
   },
   content: {
     flex: 1,
@@ -463,19 +463,19 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#4B3F2F",
     marginBottom: 6,
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_500Medium",
   },
   userEmail: {
     fontSize: 15,
     color: "#666",
     marginBottom: 6,
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_400Regular",
   },
   userLevel: {
     fontSize: 14,
     color: "#007AFF",
     fontWeight: "600",
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_500Medium",
   },
   statsSection: {
     backgroundColor: "white",
@@ -498,13 +498,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#007AFF",
     marginBottom: 6,
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_500Medium",
   },
   statLabel: {
     fontSize: 13,
     color: "#666",
     textAlign: "center",
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_400Regular",
   },
   menuSection: {
     backgroundColor: "white",
@@ -541,12 +541,12 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#4B3F2F",
     marginBottom: 3,
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_500Medium",
   },
   menuSubtitle: {
     fontSize: 14,
     color: "#666",
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_400Regular",
   },
   menuArrow: {
     fontSize: 20,
@@ -569,7 +569,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#4B3F2F",
     marginBottom: 18,
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_500Medium",
   },
   settingItem: {
     flexDirection: "row",
@@ -588,7 +588,7 @@ const styles = StyleSheet.create({
   settingTitle: {
     fontSize: 17,
     color: "#4B3F2F",
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_400Regular",
   },
   logoutButton: {
     backgroundColor: "#FF3B30",
@@ -606,7 +606,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 17,
     fontWeight: "600",
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_500Medium",
   },
   // Modal Styles
   modalOverlay: {
@@ -638,7 +638,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: "#4B3F2F",
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_500Medium",
   },
   modalClose: {
     fontSize: 26,
@@ -656,7 +656,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#4B3F2F",
     marginBottom: 8,
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_500Medium",
   },
   input: {
     borderWidth: 1,
@@ -665,7 +665,7 @@ const styles = StyleSheet.create({
     padding: 16,
     fontSize: 16,
     backgroundColor: "white",
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_400Regular",
   },
   modalFooter: {
     flexDirection: "row",
@@ -695,13 +695,13 @@ const styles = StyleSheet.create({
     color: "#4B3F2F",
     fontSize: 16,
     fontWeight: "600",
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_500Medium",
   },
   modalButtonPrimaryText: {
     color: "white",
     fontSize: 16,
     fontWeight: "600",
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_500Medium",
   },
   section: {
     backgroundColor: "white",

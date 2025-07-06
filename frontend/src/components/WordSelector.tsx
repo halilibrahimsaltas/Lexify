@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     marginVertical: 6,
     textAlign: "center",
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_500Medium",
   },
   translationSection: {
     alignItems: "center",
@@ -217,14 +217,14 @@ const styles = StyleSheet.create({
     fontSize: 32,
     color: "#fff",
     fontWeight: "bold",
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_500Medium",
     opacity: 1,
   },
   arrowTextDisabled: {
     fontSize: 32,
     color: "#444",
     fontWeight: "bold",
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_500Medium",
     opacity: 0.5,
   },
   translationBox: {
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     textAlign: "center",
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_500Medium",
   },
   categoryText: {
     fontSize: 13,
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
     textAlign: "center",
     fontWeight: "bold",
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_400Regular",
   },
   saveButton: {
     backgroundColor: "#fff",
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
     color: "#222",
     fontSize: 16,
     fontWeight: "bold",
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_500Medium",
   },
 });
 

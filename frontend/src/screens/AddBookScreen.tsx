@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#4B3F2F",
     flex: 1,
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_500Medium",
     marginBottom: 20,
   },
   input: {

@@ -1,9 +1,9 @@
-import { useFonts as useExpoFonts } from 'expo-font';
+import { useFonts, Roboto_400Regular, Roboto_500Medium } from '@expo-google-fonts/roboto';
 
-export const useFonts = () => {
-  const [fontsLoaded] = useExpoFonts({
-    'Merriweather': require('../assets/fonts/Merriweather-VariableFont_opsz,wdth,wght.ttf'),
-    'Merriweather-Italic': require('../assets/fonts/Merriweather-Italic-VariableFont_opsz,wdth,wght.ttf'),
+export const useRobotoFonts = () => {
+  const [fontsLoaded] = useFonts({
+    Roboto_400Regular,
+    Roboto_500Medium,
   });
 
   return fontsLoaded;

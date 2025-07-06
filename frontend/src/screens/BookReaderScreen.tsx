@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 15,
     color: "#666",
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_400Regular",
   },
   contentWrapper: {
     flex: 1,
@@ -251,13 +251,13 @@ const styles = StyleSheet.create({
     color: "#4B3F2F",
     lineHeight: 26,
     textAlign: "justify",
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_400Regular",
   },
   wordText: {
     fontSize: 17,
     color: "#2c3e50",
     lineHeight: 26,
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_400Regular",
     marginRight: 2,
     marginBottom: 2,
     borderRadius: 3,
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
     color: "#007AFF",
     fontSize: 18,
     fontWeight: "bold",
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_500Medium",
   },
   navButtonTextDisabled: {
     color: "#bdbdbd",
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
   pageText: {
     fontSize: 15,
     color: "#333",
-    fontFamily: "Merriweather",
+    fontFamily: "Roboto_400Regular",
     minWidth: 60,
     textAlign: "center",
   },
