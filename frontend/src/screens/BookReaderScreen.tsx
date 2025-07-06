@@ -13,6 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import WordSelector from "../components/WordSelector";
 import { Book } from "../types";
 import bookService from "../services/book.service";
+import wordService from '../services/word.service';
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
@@ -82,8 +83,18 @@ const BookReaderScreen = ({ route }: any) => {
     }
   };
 
-  const handleWordSave = (word: string, translation: string) => {
-    console.log("✅ Favoriye eklendi:", { word, translation });
+  const handleWordSave = async (word: string, translation: string) => {
+    try {
+      await wordService.addUserWord({
+        originalText: word,
+        translatedText: translation,
+        sourceLanguage: 'en', // veya dinamik olarak belirle
+        targetLanguage: 'tr',
+      });
+      showAlert('Başarılı', 'Kelime favorilere eklendi', 'primary');
+    } catch (error) {
+      showAlert('Hata', 'Kelime eklenemedi', 'primary');
+    }
   };
 
   // Pagination'ı otomatik gizle/göster

@@ -25,7 +25,8 @@ export class WordController {
   @ApiOperation({ summary: 'Kelimeyi favorilere ekle' })
   async add(@Request() req, @Body() dto: CreateWordDto) {
     const word = await this.wordService.addToFavorites(req.user.sub, dto);
-    return { message: 'Favoriye eklendi', word };
+    // Backend response: { message, word }
+    return word;
   }
 
   @Get()

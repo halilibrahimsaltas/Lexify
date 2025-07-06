@@ -12,6 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import bookService from "../services/book.service";
 import WordSelector from "../components/WordSelector";
 import type { Book } from "../types";
+import wordService from '../services/word.service';
 
 const BookReaderScreen = ({ navigation, route }: any) => {
   const { bookId } = route.params;
@@ -110,8 +111,12 @@ const BookReaderScreen = ({ navigation, route }: any) => {
 
   const handleWordSave = async (word: string, translation: string) => {
     try {
-      // Buraya backend'e kaydetme isteği yazılabilir
-      console.log("✅ Favori kaydedildi:", { word, translation });
+      await wordService.addUserWord({
+        originalText: word,
+        translatedText: translation,
+        sourceLanguage: 'en', // veya dinamik olarak belirle
+        targetLanguage: 'tr',
+      });
       showAlert("Başarılı", `"${word}" favorilere eklendi.`, 'primary');
     } catch (error) {
       showAlert("Hata", "Kelime kaydedilemedi", 'primary');

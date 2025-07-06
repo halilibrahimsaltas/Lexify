@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -61,6 +62,19 @@ const ProfileScreen = ({ navigation }: any) => {
       loadUserWords();
     }
   }, [user]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (user) {
+        setEditForm({
+          name: user.name,
+          email: user.email,
+          password: "",
+        });
+        loadUserWords();
+      }
+    }, [user])
+  );
 
   const loadUserWords = async () => {
     if (!user) return;

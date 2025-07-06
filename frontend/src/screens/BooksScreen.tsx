@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -41,6 +42,12 @@ const BooksScreen = ({ navigation }: any) => {
   useEffect(() => {
     loadBooks();
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadBooks();
+    }, [])
+  );
 
   const loadBooks = async () => {
     try {

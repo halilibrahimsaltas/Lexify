@@ -19,6 +19,17 @@ class WordService {
   async deleteUserWord(id: number): Promise<void> {
     await api.delete(`/favorites/${id}`);
   }
+
+  async addUserWord(word: {
+    originalText: string;
+    translatedText: string;
+    sourceLanguage: string;
+    targetLanguage: string;
+  }): Promise<Word> {
+    const response = await api.post('/favorites', word);
+    // Backend response: { message, word }
+    return response.data.word;
+  }
 }
 
 export default new WordService();

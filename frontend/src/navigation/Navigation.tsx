@@ -119,6 +119,8 @@ const DrawerNavigator = () => (
         backgroundColor: '#FFF8E1',
         width: 280,
       },
+      // Sadece Favori Kelimeler için unmountOnBlur: true
+      ...(route.name === 'Favori Kelimeler' ? { unmountOnBlur: true } : {}),
     })}
   >
     <Drawer.Screen name="Kitaplarım" component={BooksScreen} />

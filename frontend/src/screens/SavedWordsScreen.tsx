@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import wordService, { Word } from '../services/word.service';
@@ -50,6 +51,12 @@ const SavedWordsScreen = ({ navigation }: any) => {
   useEffect(() => {
     fetchWords();
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchWords();
+    }, [])
+  );
 
   const fetchWords = async () => {
     setLoading(true);

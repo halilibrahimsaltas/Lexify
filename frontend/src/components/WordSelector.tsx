@@ -68,11 +68,15 @@ const WordSelector: React.FC<WordSelectorProps> = ({
     }
   };
 
-  const handleSaveWord = () => {
+  const handleSaveWord = async () => {
     if (alternatives.length > 0) {
-      onWordSave?.(selectedWord, alternatives[currentIndex].translation);
-      Alert.alert("Başarılı", "Kelime kaydedildi");
-      onClose();
+      if (onWordSave) {
+        await onWordSave(selectedWord, alternatives[currentIndex].translation);
+        onClose();
+      } else {
+        Alert.alert("Başarılı", "Kelime kaydedildi");
+        onClose();
+      }
     }
   };
 

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import dictionaryService from '../services/dictionary.service';
+import wordService from '../services/word.service';
 
 interface Word {
   id: string;
@@ -17,6 +19,9 @@ const DictionaryScreen = () => {
   const [words, setWords] = useState<Word[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [stats, setStats] = useState<any>(null);
+  const [addingId, setAddingId] = useState<string | null>(null);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({ title: '', message: '', type: 'primary' as 'primary' | 'secondary' });
 
   useEffect(() => {
     loadDictionaryStats();
@@ -59,11 +64,44 @@ const DictionaryScreen = () => {
     return () => clearTimeout(timeoutId);
   };
 
+  const showAlert = (title: string, message: string, type: 'primary' | 'secondary' = 'primary') => {
+    setAlertConfig({ title, message, type });
+    setAlertVisible(true);
+  };
+
+  const handleAddFavorite = async (item: Word) => {
+    setAddingId(item.id);
+    try {
+      await wordService.addUserWord({
+        originalText: item.word,
+        translatedText: item.translation,
+        sourceLanguage: item.language,
+        targetLanguage: 'tr', // veya uygun hedef dil
+      });
+      showAlert('Başarılı', 'Kelime favorilere eklendi', 'primary');
+    } catch (error) {
+      showAlert('Hata', 'Kelime eklenemedi', 'primary');
+    } finally {
+      setAddingId(null);
+    }
+  };
+
   const renderWord = ({ item }: { item: Word }) => (
     <View style={styles.wordItem}>
       <View style={styles.wordContainer}>
         <Text style={styles.wordText}>{item.word}</Text>
         <Text style={styles.languageTag}>{item.language.toUpperCase()}</Text>
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => handleAddFavorite(item)}
+          disabled={addingId === item.id}
+        >
+          {addingId === item.id ? (
+            <ActivityIndicator size={16} color="#32341f" />
+          ) : (
+            <Ionicons name="add" size={20} color="#32341f" />
+          )}
+        </TouchableOpacity>
       </View>
       <Text style={styles.translationText}>{item.translation}</Text>
       {item.category && (
@@ -74,7 +112,6 @@ const DictionaryScreen = () => {
 
   const renderHeader = () => (
     <View style={styles.headerContainer}>
-      <Text style={styles.title}>Sözlük</Text>
       {stats && (
         <View style={styles.statsContainer}>
           <Text style={styles.statsText}>
@@ -99,6 +136,7 @@ const DictionaryScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+  
       <TextInput
         style={styles.searchInput}
         placeholder="Kelime ara..."
@@ -119,6 +157,16 @@ const DictionaryScreen = () => {
         ListEmptyComponent={renderEmpty}
         contentContainerStyle={words.length === 0 ? styles.emptyListContainer : undefined}
       />
+
+    {/* Custom Alert Component */}
+    {alertVisible && (
+      <View style={{ position: 'absolute', left: 0, right: 0, bottom: 40, alignItems: 'center', zIndex: 100 }}>
+        <View style={{ backgroundColor: '#32341f', padding: 12, borderRadius: 8 }}>
+          <Text style={{ color: '#FFF8E1', fontWeight: 'bold' }}>{alertConfig.title}</Text>
+          <Text style={{ color: '#FFF8E1' }}>{alertConfig.message}</Text>
+        </View>
+      </View>
+    )}
     </SafeAreaView>
   );
 };
@@ -223,18 +271,18 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto_400Regular',
   },
   wordItem: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 6,
+    backgroundColor: '#FFF8E1',
+    borderRadius: 0,
+    elevation: 0,
+    paddingVertical: 12,
+    paddingHorizontal: 0,
+    marginBottom: 0,
+    marginHorizontal: 0,
+    borderWidth: 0,
+    shadowColor: 'transparent',
+    width: '100%',
+    minWidth: '100%',
+    maxWidth: '100%',
   },
   wordContainer: {
     flexDirection: 'row',
@@ -243,14 +291,16 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   wordText: {
-    fontSize: 19,
-    fontWeight: '600',
-    color: '#4B3F2F',
-    fontFamily: 'Roboto_500Medium',
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#4E2B1B',
+    flex: 1,
+    marginRight: 8,
+    textAlign: 'left',
   },
   languageTag: {
-    backgroundColor: '#007AFF',
-    color: 'white',
+    backgroundColor: '#32341f',
+    color: '#FFF8E1',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 8,
@@ -259,16 +309,30 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto_500Medium',
   },
   translationText: {
-    fontSize: 17,
-    color: '#666',
-    marginBottom: 6,
+    color: '#4E2B1B',
+    fontSize: 14,
+    marginTop: 2,
+    textAlign: 'left',
     fontFamily: 'Roboto_400Regular',
   },
   categoryText: {
-    fontSize: 13,
-    color: '#999',
-    fontStyle: 'italic',
+    fontSize: 12,
+    color: '#4E2B1B',
+    marginTop: 2,
+    textAlign: 'left',
     fontFamily: 'Roboto_400Regular',
+  },
+  addButton: {
+    marginLeft: 8,
+    borderWidth: 1,
+    borderColor: '#32341f',
+    borderRadius: 8,
+    padding: 2,
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 28,
+    height: 28,
   },
 });
 
