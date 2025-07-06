@@ -74,6 +74,7 @@ const WordSelector: React.FC<WordSelectorProps> = ({
         await onWordSave(selectedWord, alternatives[currentIndex].translation);
         onClose();
       } else {
+        // Sadece fallback için Alert, normalde Toast üst parent'ta gösterilecek
         Alert.alert("Başarılı", "Kelime kaydedildi");
         onClose();
       }

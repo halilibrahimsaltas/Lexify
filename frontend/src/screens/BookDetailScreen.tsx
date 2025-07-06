@@ -7,7 +7,7 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import Alert from "../components/Alert";
+import Toast from "../components/Toast";
 import { SafeAreaView } from "react-native-safe-area-context";
 import bookService from "../services/book.service";
 import WordSelector from "../components/WordSelector";
@@ -26,21 +26,9 @@ const BookReaderScreen = ({ navigation, route }: any) => {
   const [wordSelectorVisible, setWordSelectorVisible] = useState(false);
   const [chapters, setChapters] = useState<string[]>([]);
   const [currentChapter, setCurrentChapter] = useState(0);
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [alertConfig, setAlertConfig] = useState({
-    title: '',
-    message: '',
-    type: 'primary' as 'primary' | 'secondary',
-  });
-
-  const showAlert = (title: string, message: string, type: 'primary' | 'secondary' = 'primary') => {
-    setAlertConfig({ title, message, type });
-    setAlertVisible(true);
-  };
-
-  const handleCloseAlert = () => {
-    setAlertVisible(false);
-  };
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>("success");
 
   useEffect(() => {
     fetchAll();
@@ -114,12 +102,16 @@ const BookReaderScreen = ({ navigation, route }: any) => {
       await wordService.addUserWord({
         originalText: word,
         translatedText: translation,
-        sourceLanguage: 'en', // veya dinamik olarak belirle
+        sourceLanguage: 'en',
         targetLanguage: 'tr',
       });
-      showAlert("Başarılı", `"${word}" favorilere eklendi.`, 'primary');
+      setToastMessage(`"${word}" favorilere eklendi.`);
+      setToastType('success');
+      setToastVisible(true);
     } catch (error) {
-      showAlert("Hata", "Kelime kaydedilemedi", 'primary');
+      setToastMessage('Kelime kaydedilemedi');
+      setToastType('error');
+      setToastVisible(true);
     }
   };
 
@@ -197,13 +189,11 @@ const BookReaderScreen = ({ navigation, route }: any) => {
         </View>
       )}
 
-      {/* Custom Alert Component */}
-      <Alert
-        visible={alertVisible}
-        title={alertConfig.title}
-        message={alertConfig.message}
-        type={alertConfig.type as 'primary' | 'secondary'}
-        onClose={handleCloseAlert}
+      <Toast
+        visible={toastVisible}
+        message={toastMessage}
+        type={toastType}
+        onHide={() => setToastVisible(false)}
       />
     </SafeAreaView>
   );

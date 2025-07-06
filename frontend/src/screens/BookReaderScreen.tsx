@@ -8,7 +8,8 @@ import {
   PanResponder,
   Dimensions,
 } from "react-native";
-import Alert from "../components/Alert";
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import Toast from "../components/Toast";
 import { SafeAreaView } from "react-native-safe-area-context";
 import WordSelector from "../components/WordSelector";
 import { Book } from "../types";
@@ -29,21 +30,9 @@ const BookReaderScreen = ({ route }: any) => {
   const [totalPages, setTotalPages] = useState<number>(1);
   const [showPagination, setShowPagination] = useState(true);
   const hideTimer = useRef<NodeJS.Timeout | null>(null);
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [alertConfig, setAlertConfig] = useState({
-    title: '',
-    message: '',
-    type: 'primary' as 'primary' | 'secondary',
-  });
-
-  const showAlert = (title: string, message: string, type: 'primary' | 'secondary' = 'primary') => {
-    setAlertConfig({ title, message, type });
-    setAlertVisible(true);
-  };
-
-  const handleCloseAlert = () => {
-    setAlertVisible(false);
-  };
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>("success");
 
   useEffect(() => {
     loadBookMetadata();
@@ -58,7 +47,9 @@ const BookReaderScreen = ({ route }: any) => {
       const bookData = await bookService.getBook(bookId);
       setBook(bookData);
     } catch (error: any) {
-      showAlert("Hata", error.message || "Kitap bilgisi yüklenemedi", 'primary');
+      setToastMessage(error.message || "Kitap bilgisi yüklenemedi");
+      setToastType('error');
+      setToastVisible(true);
     }
   };
 
@@ -69,7 +60,9 @@ const BookReaderScreen = ({ route }: any) => {
       setContent(data.content);
       setTotalPages(data.totalPages || 1);
     } catch (error: any) {
-      showAlert("Hata", error.message || "Sayfa yüklenemedi", 'primary');
+      setToastMessage(error.message || "Sayfa yüklenemedi");
+      setToastType('error');
+      setToastVisible(true);
     } finally {
       setLoading(false);
     }
@@ -88,12 +81,16 @@ const BookReaderScreen = ({ route }: any) => {
       await wordService.addUserWord({
         originalText: word,
         translatedText: translation,
-        sourceLanguage: 'en', // veya dinamik olarak belirle
+        sourceLanguage: 'en',
         targetLanguage: 'tr',
       });
-      showAlert('Başarılı', 'Kelime favorilere eklendi', 'primary');
+      setToastMessage('Kelime favorilere eklendi');
+      setToastType('success');
+      setToastVisible(true);
     } catch (error) {
-      showAlert('Hata', 'Kelime eklenemedi', 'primary');
+      setToastMessage('Kelime eklenemedi');
+      setToastType('error');
+      setToastVisible(true);
     }
   };
 
@@ -180,7 +177,7 @@ const BookReaderScreen = ({ route }: any) => {
                   onPress={() => goToPage("prev")}
                   disabled={currentPage === 1}
                 >
-                  <Text style={currentPage === 1 ? styles.navButtonTextDisabled : styles.navButtonText}>‹</Text>
+                  <Ionicons name="chevron-back" size={22} color={currentPage === 1 ? '#bdbdbd' : '#32341f'} />
                 </TouchableOpacity>
                 <Text style={styles.pageText}>
                   {currentPage} / {totalPages}
@@ -193,7 +190,7 @@ const BookReaderScreen = ({ route }: any) => {
                   onPress={() => goToPage("next")}
                   disabled={currentPage === totalPages}
                 >
-                  <Text style={currentPage === totalPages ? styles.navButtonTextDisabled : styles.navButtonText}>›</Text>
+                  <Ionicons name="chevron-forward" size={22} color={currentPage === totalPages ? '#bdbdbd' : '#32341f'} />
                 </TouchableOpacity>
               </View>
             )}
@@ -211,13 +208,11 @@ const BookReaderScreen = ({ route }: any) => {
           </View>
         )}
 
-        {/* Custom Alert Component */}
-        <Alert
-          visible={alertVisible}
-          title={alertConfig.title}
-          message={alertConfig.message}
-          type={alertConfig.type as 'primary' | 'secondary'}
-          onClose={handleCloseAlert}
+        <Toast
+          visible={toastVisible}
+          message={toastMessage}
+          type={toastType}
+          onHide={() => setToastVisible(false)}
         />
       </View>
     </SafeAreaView>
@@ -303,7 +298,7 @@ const styles = StyleSheet.create({
     minWidth: 36,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#007AFF",
+    borderColor: "#32341f",
   },
   disabled: {
     backgroundColor: "#FFF8E1",

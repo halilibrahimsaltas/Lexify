@@ -3,8 +3,9 @@ import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import wordService, { Word } from '../services/word.service';
-import Alert from '../components/Alert';
+import Toast from '../components/Toast';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Alert from '../components/Alert';
 
 
 const SavedWordsScreen = ({ navigation }: any) => {
@@ -18,6 +19,9 @@ const SavedWordsScreen = ({ navigation }: any) => {
   });
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<{ id: number; word: string } | null>(null);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>("success");
   const languageNames: Record<string, string> = { en: 'İngilizce', tr: 'Türkçe', de: 'Almanca', fr: 'Fransızca', es: 'İspanyolca' };
 
   const showAlert = (title: string, message: string, type: 'primary' | 'secondary' = 'primary') => {
@@ -40,9 +44,13 @@ const SavedWordsScreen = ({ navigation }: any) => {
     try {
       await wordService.deleteUserWord(confirmDelete.id);
       setWords((prev) => prev.filter((w) => w.id !== confirmDelete.id));
-      showAlert('Başarılı', 'Kelime favorilerden kaldırıldı.', 'primary');
+      setToastMessage('Kelime favorilerden kaldırıldı.');
+      setToastType('success');
+      setToastVisible(true);
     } catch (error) {
-      showAlert('Hata', 'Kelime silinemedi.', 'primary');
+      setToastMessage('Kelime silinemedi.');
+      setToastType('error');
+      setToastVisible(true);
     } finally {
       setDeletingId(null);
     }
@@ -123,13 +131,11 @@ const SavedWordsScreen = ({ navigation }: any) => {
         />
       )}
 
-      {/* Custom Alert Component */}
-      <Alert
-        visible={alertVisible}
-        title={alertConfig.title}
-        message={alertConfig.message}
-        type={alertConfig.type as 'primary' | 'secondary'}
-        onClose={handleCloseAlert}
+      <Toast
+        visible={toastVisible}
+        message={toastMessage}
+        type={toastType}
+        onHide={() => setToastVisible(false)}
       />
       {/* Delete confirm Alert */}
       <Alert

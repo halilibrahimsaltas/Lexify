@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   TextInput,
 } from "react-native";
-import Alert from "../components/Alert";
+import Toast from "../components/Toast";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as DocumentPicker from "expo-document-picker";
 import bookService from "../services/book.service";
@@ -17,12 +17,9 @@ import Button from '../components/Button';
 const AddBookScreen = ({ navigation }: any) => {
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<any>(null);
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [alertConfig, setAlertConfig] = useState({
-    title: '',
-    message: '',
-    type: 'primary' as 'primary' | 'secondary',
-  });
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>("success");
 
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
@@ -30,12 +27,12 @@ const AddBookScreen = ({ navigation }: any) => {
   const [coverImage, setCoverImage] = useState("");
 
   const showAlert = (title: string, message: string, type: 'primary' | 'secondary' = 'primary') => {
-    setAlertConfig({ title, message, type });
-    setAlertVisible(true);
+    // This function is no longer used for alerts, but kept for now.
+    // The new Toast component handles its own visibility.
   };
 
   const handleCloseAlert = () => {
-    setAlertVisible(false);
+    // This function is no longer used for alerts.
   };
 
   const handleFilePick = async () => {
@@ -49,19 +46,21 @@ const AddBookScreen = ({ navigation }: any) => {
 
       const file = result.assets[0];
       setSelectedFile(file);
-      showAlert("Başarılı", `${file.name} dosyası seçildi`, 'primary');
+      setToastMessage(`${file.name} dosyası seçildi`);
+      setToastType('success');
+      setToastVisible(true);
     } catch (error) {
-      showAlert("Hata", "Dosya seçilirken bir hata oluştu", 'primary');
+      setToastMessage("Dosya seçilirken bir hata oluştu");
+      setToastType('error');
+      setToastVisible(true);
     }
   };
 
   const handleUploadPdf = async () => {
     if (!selectedFile || !title || !author || !category) {
-      showAlert(
-        "Eksik Bilgi",
-        "Lütfen tüm zorunlu alanları doldurun ve dosya seçin",
-        'secondary'
-      );
+      setToastMessage("Lütfen tüm zorunlu alanları doldurun ve dosya seçin");
+      setToastType('info');
+      setToastVisible(true);
       return;
     }
 
@@ -81,7 +80,9 @@ const AddBookScreen = ({ navigation }: any) => {
         coverImage: coverImage || undefined,
       });
       console.log("Kitap yükleme sonucu:", result);
-      showAlert("Başarılı", "Kitap başarıyla yüklendi", 'primary');
+      setToastMessage("Kitap başarıyla yüklendi");
+      setToastType('success');
+      setToastVisible(true);
       setTimeout(() => navigation.navigate("MainDrawer"), 1500);
     } catch (error: any) {
       console.error("❌ Upload error:", error);
@@ -94,13 +95,13 @@ const AddBookScreen = ({ navigation }: any) => {
       } else {
         console.log("Error message:", error.message);
       }
-      showAlert(
-        "Hata",
+      setToastMessage(
         error?.response?.data?.message ||
-          error.message ||
-          "Kitap yüklenirken hata oluştu",
-        'primary'
+        error.message ||
+        "Kitap yüklenirken hata oluştu"
       );
+      setToastType('error');
+      setToastVisible(true);
     } finally {
       setLoading(false);
       console.log("--- Kitap Yükleme Bitti ---");
@@ -154,13 +155,11 @@ const AddBookScreen = ({ navigation }: any) => {
         />
       </ScrollView>
 
-      {/* Custom Alert Component */}
-      <Alert
-        visible={alertVisible}
-        title={alertConfig.title}
-        message={alertConfig.message}
-        type={alertConfig.type as 'primary' | 'secondary'}
-        onClose={handleCloseAlert}
+      <Toast
+        visible={toastVisible}
+        message={toastMessage}
+        type={toastType}
+        onHide={() => setToastVisible(false)}
       />
     </SafeAreaView>
   );

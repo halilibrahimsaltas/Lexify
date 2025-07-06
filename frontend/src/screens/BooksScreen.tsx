@@ -11,6 +11,7 @@ import {
   TextInput,
 } from "react-native";
 import Alert from "../components/Alert";
+import Toast from "../components/Toast";
 import { SafeAreaView } from "react-native-safe-area-context";
 import bookService from "../services/book.service";
 import { Book } from "../types";
@@ -29,6 +30,10 @@ const BooksScreen = ({ navigation }: any) => {
     message: '',
     type: 'primary' as 'primary' | 'secondary',
   });
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>("success");
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
 
   const showAlert = (title: string, message: string, type: 'primary' | 'secondary' = 'primary') => {
     setAlertConfig({ title, message, type });
@@ -70,45 +75,34 @@ const BooksScreen = ({ navigation }: any) => {
     setRefreshing(false);
   };
 
-  const handleDeleteBook = async (bookId: number) => {
-    showAlert(
-      "Kitabı Sil", 
-      "Bu kitabı silmek istediğinizden emin misiniz?", 
-      'secondary'
-    );
-    
-    // Silme işlemi için özel butonlar
+  const handleDeleteBook = (bookId: number) => {
+    setConfirmDeleteId(bookId);
     setAlertConfig({
       title: "Kitabı Sil",
       message: "Bu kitabı silmek istediğinizden emin misiniz?",
       type: 'secondary',
     });
     setAlertVisible(true);
-    
-    const confirmDelete = async () => {
-      setDeleteLoading(bookId);
-      try {
-        await bookService.deleteBook(bookId);
-        setBooks(books.filter((book) => book.id !== bookId));
-        showAlert("Başarılı", "Kitap başarıyla silindi", 'primary');
-      } catch (error: any) {
-        showAlert(
-          "Hata",
-          error.message || "Kitap silinirken bir hata oluştu",
-          'primary'
-        );
-      } finally {
-        setDeleteLoading(null);
-      }
-    };
-    
-    // Silme onayı için özel butonlar
-    setAlertConfig({
-      title: "Kitabı Sil",
-      message: "Bu kitabı silmek istediğinizden emin misiniz?",
-      type: 'secondary',
-    });
-    setAlertVisible(true);
+  };
+
+  const confirmDelete = async () => {
+    if (confirmDeleteId == null) return;
+    setDeleteLoading(confirmDeleteId);
+    setAlertVisible(false);
+    try {
+      await bookService.deleteBook(confirmDeleteId);
+      setBooks(books.filter((book) => book.id !== confirmDeleteId));
+      setToastMessage("Kitap başarıyla silindi");
+      setToastType('success');
+      setToastVisible(true);
+    } catch (error: any) {
+      setToastMessage(error.message || "Kitap silinirken bir hata oluştu");
+      setToastType('error');
+      setToastVisible(true);
+    } finally {
+      setDeleteLoading(null);
+      setConfirmDeleteId(null);
+    }
   };
 
   const handleSearch = async () => {
@@ -210,6 +204,28 @@ const BooksScreen = ({ navigation }: any) => {
         message={alertConfig.message}
         type={alertConfig.type as 'primary' | 'secondary'}
         onClose={handleCloseAlert}
+        buttons={[
+          {
+            text: 'İptal',
+            onPress: () => setAlertVisible(false),
+            variant: 'secondary',
+            iconName: 'close',
+            iconFamily: 'MaterialIcons',
+          },
+          {
+            text: 'Sil',
+            onPress: confirmDelete,
+            variant: 'primary',
+            iconName: 'delete',
+            iconFamily: 'MaterialIcons',
+          },
+        ]}
+      />
+      <Toast
+        visible={toastVisible}
+        message={toastMessage}
+        type={toastType}
+        onHide={() => setToastVisible(false)}
       />
     </SafeAreaView>
   );
