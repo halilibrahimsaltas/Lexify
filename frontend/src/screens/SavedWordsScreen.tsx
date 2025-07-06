@@ -1,14 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import wordService, { Word } from '../services/word.service';
+import Alert from '../components/Alert';
 
 
 
 const SavedWordsScreen = ({ navigation }: any) => {
   const [words, setWords] = useState<Word[]>([]);
   const [loading, setLoading] = useState(true);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({
+    title: '',
+    message: '',
+    type: 'info' as 'success' | 'error' | 'warning' | 'info',
+  });
   const languageNames: Record<string, string> = { en: 'İngilizce', tr: 'Türkçe', de: 'Almanca', fr: 'Fransızca', es: 'İspanyolca' };
+
+  const showAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
+    setAlertConfig({ title, message, type });
+    setAlertVisible(true);
+  };
+
+  const handleCloseAlert = () => {
+    setAlertVisible(false);
+  };
 
   useEffect(() => {
     fetchWords();
@@ -22,7 +38,7 @@ const SavedWordsScreen = ({ navigation }: any) => {
     );
       setWords(data);
     } catch (error) {
-      Alert.alert('Hata', 'Kaydedilmiş kelimeler alınamadı');
+      showAlert('Hata', 'Kaydedilmiş kelimeler alınamadı', 'error');
     } finally {
       setLoading(false);
     }
@@ -62,6 +78,15 @@ const SavedWordsScreen = ({ navigation }: any) => {
           ListEmptyComponent={<Text style={styles.emptyText}>Hiç kelime kaydedilmemiş.</Text>}
         />
       )}
+
+      {/* Custom Alert Component */}
+      <Alert
+        visible={alertVisible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        onClose={handleCloseAlert}
+      />
     </SafeAreaView>
   );
 };

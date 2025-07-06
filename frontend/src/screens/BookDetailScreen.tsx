@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  Alert,
   ActivityIndicator,
   View,
   Text,
@@ -8,6 +7,7 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
+import Alert from "../components/Alert";
 import { SafeAreaView } from "react-native-safe-area-context";
 import bookService from "../services/book.service";
 import WordSelector from "../components/WordSelector";
@@ -25,6 +25,21 @@ const BookReaderScreen = ({ navigation, route }: any) => {
   const [wordSelectorVisible, setWordSelectorVisible] = useState(false);
   const [chapters, setChapters] = useState<string[]>([]);
   const [currentChapter, setCurrentChapter] = useState(0);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({
+    title: '',
+    message: '',
+    type: 'info' as 'success' | 'error' | 'warning' | 'info',
+  });
+
+  const showAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
+    setAlertConfig({ title, message, type });
+    setAlertVisible(true);
+  };
+
+  const handleCloseAlert = () => {
+    setAlertVisible(false);
+  };
 
   useEffect(() => {
     fetchAll();
@@ -97,9 +112,9 @@ const BookReaderScreen = ({ navigation, route }: any) => {
     try {
       // Buraya backend'e kaydetme isteği yazılabilir
       console.log("✅ Favori kaydedildi:", { word, translation });
-      Alert.alert("Başarılı", `"${word}" favorilere eklendi.`);
+      showAlert("Başarılı", `"${word}" favorilere eklendi.`, 'success');
     } catch (error) {
-      Alert.alert("Hata", "Kelime kaydedilemedi");
+      showAlert("Hata", "Kelime kaydedilemedi", 'error');
     }
   };
 
@@ -171,6 +186,15 @@ const BookReaderScreen = ({ navigation, route }: any) => {
         selectedWord={selectedWord}
         onClose={() => setWordSelectorVisible(false)}
         onWordSave={handleWordSave}
+      />
+
+      {/* Custom Alert Component */}
+      <Alert
+        visible={alertVisible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        onClose={handleCloseAlert}
       />
     </SafeAreaView>
   );

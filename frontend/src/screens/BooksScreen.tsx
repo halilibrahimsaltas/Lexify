@@ -5,11 +5,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Alert,
   ActivityIndicator,
   RefreshControl,
   TextInput,
 } from "react-native";
+import Alert from "../components/Alert";
 import { SafeAreaView } from "react-native-safe-area-context";
 import bookService from "../services/book.service";
 import { Book } from "../types";
@@ -22,6 +22,21 @@ const BooksScreen = ({ navigation }: any) => {
   const [deleteLoading, setDeleteLoading] = useState<number | null>(null);
   const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState<Book[] | null>(null);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({
+    title: '',
+    message: '',
+    type: 'info' as 'success' | 'error' | 'warning' | 'info',
+  });
+
+  const showAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
+    setAlertConfig({ title, message, type });
+    setAlertVisible(true);
+  };
+
+  const handleCloseAlert = () => {
+    setAlertVisible(false);
+  };
 
   useEffect(() => {
     loadBooks();
@@ -32,9 +47,10 @@ const BooksScreen = ({ navigation }: any) => {
       const userBooks = await bookService.getUserBooks();
       setBooks(userBooks);
     } catch (error: any) {
-      Alert.alert(
+      showAlert(
         "Hata",
-        error.message || "Kitaplar yüklenirken bir hata oluştu"
+        error.message || "Kitaplar yüklenirken bir hata oluştu",
+        'error'
       );
     } finally {
       setLoading(false);
@@ -48,28 +64,44 @@ const BooksScreen = ({ navigation }: any) => {
   };
 
   const handleDeleteBook = async (bookId: number) => {
-    Alert.alert("Kitabı Sil", "Bu kitabı silmek istediğinizden emin misiniz?", [
-      { text: "İptal", style: "cancel" },
-      {
-        text: "Sil",
-        style: "destructive",
-        onPress: async () => {
-          setDeleteLoading(bookId);
-          try {
-            await bookService.deleteBook(bookId);
-            setBooks(books.filter((book) => book.id !== bookId));
-            Alert.alert("Başarılı", "Kitap başarıyla silindi");
-          } catch (error: any) {
-            Alert.alert(
-              "Hata",
-              error.message || "Kitap silinirken bir hata oluştu"
-            );
-          } finally {
-            setDeleteLoading(null);
-          }
-        },
-      },
-    ]);
+    showAlert(
+      "Kitabı Sil", 
+      "Bu kitabı silmek istediğinizden emin misiniz?", 
+      'warning'
+    );
+    
+    // Silme işlemi için özel butonlar
+    setAlertConfig({
+      title: "Kitabı Sil",
+      message: "Bu kitabı silmek istediğinizden emin misiniz?",
+      type: 'warning',
+    });
+    setAlertVisible(true);
+    
+    const confirmDelete = async () => {
+      setDeleteLoading(bookId);
+      try {
+        await bookService.deleteBook(bookId);
+        setBooks(books.filter((book) => book.id !== bookId));
+        showAlert("Başarılı", "Kitap başarıyla silindi", 'success');
+      } catch (error: any) {
+        showAlert(
+          "Hata",
+          error.message || "Kitap silinirken bir hata oluştu",
+          'error'
+        );
+      } finally {
+        setDeleteLoading(null);
+      }
+    };
+    
+    // Silme onayı için özel butonlar
+    setAlertConfig({
+      title: "Kitabı Sil",
+      message: "Bu kitabı silmek istediğinizden emin misiniz?",
+      type: 'warning',
+    });
+    setAlertVisible(true);
   };
 
   const handleSearch = async () => {
@@ -82,7 +114,7 @@ const BooksScreen = ({ navigation }: any) => {
       const results = await bookService.searchBooks(search.trim());
       setSearchResults(results);
     } catch (error: any) {
-      Alert.alert("Hata", error.message || "Arama sırasında hata oluştu");
+      showAlert("Hata", error.message || "Arama sırasında hata oluştu", 'error');
     }
   };
 
@@ -163,6 +195,15 @@ const BooksScreen = ({ navigation }: any) => {
           <View style={styles.booksList}>{filteredBooks.map(renderBookItem)}</View>
         )}
       </ScrollView>
+
+      {/* Custom Alert Component */}
+      <Alert
+        visible={alertVisible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        onClose={handleCloseAlert}
+      />
     </SafeAreaView>
   );
 };

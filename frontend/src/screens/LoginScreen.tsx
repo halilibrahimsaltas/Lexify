@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../contexts/AuthContext';
+import Alert from '../components/Alert';
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
@@ -9,36 +10,51 @@ const LoginScreen = () => {
   const [name, setName] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({
+    title: '',
+    message: '',
+    type: 'info' as 'success' | 'error' | 'warning' | 'info',
+  });
 
   const { login, register } = useAuth();
 
+  const showAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
+    setAlertConfig({ title, message, type });
+    setAlertVisible(true);
+  };
+
+  const handleCloseAlert = () => {
+    setAlertVisible(false);
+  };
+
   const validateForm = () => {
     if (!email.trim() || !password.trim()) {
-      Alert.alert('Hata', 'Lütfen tüm alanları doldurun');
+      showAlert('Hata', 'Lütfen tüm alanları doldurun', 'error');
       return false;
     }
 
     if (!isLogin && !name.trim()) {
-      Alert.alert('Hata', 'Lütfen adınızı girin');
+      showAlert('Hata', 'Lütfen adınızı girin', 'error');
       return false;
     }
 
     // Email formatı kontrolü
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      Alert.alert('Hata', 'Geçerli bir e-posta adresi girin');
+      showAlert('Hata', 'Geçerli bir e-posta adresi girin', 'error');
       return false;
     }
 
     // Şifre uzunluğu kontrolü (backend DTO'ya uygun)
     if (password.length < 8) {
-      Alert.alert('Hata', 'Şifre en az 8 karakter olmalıdır');
+      showAlert('Hata', 'Şifre en az 8 karakter olmalıdır', 'error');
       return false;
     }
 
     // İsim uzunluğu kontrolü (backend DTO'ya uygun)
     if (!isLogin && (name.length < 2 || name.length > 50)) {
-      Alert.alert('Hata', 'İsim 2-50 karakter arasında olmalıdır');
+      showAlert('Hata', 'İsim 2-50 karakter arasında olmalıdır', 'error');
       return false;
     }
 
@@ -53,14 +69,14 @@ const LoginScreen = () => {
       if (isLogin) {
         // Giriş işlemi
         await login(email, password);
-        Alert.alert('Başarılı', 'Giriş yapıldı');
+        
       } else {
         // Kayıt işlemi
         await register(email, password, name);
-        Alert.alert('Başarılı', 'Hesap oluşturuldu');
+        showAlert('Başarılı', 'Hesap oluşturuldu', 'success');
       }
     } catch (error: any) {
-      Alert.alert('Hata', error.message || 'Bir hata oluştu');
+      showAlert('Hata', error.message || 'Bir hata oluştu', 'error');
     } finally {
       setLoading(false);
     }
@@ -167,6 +183,15 @@ const LoginScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* Custom Alert Component */}
+      <Alert
+        visible={alertVisible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        onClose={handleCloseAlert}
+      />
     </SafeAreaView>
   );
 };

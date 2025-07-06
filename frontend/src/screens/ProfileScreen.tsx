@@ -6,11 +6,11 @@ import {
   TouchableOpacity,
   Switch,
   ScrollView,
-  Alert,
   ActivityIndicator,
   TextInput,
   Modal,
 } from "react-native";
+import Alert from "../components/Alert";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "../contexts/AuthContext";
 import userService, { User, UpdateUserRequest } from "../services/user.service";
@@ -29,6 +29,21 @@ const ProfileScreen = ({ navigation }: any) => {
     password: "",
   });
   const [userWords, setUserWords] = useState<Word[]>([]);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({
+    title: '',
+    message: '',
+    type: 'info' as 'success' | 'error' | 'warning' | 'info',
+  });
+
+  const showAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
+    setAlertConfig({ title, message, type });
+    setAlertVisible(true);
+  };
+
+  const handleCloseAlert = () => {
+    setAlertVisible(false);
+  };
 
   useEffect(() => {
     if (user) {
@@ -61,7 +76,7 @@ const ProfileScreen = ({ navigation }: any) => {
     if (editForm.password.trim()) updateData.password = editForm.password;
 
     if (Object.keys(updateData).length === 0) {
-      Alert.alert("Bilgi", "Değişiklik yapılmadı");
+      showAlert("Bilgi", "Değişiklik yapılmadı", 'info');
       return;
     }
 
@@ -78,25 +93,32 @@ const ProfileScreen = ({ navigation }: any) => {
       });
 
       setEditModalVisible(false);
-      Alert.alert("Başarılı", "Profil güncellendi");
+      showAlert("Başarılı", "Profil güncellendi", 'success');
     } catch (error: any) {
-      Alert.alert("Hata", error.message);
+      showAlert("Hata", error.message, 'error');
     } finally {
       setEditLoading(false);
     }
   };
 
   const handleLogout = async () => {
-    Alert.alert("Çıkış Yap", "Çıkış yapmak istediğinizden emin misiniz?", [
-      { text: "İptal", style: "cancel" },
-      {
-        text: "Çıkış Yap",
-        style: "destructive",
-        onPress: async () => {
-          await logout();
-        },
-      },
-    ]);
+    showAlert(
+      "Çıkış Yap", 
+      "Çıkış yapmak istediğinizden emin misiniz?", 
+      'warning'
+    );
+    
+    // Çıkış onayı için özel butonlar
+    setAlertConfig({
+      title: "Çıkış Yap",
+      message: "Çıkış yapmak istediğinizden emin misiniz?",
+      type: 'warning',
+    });
+    setAlertVisible(true);
+    
+    const confirmLogout = async () => {
+      await logout();
+    };
   };
 
   const menuItems = [
@@ -119,7 +141,7 @@ const ProfileScreen = ({ navigation }: any) => {
       title: "Öğrenme İstatistikleri",
       subtitle: "İlerlemenizi görüntüleyin",
       icon: "📊",
-      onPress: () => Alert.alert("Bilgi", "Bu özellik yakında eklenecek"),
+      onPress: () => showAlert("Bilgi", "Bu özellik yakında eklenecek", 'info'),
     },
     {
       id: "4",
@@ -133,14 +155,14 @@ const ProfileScreen = ({ navigation }: any) => {
       title: "Ayarlar",
       subtitle: "Uygulama ayarlarını düzenleyin",
       icon: "⚙️",
-      onPress: () => Alert.alert("Bilgi", "Bu özellik yakında eklenecek"),
+      onPress: () => showAlert("Bilgi", "Bu özellik yakında eklenecek", 'info'),
     },
     {
       id: "6",
       title: "Yardım",
       subtitle: "Destek ve SSS",
       icon: "❓",
-      onPress: () => Alert.alert("Bilgi", "Bu özellik yakında eklenecek"),
+      onPress: () => showAlert("Bilgi", "Bu özellik yakında eklenecek", 'info'),
     },
   ];
 
@@ -270,6 +292,15 @@ const ProfileScreen = ({ navigation }: any) => {
           <Text style={styles.logoutButtonText}>Çıkış Yap</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      {/* Custom Alert Component */}
+      <Alert
+        visible={alertVisible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        onClose={handleCloseAlert}
+      />
 
       {/* Profil Düzenleme Modal */}
       <Modal

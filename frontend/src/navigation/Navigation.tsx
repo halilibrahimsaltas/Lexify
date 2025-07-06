@@ -13,6 +13,7 @@ import BookReaderScreen from '../screens/BookReaderScreen';
 import LoginScreen from '../screens/LoginScreen';
 import LogoutScreen from '../screens/LogoutScreen';// logout işlemini burada yapacağız
 import LoadingScreen from '../components/LoadingScreen';
+import DictionaryScreen from '../screens/DictionaryScreen';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -22,6 +23,7 @@ const DrawerNavigator = () => (
     <Drawer.Screen name="Kitaplarım" component={BooksScreen} />
     <Drawer.Screen name="Favori Kelimeler" component={SavedWordsScreen} />
     <Drawer.Screen name="Profil" component={ProfileScreen} />
+    <Drawer.Screen name="Sözlük" component={DictionaryScreen} />
     <Drawer.Screen name="Çıkış Yap" component={LogoutScreen} />
   </Drawer.Navigator>
 );

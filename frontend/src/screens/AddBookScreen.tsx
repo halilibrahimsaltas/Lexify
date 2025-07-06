@@ -5,10 +5,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Alert,
   ActivityIndicator,
   TextInput,
 } from "react-native";
+import Alert from "../components/Alert";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as DocumentPicker from "expo-document-picker";
 import bookService from "../services/book.service";
@@ -16,11 +16,26 @@ import bookService from "../services/book.service";
 const AddBookScreen = ({ navigation }: any) => {
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<any>(null);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({
+    title: '',
+    message: '',
+    type: 'info' as 'success' | 'error' | 'warning' | 'info',
+  });
 
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [category, setCategory] = useState("");
   const [coverImage, setCoverImage] = useState("");
+
+  const showAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
+    setAlertConfig({ title, message, type });
+    setAlertVisible(true);
+  };
+
+  const handleCloseAlert = () => {
+    setAlertVisible(false);
+  };
 
   const handleFilePick = async () => {
     try {
@@ -33,17 +48,18 @@ const AddBookScreen = ({ navigation }: any) => {
 
       const file = result.assets[0];
       setSelectedFile(file);
-      Alert.alert("Başarılı", `${file.name} dosyası seçildi`);
+      showAlert("Başarılı", `${file.name} dosyası seçildi`, 'success');
     } catch (error) {
-      Alert.alert("Hata", "Dosya seçilirken bir hata oluştu");
+      showAlert("Hata", "Dosya seçilirken bir hata oluştu", 'error');
     }
   };
 
   const handleUploadPdf = async () => {
     if (!selectedFile || !title || !author || !category) {
-      Alert.alert(
+      showAlert(
         "Eksik Bilgi",
-        "Lütfen tüm zorunlu alanları doldurun ve dosya seçin"
+        "Lütfen tüm zorunlu alanları doldurun ve dosya seçin",
+        'warning'
       );
       return;
     }
@@ -64,9 +80,8 @@ const AddBookScreen = ({ navigation }: any) => {
         coverImage: coverImage || undefined,
       });
       console.log("Kitap yükleme sonucu:", result);
-      Alert.alert("Başarılı", "Kitap başarıyla yüklendi", [
-        { text: "Tamam", onPress: () => navigation.navigate("MainDrawer") },
-      ]);
+      showAlert("Başarılı", "Kitap başarıyla yüklendi", 'success');
+      setTimeout(() => navigation.navigate("MainDrawer"), 1500);
     } catch (error: any) {
       console.error("❌ Upload error:", error);
       if (error?.response) {
@@ -78,11 +93,12 @@ const AddBookScreen = ({ navigation }: any) => {
       } else {
         console.log("Error message:", error.message);
       }
-      Alert.alert(
+      showAlert(
         "Hata",
         error?.response?.data?.message ||
           error.message ||
-          "Kitap yüklenirken hata oluştu"
+          "Kitap yüklenirken hata oluştu",
+        'error'
       );
     } finally {
       setLoading(false);
@@ -142,6 +158,15 @@ const AddBookScreen = ({ navigation }: any) => {
           )}
         </TouchableOpacity>
       </ScrollView>
+
+      {/* Custom Alert Component */}
+      <Alert
+        visible={alertVisible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        onClose={handleCloseAlert}
+      />
     </SafeAreaView>
   );
 };

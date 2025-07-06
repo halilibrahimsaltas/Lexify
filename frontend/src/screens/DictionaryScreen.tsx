@@ -99,7 +99,7 @@ const DictionaryScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {renderHeader()}
+     
       
       <View style={styles.searchContainer}>
         <TextInput
@@ -127,7 +127,7 @@ const DictionaryScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#FFF8E1',
   },
   headerContainer: {
     padding: 20,
@@ -150,15 +150,18 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: '#FFF8E1',
   },
   searchInput: {
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
+    flex: 1,
+    backgroundColor: "#fff",
     borderRadius: 10,
-    padding: 15,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     fontSize: 16,
-    backgroundColor: '#f9f9f9',
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: "#F7C873",
   },
   wordList: {
     flex: 1,

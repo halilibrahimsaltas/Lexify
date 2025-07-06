@@ -4,11 +4,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   Text,
-  Alert,
   ActivityIndicator,
   PanResponder,
   Dimensions,
 } from "react-native";
+import Alert from "../components/Alert";
 import { SafeAreaView } from "react-native-safe-area-context";
 import WordSelector from "../components/WordSelector";
 import { Book } from "../types";
@@ -28,6 +28,21 @@ const BookReaderScreen = ({ route }: any) => {
   const [totalPages, setTotalPages] = useState<number>(1);
   const [showPagination, setShowPagination] = useState(true);
   const hideTimer = useRef<NodeJS.Timeout | null>(null);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({
+    title: '',
+    message: '',
+    type: 'info' as 'success' | 'error' | 'warning' | 'info',
+  });
+
+  const showAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
+    setAlertConfig({ title, message, type });
+    setAlertVisible(true);
+  };
+
+  const handleCloseAlert = () => {
+    setAlertVisible(false);
+  };
 
   useEffect(() => {
     loadBookMetadata();
@@ -42,7 +57,7 @@ const BookReaderScreen = ({ route }: any) => {
       const bookData = await bookService.getBook(bookId);
       setBook(bookData);
     } catch (error: any) {
-      Alert.alert("Hata", error.message || "Kitap bilgisi yüklenemedi");
+      showAlert("Hata", error.message || "Kitap bilgisi yüklenemedi", 'error');
     }
   };
 
@@ -53,7 +68,7 @@ const BookReaderScreen = ({ route }: any) => {
       setContent(data.content);
       setTotalPages(data.totalPages || 1);
     } catch (error: any) {
-      Alert.alert("Hata", error.message || "Sayfa yüklenemedi");
+      showAlert("Hata", error.message || "Sayfa yüklenemedi", 'error');
     } finally {
       setLoading(false);
     }
@@ -179,6 +194,15 @@ const BookReaderScreen = ({ route }: any) => {
           selectedWord={selectedWord}
           onClose={() => setWordSelectorVisible(false)}
           onWordSave={handleWordSave}
+        />
+
+        {/* Custom Alert Component */}
+        <Alert
+          visible={alertVisible}
+          title={alertConfig.title}
+          message={alertConfig.message}
+          type={alertConfig.type}
+          onClose={handleCloseAlert}
         />
       </View>
     </SafeAreaView>
