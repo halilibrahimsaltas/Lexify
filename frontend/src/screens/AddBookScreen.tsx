@@ -176,13 +176,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFF8E1",
   },
-  scrollContent: { padding: 20 },
+  scrollContent: { padding: 20, },
   title: {
     fontSize: 26,
     fontWeight: "bold",
     color: "#4B3F2F",
     flex: 1,
     fontFamily: "Merriweather",
+    marginBottom: 20,
   },
   input: {
     backgroundColor: "#f1f1f1",

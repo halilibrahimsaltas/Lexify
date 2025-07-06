@@ -59,15 +59,12 @@ const SavedWordsScreen = ({ navigation }: any) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← Geri</Text>
-        </TouchableOpacity>
-        <Text style={styles.title}>Kaydedilmiş Kelimeler</Text>
-      </View>
+     
+
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#007AFF" />
+          <Text style={styles.loadingText}>Kelimeler yükleniyor...</Text>
         </View>
       ) : (
         <FlatList
@@ -75,7 +72,16 @@ const SavedWordsScreen = ({ navigation }: any) => {
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={words.length === 0 ? styles.emptyContainer : undefined}
-          ListEmptyComponent={<Text style={styles.emptyText}>Hiç kelime kaydedilmemiş.</Text>}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyIcon}>❤️</Text>
+              <Text style={styles.emptyTitle}>Henüz kelime kaydetmediniz</Text>
+              <Text style={styles.emptyText}>
+                Kitap okurken kelimeleri favorilere ekleyerek burada görüntüleyebilirsiniz.
+              </Text>
+            </View>
+          }
+          showsVerticalScrollIndicator={false}
         />
       )}
 
@@ -94,67 +100,75 @@ const SavedWordsScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#FFF8E1',
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: 'white',
+    padding: 24,
+    backgroundColor: '#FFF8E1',
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  backButton: {
-    marginRight: 15,
-  },
-  backButtonText: {
-    color: '#007AFF',
-    fontSize: 16,
-    fontWeight: '600',
+    borderBottomColor: '#F7C873',
+    alignItems: 'center',
   },
   title: {
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: 'bold',
-    color: '#333',
-    flex: 1,
+    color: '#4B3F2F',
+    marginBottom: 6,
+    fontFamily: 'Merriweather',
+  },
+  subtitle: {
+    fontSize: 15,
+    color: '#666',
+    fontFamily: 'Merriweather',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#FFF8E1',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#666',
+    fontFamily: 'Merriweather',
   },
   wordItem: {
     backgroundColor: 'white',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
+    padding: 20,
+    borderRadius: 16,
+    marginBottom: 12,
     marginHorizontal: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowRadius: 8,
+    elevation: 6,
   },
   wordText: {
-    fontSize: 18,
+    fontSize: 19,
     fontWeight: '600',
-    color: '#333',
+    color: '#4B3F2F',
+    fontFamily: 'Merriweather',
   },
   translationText: {
-    fontSize: 16,
+    fontSize: 17,
     color: '#007AFF',
-    marginTop: 4,
+    marginTop: 6,
+    fontFamily: 'Merriweather',
   },
   metaText: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#666',
-    marginTop: 4,
+    marginTop: 6,
+    fontFamily: 'Merriweather',
   },
   dateText: {
-    fontSize: 11,
-    color: '#aaa',
-    marginTop: 2,
+    fontSize: 12,
+    color: '#999',
+    marginTop: 4,
     textAlign: 'right',
+    fontFamily: 'Merriweather',
   },
   emptyContainer: {
     flex: 1,
@@ -162,10 +176,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 40,
   },
+  emptyIcon: {
+    fontSize: 80,
+    marginBottom: 20,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#4B3F2F',
+    marginBottom: 10,
+    textAlign: 'center',
+    fontFamily: 'Merriweather',
+  },
   emptyText: {
     fontSize: 16,
     color: '#666',
     textAlign: 'center',
+    lineHeight: 24,
+    fontFamily: 'Merriweather',
   },
 });
 

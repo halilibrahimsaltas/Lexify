@@ -102,13 +102,30 @@ const DictionaryScreen = () => {
      
       
       <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Kelime ara..."
-          value={searchQuery}
-          onChangeText={handleSearch}
-          autoCapitalize="none"
-        />
+        <View style={styles.searchWrapper}>
+          <Text style={styles.searchIcon}>🔍</Text>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Kelime ara..."
+            placeholderTextColor="#999"
+            value={searchQuery}
+            onChangeText={handleSearch}
+            autoCapitalize="none"
+            autoCorrect={false}
+            returnKeyType="search"
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity 
+              style={styles.clearButton}
+              onPress={() => {
+                setSearchQuery('');
+                setWords([]);
+              }}
+            >
+              <Text style={styles.clearButtonText}>✕</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       <FlatList
@@ -130,38 +147,69 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF8E1',
   },
   headerContainer: {
-    padding: 20,
-    backgroundColor: 'white',
+    padding: 24,
+    backgroundColor: '#FFF8E1',
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: '#F7C873',
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 5,
+    color: '#4B3F2F',
+    marginBottom: 8,
+    fontFamily: 'Merriweather',
   },
   statsContainer: {
-    marginTop: 5,
+    marginTop: 8,
   },
   statsText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#666',
+    fontFamily: 'Merriweather',
   },
   searchContainer: {
     padding: 20,
     backgroundColor: '#FFF8E1',
   },
+  searchWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderWidth: 2,
+    borderColor: '#F7C873',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  searchIcon: {
+    fontSize: 18,
+    marginRight: 12,
+    color: '#666',
+  },
   searchInput: {
     flex: 1,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
     fontSize: 16,
-    marginRight: 8,
-    borderWidth: 1,
-    borderColor: "#F7C873",
+    color: '#333',
+    fontFamily: 'Merriweather',
+  },
+  clearButton: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 8,
+  },
+  clearButtonText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: 'bold',
   },
   wordList: {
     flex: 1,
@@ -176,56 +224,61 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 50,
+    paddingVertical: 60,
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: 17,
     color: '#666',
     textAlign: 'center',
+    fontFamily: 'Merriweather',
   },
   wordItem: {
     backgroundColor: 'white',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
+    padding: 20,
+    borderRadius: 16,
+    marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
     shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowRadius: 8,
+    elevation: 6,
   },
   wordContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 5,
+    marginBottom: 8,
   },
   wordText: {
-    fontSize: 18,
+    fontSize: 19,
     fontWeight: '600',
-    color: '#333',
+    color: '#4B3F2F',
+    fontFamily: 'Merriweather',
   },
   languageTag: {
     backgroundColor: '#007AFF',
     color: 'white',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
     fontSize: 12,
     fontWeight: '600',
+    fontFamily: 'Merriweather',
   },
   translationText: {
-    fontSize: 16,
+    fontSize: 17,
     color: '#666',
-    marginBottom: 5,
+    marginBottom: 6,
+    fontFamily: 'Merriweather',
   },
   categoryText: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#999',
     fontStyle: 'italic',
+    fontFamily: 'Merriweather',
   },
 });
 
