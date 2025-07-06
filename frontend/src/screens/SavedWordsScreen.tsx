@@ -13,13 +13,13 @@ const SavedWordsScreen = ({ navigation }: any) => {
   const [alertConfig, setAlertConfig] = useState({
     title: '',
     message: '',
-    type: 'info' as 'success' | 'error' | 'warning' | 'info',
+    type: 'primary' as 'primary' | 'secondary',
   });
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<{ id: number; word: string } | null>(null);
   const languageNames: Record<string, string> = { en: 'İngilizce', tr: 'Türkçe', de: 'Almanca', fr: 'Fransızca', es: 'İspanyolca' };
 
-  const showAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
+  const showAlert = (title: string, message: string, type: 'primary' | 'secondary' = 'primary') => {
     setAlertConfig({ title, message, type });
     setAlertVisible(true);
   };
@@ -39,9 +39,9 @@ const SavedWordsScreen = ({ navigation }: any) => {
     try {
       await wordService.deleteUserWord(confirmDelete.id);
       setWords((prev) => prev.filter((w) => w.id !== confirmDelete.id));
-      showAlert('Başarılı', 'Kelime favorilerden kaldırıldı.', 'success');
+      showAlert('Başarılı', 'Kelime favorilerden kaldırıldı.', 'primary');
     } catch (error) {
-      showAlert('Hata', 'Kelime silinemedi.', 'error');
+      showAlert('Hata', 'Kelime silinemedi.', 'primary');
     } finally {
       setDeletingId(null);
     }
@@ -59,7 +59,7 @@ const SavedWordsScreen = ({ navigation }: any) => {
     );
       setWords(data);
     } catch (error) {
-      showAlert('Hata', 'Kaydedilmiş kelimeler alınamadı', 'error');
+      showAlert('Hata', 'Kaydedilmiş kelimeler alınamadı', 'primary');
     } finally {
       setLoading(false);
     }
@@ -121,7 +121,7 @@ const SavedWordsScreen = ({ navigation }: any) => {
         visible={alertVisible}
         title={alertConfig.title}
         message={alertConfig.message}
-        type={alertConfig.type}
+        type={alertConfig.type as 'primary' | 'secondary'}
         onClose={handleCloseAlert}
       />
       {/* Delete confirm Alert */}
@@ -129,7 +129,7 @@ const SavedWordsScreen = ({ navigation }: any) => {
         visible={!!confirmDelete}
         title="Favoriden Sil"
         message={`"${confirmDelete?.word}" kelimesini favorilerden kaldırmak istediğinize emin misiniz?`}
-        type="warning"
+        type="secondary"
         onClose={() => setConfirmDelete(null)}
         buttons={[
           {

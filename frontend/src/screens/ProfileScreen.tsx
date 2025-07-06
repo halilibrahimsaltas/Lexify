@@ -39,10 +39,10 @@ const ProfileScreen = ({ navigation }: any) => {
   const [alertConfig, setAlertConfig] = useState({
     title: '',
     message: '',
-    type: 'info' as 'success' | 'error' | 'warning' | 'info',
+    type: 'primary' as 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info',
   });
 
-  const showAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
+  const showAlert = (title: string, message: string, type: 'primary' | 'secondary' = 'primary') => {
     setAlertConfig({ title, message, type });
     setAlertVisible(true);
   };
@@ -82,7 +82,7 @@ const ProfileScreen = ({ navigation }: any) => {
     if (editForm.password.trim()) updateData.password = editForm.password;
 
     if (Object.keys(updateData).length === 0) {
-      showAlert("Bilgi", "Değişiklik yapılmadı", 'info');
+      showAlert("Bilgi", "Değişiklik yapılmadı", 'primary');
       return;
     }
 
@@ -99,9 +99,9 @@ const ProfileScreen = ({ navigation }: any) => {
       });
 
       setEditModalVisible(false);
-      showAlert("Başarılı", "Profil güncellendi", 'success');
+      showAlert("Başarılı", "Profil güncellendi", 'primary');
     } catch (error: any) {
-      showAlert("Hata", error.message, 'error');
+      showAlert("Hata", error.message, 'primary');
     } finally {
       setEditLoading(false);
     }
@@ -111,14 +111,14 @@ const ProfileScreen = ({ navigation }: any) => {
     showAlert(
       "Çıkış Yap", 
       "Çıkış yapmak istediğinizden emin misiniz?", 
-      'warning'
+      'secondary'
     );
     
     // Çıkış onayı için özel butonlar
     setAlertConfig({
       title: "Çıkış Yap",
       message: "Çıkış yapmak istediğinizden emin misiniz?",
-      type: 'warning',
+      type: 'secondary',
     });
     setAlertVisible(true);
     
@@ -157,25 +157,18 @@ const ProfileScreen = ({ navigation }: any) => {
       onPress: () => navigation.navigate("MainDrawer", { screen: "Sözlük" }),
     },
     {
-      id: "5",
-      title: "Öğrenme İstatistikleri",
-      subtitle: "İlerlemenizi görüntüleyin",
-      icon: <Feather name="bar-chart-2" size={26} color="#FFF8E1" />,
-      onPress: () => showAlert("Bilgi", "Bu özellik yakında eklenecek", 'info'),
-    },
-    {
       id: "6",
       title: "Ayarlar",
       subtitle: "Uygulama ayarlarını düzenleyin",
       icon: <Feather name="settings" size={26} color="#FFF8E1" />,
-      onPress: () => showAlert("Bilgi", "Bu özellik yakında eklenecek", 'info'),
+      onPress: () => showAlert("Bilgi", "Bu özellik yakında eklenecek", 'primary'),
     },
     {
       id: "7",
       title: "Yardım",
       subtitle: "Destek ve SSS",
       icon: <Feather name="help-circle" size={26} color="#FFF8E1" />,
-      onPress: () => showAlert("Bilgi", "Bu özellik yakında eklenecek", 'info'),
+      onPress: () => showAlert("Bilgi", "Bu özellik yakında eklenecek", 'primary'),
     },
   ];
 
@@ -240,7 +233,7 @@ const ProfileScreen = ({ navigation }: any) => {
         visible={alertVisible}
         title={alertConfig.title}
         message={alertConfig.message}
-        type={alertConfig.type}
+        type={alertConfig.type as 'primary' | 'secondary'}
         onClose={handleCloseAlert}
       />
 
@@ -369,13 +362,13 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 20,
+    padding: 10,
   },
   userSection: {
     backgroundColor: "#FFF8E1",
     borderRadius: 0,
-    padding: 24,
-    marginBottom: 20,
+    padding: 12,
+    marginBottom: 10,
     flexDirection: "row",
     alignItems: "center",
     shadowColor: 'transparent',

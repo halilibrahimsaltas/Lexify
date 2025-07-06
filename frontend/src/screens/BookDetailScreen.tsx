@@ -29,10 +29,10 @@ const BookReaderScreen = ({ navigation, route }: any) => {
   const [alertConfig, setAlertConfig] = useState({
     title: '',
     message: '',
-    type: 'info' as 'success' | 'error' | 'warning' | 'info',
+    type: 'primary' as 'primary' | 'secondary',
   });
 
-  const showAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
+  const showAlert = (title: string, message: string, type: 'primary' | 'secondary' = 'primary') => {
     setAlertConfig({ title, message, type });
     setAlertVisible(true);
   };
@@ -112,9 +112,9 @@ const BookReaderScreen = ({ navigation, route }: any) => {
     try {
       // Buraya backend'e kaydetme isteği yazılabilir
       console.log("✅ Favori kaydedildi:", { word, translation });
-      showAlert("Başarılı", `"${word}" favorilere eklendi.`, 'success');
+      showAlert("Başarılı", `"${word}" favorilere eklendi.`, 'primary');
     } catch (error) {
-      showAlert("Hata", "Kelime kaydedilemedi", 'error');
+      showAlert("Hata", "Kelime kaydedilemedi", 'primary');
     }
   };
 
@@ -197,7 +197,7 @@ const BookReaderScreen = ({ navigation, route }: any) => {
         visible={alertVisible}
         title={alertConfig.title}
         message={alertConfig.message}
-        type={alertConfig.type}
+        type={alertConfig.type as 'primary' | 'secondary'}
         onClose={handleCloseAlert}
       />
     </SafeAreaView>

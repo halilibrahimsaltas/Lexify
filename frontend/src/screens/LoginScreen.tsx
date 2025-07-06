@@ -14,12 +14,12 @@ const LoginScreen = () => {
   const [alertConfig, setAlertConfig] = useState({
     title: '',
     message: '',
-    type: 'info' as 'success' | 'error' | 'warning' | 'info',
+    type: 'primary' as 'primary' | 'secondary',
   });
 
   const { login, register } = useAuth();
 
-  const showAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
+  const showAlert = (title: string, message: string, type: 'primary' | 'secondary' = 'primary') => {
     setAlertConfig({ title, message, type });
     setAlertVisible(true);
   };
@@ -30,31 +30,31 @@ const LoginScreen = () => {
 
   const validateForm = () => {
     if (!email.trim() || !password.trim()) {
-      showAlert('Hata', 'Lütfen tüm alanları doldurun', 'error');
+      showAlert('Hata', 'Lütfen tüm alanları doldurun', 'primary');
       return false;
     }
 
     if (!isLogin && !name.trim()) {
-      showAlert('Hata', 'Lütfen adınızı girin', 'error');
+      showAlert('Hata', 'Lütfen adınızı girin', 'primary');
       return false;
     }
 
     // Email formatı kontrolü
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      showAlert('Hata', 'Geçerli bir e-posta adresi girin', 'error');
+      showAlert('Hata', 'Geçerli bir e-posta adresi girin', 'primary');
       return false;
     }
 
     // Şifre uzunluğu kontrolü (backend DTO'ya uygun)
     if (password.length < 8) {
-      showAlert('Hata', 'Şifre en az 8 karakter olmalıdır', 'error');
+      showAlert('Hata', 'Şifre en az 8 karakter olmalıdır', 'primary');
       return false;
     }
 
     // İsim uzunluğu kontrolü (backend DTO'ya uygun)
     if (!isLogin && (name.length < 2 || name.length > 50)) {
-      showAlert('Hata', 'İsim 2-50 karakter arasında olmalıdır', 'error');
+      showAlert('Hata', 'İsim 2-50 karakter arasında olmalıdır', 'primary');
       return false;
     }
 
@@ -73,10 +73,10 @@ const LoginScreen = () => {
       } else {
         // Kayıt işlemi
         await register(email, password, name);
-        showAlert('Başarılı', 'Hesap oluşturuldu', 'success');
+        showAlert('Başarılı', 'Hesap oluşturuldu', 'primary');
       }
     } catch (error: any) {
-      showAlert('Hata', error.message || 'Bir hata oluştu', 'error');
+      showAlert('Hata', error.message || 'Bir hata oluştu', 'primary');
     } finally {
       setLoading(false);
     }
@@ -189,7 +189,7 @@ const LoginScreen = () => {
         visible={alertVisible}
         title={alertConfig.title}
         message={alertConfig.message}
-        type={alertConfig.type}
+        type={alertConfig.type as 'primary' | 'secondary'}
         onClose={handleCloseAlert}
       />
     </SafeAreaView>

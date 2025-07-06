@@ -21,7 +21,7 @@ const AddBookScreen = ({ navigation }: any) => {
   const [alertConfig, setAlertConfig] = useState({
     title: '',
     message: '',
-    type: 'info' as 'success' | 'error' | 'warning' | 'info',
+    type: 'primary' as 'primary' | 'secondary',
   });
 
   const [title, setTitle] = useState("");
@@ -29,7 +29,7 @@ const AddBookScreen = ({ navigation }: any) => {
   const [category, setCategory] = useState("");
   const [coverImage, setCoverImage] = useState("");
 
-  const showAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
+  const showAlert = (title: string, message: string, type: 'primary' | 'secondary' = 'primary') => {
     setAlertConfig({ title, message, type });
     setAlertVisible(true);
   };
@@ -49,9 +49,9 @@ const AddBookScreen = ({ navigation }: any) => {
 
       const file = result.assets[0];
       setSelectedFile(file);
-      showAlert("Başarılı", `${file.name} dosyası seçildi`, 'success');
+      showAlert("Başarılı", `${file.name} dosyası seçildi`, 'primary');
     } catch (error) {
-      showAlert("Hata", "Dosya seçilirken bir hata oluştu", 'error');
+      showAlert("Hata", "Dosya seçilirken bir hata oluştu", 'primary');
     }
   };
 
@@ -60,7 +60,7 @@ const AddBookScreen = ({ navigation }: any) => {
       showAlert(
         "Eksik Bilgi",
         "Lütfen tüm zorunlu alanları doldurun ve dosya seçin",
-        'warning'
+        'secondary'
       );
       return;
     }
@@ -81,7 +81,7 @@ const AddBookScreen = ({ navigation }: any) => {
         coverImage: coverImage || undefined,
       });
       console.log("Kitap yükleme sonucu:", result);
-      showAlert("Başarılı", "Kitap başarıyla yüklendi", 'success');
+      showAlert("Başarılı", "Kitap başarıyla yüklendi", 'primary');
       setTimeout(() => navigation.navigate("MainDrawer"), 1500);
     } catch (error: any) {
       console.error("❌ Upload error:", error);
@@ -99,7 +99,7 @@ const AddBookScreen = ({ navigation }: any) => {
         error?.response?.data?.message ||
           error.message ||
           "Kitap yüklenirken hata oluştu",
-        'error'
+        'primary'
       );
     } finally {
       setLoading(false);
@@ -159,7 +159,7 @@ const AddBookScreen = ({ navigation }: any) => {
         visible={alertVisible}
         title={alertConfig.title}
         message={alertConfig.message}
-        type={alertConfig.type}
+        type={alertConfig.type as 'primary' | 'secondary'}
         onClose={handleCloseAlert}
       />
     </SafeAreaView>

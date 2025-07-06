@@ -32,10 +32,10 @@ const BookReaderScreen = ({ route }: any) => {
   const [alertConfig, setAlertConfig] = useState({
     title: '',
     message: '',
-    type: 'info' as 'success' | 'error' | 'warning' | 'info',
+    type: 'primary' as 'primary' | 'secondary',
   });
 
-  const showAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
+  const showAlert = (title: string, message: string, type: 'primary' | 'secondary' = 'primary') => {
     setAlertConfig({ title, message, type });
     setAlertVisible(true);
   };
@@ -57,7 +57,7 @@ const BookReaderScreen = ({ route }: any) => {
       const bookData = await bookService.getBook(bookId);
       setBook(bookData);
     } catch (error: any) {
-      showAlert("Hata", error.message || "Kitap bilgisi yüklenemedi", 'error');
+      showAlert("Hata", error.message || "Kitap bilgisi yüklenemedi", 'primary');
     }
   };
 
@@ -68,7 +68,7 @@ const BookReaderScreen = ({ route }: any) => {
       setContent(data.content);
       setTotalPages(data.totalPages || 1);
     } catch (error: any) {
-      showAlert("Hata", error.message || "Sayfa yüklenemedi", 'error');
+      showAlert("Hata", error.message || "Sayfa yüklenemedi", 'primary');
     } finally {
       setLoading(false);
     }
@@ -205,7 +205,7 @@ const BookReaderScreen = ({ route }: any) => {
           visible={alertVisible}
           title={alertConfig.title}
           message={alertConfig.message}
-          type={alertConfig.type}
+          type={alertConfig.type as 'primary' | 'secondary'}
           onClose={handleCloseAlert}
         />
       </View>

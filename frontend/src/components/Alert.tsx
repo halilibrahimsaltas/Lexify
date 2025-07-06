@@ -20,14 +20,14 @@ interface AlertProps {
   visible: boolean;
   title?: string;
   message: string;
-  type?: 'success' | 'error' | 'warning' | 'info';
+  type?: 'primary' | 'secondary';
   showIcon?: boolean;
   showCloseButton?: boolean;
   closeOnBackdropPress?: boolean;
   buttons?: Array<{
     text: string;
     onPress: () => void;
-    variant?: 'primary' | 'secondary' | 'outline';
+    variant?: 'primary' | 'secondary';
     iconName?: string;
     iconFamily?: string;
   }>;
@@ -42,7 +42,7 @@ const Alert: React.FC<AlertProps> = ({
   visible,
   title,
   message,
-  type = 'info',
+  type = 'primary',
   showIcon = true,
   showCloseButton = true,
   closeOnBackdropPress = true,
@@ -107,56 +107,30 @@ const Alert: React.FC<AlertProps> = ({
 
   const getIcon = () => {
     let iconName = 'info';
-    let iconColor = '#007AFF';
-    switch (type) {
-      case 'success':
-        iconName = 'check-circle';
-        iconColor = '#4CAF50';
-        break;
-      case 'error':
-        iconName = 'error';
-        iconColor = '#FF3B30';
-        break;
-      case 'warning':
-        iconName = 'warning';
-        iconColor = '#FF9800';
-        break;
-      case 'info':
-      default:
-        iconName = 'info';
-        iconColor = '#007AFF';
-        break;
+    let iconColor = '#32341f'; // koyu yeşil
+    if (type === 'primary') {
+      iconName = 'check-circle';
+      iconColor = '#32341f';
+    } else {
+      iconName = 'info';
+      iconColor = '#4B3F2F'; // koyu kahverengi
     }
     return { iconName, iconColor };
   };
 
   const getTypeStyles = () => {
-    switch (type) {
-      case 'success':
-        return {
-          container: styles.successContainer,
-          title: styles.successTitle,
-          icon: styles.successIcon,
-        };
-      case 'error':
-        return {
-          container: styles.errorContainer,
-          title: styles.errorTitle,
-          icon: styles.errorIcon,
-        };
-      case 'warning':
-        return {
-          container: styles.warningContainer,
-          title: styles.warningTitle,
-          icon: styles.warningIcon,
-        };
-      case 'info':
-      default:
-        return {
-          container: styles.infoContainer,
-          title: styles.infoTitle,
-          icon: styles.infoIcon,
-        };
+    if (type === 'primary') {
+      return {
+        container: styles.primaryContainer,
+        title: styles.primaryTitle,
+        icon: styles.primaryIcon,
+      };
+    } else {
+      return {
+        container: styles.secondaryContainer,
+        title: styles.secondaryTitle,
+        icon: styles.secondaryIcon,
+      };
     }
   };
 
@@ -227,7 +201,6 @@ const Alert: React.FC<AlertProps> = ({
                           style={[
                             styles.button,
                             button.variant === 'secondary' && styles.secondaryButton,
-                            button.variant === 'outline' && styles.outlineButton,
                             index > 0 && styles.buttonMargin,
                           ]}
                           onPress={button.onPress}
@@ -236,13 +209,7 @@ const Alert: React.FC<AlertProps> = ({
                             <IconComponent
                               name={button.iconName}
                               size={18}
-                              color={
-                                button.variant === 'secondary'
-                                  ? '#5D4037'
-                                  : button.variant === 'outline'
-                                  ? '#007AFF'
-                                  : '#fff'
-                              }
+                              color={button.variant === 'secondary' ? '#4B3F2F' : '#FFF8E1'}
                               style={{ marginRight: 6 }}
                             />
                           )}
@@ -250,7 +217,6 @@ const Alert: React.FC<AlertProps> = ({
                             style={[
                               styles.buttonText,
                               button.variant === 'secondary' && styles.secondaryButtonText,
-                              button.variant === 'outline' && styles.outlineButtonText,
                             ]}
                           >
                             {button.text}
@@ -264,7 +230,7 @@ const Alert: React.FC<AlertProps> = ({
                 {/* Default button */}
                 {(!buttons || buttons.length === 0) && (
                   <TouchableOpacity style={styles.defaultButton} onPress={handleClose}>
-                    <MaterialIcons name="check" size={18} color="#fff" style={{ marginRight: 6 }} />
+                    <MaterialIcons name="check" size={18} color="#FFF8E1" style={{ marginRight: 6 }} />
                     <Text style={styles.defaultButtonText}>Tamam</Text>
                   </TouchableOpacity>
                 )}
@@ -294,13 +260,12 @@ const styles = StyleSheet.create({
   },
   alertContainer: {
     width: Math.min(screenWidth - 40, 400),
-    backgroundColor: 'white',
     borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowColor: 'transparent',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
   },
   content: {
     padding: 24,
@@ -318,7 +283,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#5D4037',
+    color: '#4B3F2F',
   },
   closeButton: {
     width: 32,
@@ -330,9 +295,10 @@ const styles = StyleSheet.create({
   },
   message: {
     fontSize: 16,
-    color: '#333',
+    color: '#4E2B1B',
     lineHeight: 24,
     marginBottom: 24,
+    fontFamily: 'Roboto_400Regular',
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -341,89 +307,66 @@ const styles = StyleSheet.create({
   button: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FEC84B',
+    backgroundColor: '#32341f',
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 10,
     minWidth: 80,
   },
   secondaryButton: {
-    backgroundColor: '#FAF3DD',
+    backgroundColor: '#FFF8E1',
     borderWidth: 1,
-    borderColor: '#bdbdbd',
-  },
-  outlineButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#007AFF',
+    borderColor: '#32341f',
   },
   buttonMargin: {
     marginLeft: 12,
   },
   buttonText: {
-    color: 'white',
+    color: '#FFF8E1',
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: 'Roboto_500Medium',
   },
   secondaryButtonText: {
-    color: '#5D4037',
-  },
-  outlineButtonText: {
-    color: '#007AFF',
+    color: '#4B3F2F',
+    fontFamily: 'Roboto_500Medium',
   },
   defaultButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FEC84B',
+    backgroundColor: '#32341f',
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 10,
   },
   defaultButtonText: {
-    color: 'white',
+    color: '#FFF8E1',
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: 'Roboto_500Medium',
   },
-  // Type-specific styles
-  successContainer: {
+  // Type-specific styles (sadeleştirilmiş)
+  primaryContainer: {
+    backgroundColor: '#FFF8E1',
     borderLeftWidth: 4,
-    borderLeftColor: '#4CAF50',
+    borderLeftColor: '#32341f',
   },
-  successTitle: {
-    color: '#2E7D32',
+  primaryTitle: {
+    color: '#32341f',
   },
-  successIcon: {
-    color: '#4CAF50',
+  primaryIcon: {
+    color: '#32341f',
   },
-  errorContainer: {
+  secondaryContainer: {
+    backgroundColor: '#FAFAFA',
     borderLeftWidth: 4,
-    borderLeftColor: '#FF3B30',
+    borderLeftColor: '#4B3F2F',
   },
-  errorTitle: {
-    color: '#D32F2F',
+  secondaryTitle: {
+    color: '#4B3F2F',
   },
-  errorIcon: {
-    color: '#FF3B30',
-  },
-  warningContainer: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#FF9800',
-  },
-  warningTitle: {
-    color: '#F57C00',
-  },
-  warningIcon: {
-    color: '#FF9800',
-  },
-  infoContainer: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#007AFF',
-  },
-  infoTitle: {
-    color: '#1976D2',
-  },
-  infoIcon: {
-    color: '#007AFF',
+  secondaryIcon: {
+    color: '#4B3F2F',
   },
 });
 

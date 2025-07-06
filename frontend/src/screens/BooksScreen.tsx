@@ -26,10 +26,10 @@ const BooksScreen = ({ navigation }: any) => {
   const [alertConfig, setAlertConfig] = useState({
     title: '',
     message: '',
-    type: 'info' as 'success' | 'error' | 'warning' | 'info',
+    type: 'primary' as 'primary' | 'secondary',
   });
 
-  const showAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
+  const showAlert = (title: string, message: string, type: 'primary' | 'secondary' = 'primary') => {
     setAlertConfig({ title, message, type });
     setAlertVisible(true);
   };
@@ -50,7 +50,7 @@ const BooksScreen = ({ navigation }: any) => {
       showAlert(
         "Hata",
         error.message || "Kitaplar yüklenirken bir hata oluştu",
-        'error'
+        'primary'
       );
     } finally {
       setLoading(false);
@@ -67,14 +67,14 @@ const BooksScreen = ({ navigation }: any) => {
     showAlert(
       "Kitabı Sil", 
       "Bu kitabı silmek istediğinizden emin misiniz?", 
-      'warning'
+      'secondary'
     );
     
     // Silme işlemi için özel butonlar
     setAlertConfig({
       title: "Kitabı Sil",
       message: "Bu kitabı silmek istediğinizden emin misiniz?",
-      type: 'warning',
+      type: 'secondary',
     });
     setAlertVisible(true);
     
@@ -83,12 +83,12 @@ const BooksScreen = ({ navigation }: any) => {
       try {
         await bookService.deleteBook(bookId);
         setBooks(books.filter((book) => book.id !== bookId));
-        showAlert("Başarılı", "Kitap başarıyla silindi", 'success');
+        showAlert("Başarılı", "Kitap başarıyla silindi", 'primary');
       } catch (error: any) {
         showAlert(
           "Hata",
           error.message || "Kitap silinirken bir hata oluştu",
-          'error'
+          'primary'
         );
       } finally {
         setDeleteLoading(null);
@@ -99,7 +99,7 @@ const BooksScreen = ({ navigation }: any) => {
     setAlertConfig({
       title: "Kitabı Sil",
       message: "Bu kitabı silmek istediğinizden emin misiniz?",
-      type: 'warning',
+      type: 'secondary',
     });
     setAlertVisible(true);
   };
@@ -114,7 +114,7 @@ const BooksScreen = ({ navigation }: any) => {
       const results = await bookService.searchBooks(search.trim());
       setSearchResults(results);
     } catch (error: any) {
-      showAlert("Hata", error.message || "Arama sırasında hata oluştu", 'error');
+      showAlert("Hata", error.message || "Arama sırasında hata oluştu", 'primary');
     }
   };
 
@@ -201,7 +201,7 @@ const BooksScreen = ({ navigation }: any) => {
         visible={alertVisible}
         title={alertConfig.title}
         message={alertConfig.message}
-        type={alertConfig.type}
+        type={alertConfig.type as 'primary' | 'secondary'}
         onClose={handleCloseAlert}
       />
     </SafeAreaView>
