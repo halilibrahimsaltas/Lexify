@@ -28,7 +28,7 @@ const LogoutScreen = ({ navigation }: any) => {
         visible={alertVisible}
         title="Çıkış Yapıldı"
         message="Başarıyla çıkış yapıldı."
-        type="success"
+        type="primary"
         onClose={handleCloseAlert}
         autoClose={true}
         autoCloseDelay={1500}

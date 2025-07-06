@@ -26,11 +26,11 @@ export class CreateUserDto {
         description: 'User role',
         example: UserRole.USER,
         enum: UserRole,
-        default: UserRole.USER
+        default: UserRole.USER,
+        required: false
     })
-    @IsNotEmpty()
     @IsEnum(UserRole, { message: 'Invalid role' })
-    role: UserRole;
+    role?: UserRole = UserRole.USER;
 
    
 

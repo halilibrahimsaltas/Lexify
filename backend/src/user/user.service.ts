@@ -6,6 +6,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Word } from '../word/entities/word.entity';
 import * as bcrypt from 'bcrypt';
+import { UserRole } from '../common/enum/user-role.enum';
 
 @Injectable()
 export class UserService {
@@ -15,6 +16,10 @@ export class UserService {
     ) {}
 
     async createUser(createUserDto: CreateUserDto): Promise<User> {
+        // Eğer rol gönderilmezse, otomatik olarak 'user' ata
+        if (!createUserDto.role) {
+            createUserDto.role = UserRole.USER;
+        }
         const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
         const user = this.userRepository.create({
             ...createUserDto,

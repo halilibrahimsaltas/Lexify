@@ -97,6 +97,23 @@ class BookService {
     });
     return response.data;
   }
+
+  async getBookProgress(bookId: number): Promise<number | null> {
+    const token = await storageService.getAuthToken();
+    const response = await api.get(`/progress/${bookId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data.currentPage ?? null;
+  }
+
+  async saveBookProgress(bookId: number, currentPage: number): Promise<void> {
+    const token = await storageService.getAuthToken();
+    await api.post(
+      `/progress/${bookId}`,
+      { currentPage },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+  }
 }
 
 export default new BookService();

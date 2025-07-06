@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import Constants from "expo-constants";
-import authService from "./auth.service";
+// import authService from "./auth.service"; // KALDIRILDI
 import storageService from "./storage.service";
 
 const api = axios.create({
@@ -12,13 +12,10 @@ const api = axios.create({
 api.interceptors.request.use(
   async (config) => {
     // Token varsa header'a ekle
-    const isLoggedIn = await authService.isLoggedIn();
-    if (isLoggedIn) {
-      const token = await storageService.getAuthToken();
-      if (token) {
-        config.headers = config.headers || {};
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+    const token = await storageService.getAuthToken();
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -27,33 +24,13 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor - token expire olduğunda refresh et
+// Response interceptor - sadeleştirildi, refresh ve logout işlemleri kaldırıldı
 api.interceptors.response.use(
   (response: AxiosResponse) => {
     return response;
   },
   async (error: AxiosError) => {
-    const originalRequest = error.config as any;
-
-    // Token expire hatası (401) ve henüz retry yapılmamışsa
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      try {
-        // Token'ı yenile
-        const refreshed = await authService.refreshToken();
-        if (refreshed) {
-          // Yeni token ile orijinal isteği tekrarla
-          return api(originalRequest);
-        }
-      } catch (refreshError) {
-        // Refresh başarısız olursa kullanıcıyı logout yap
-        await authService.logout();
-        // Login sayfasına yönlendir (bu kısım navigation ile yapılacak)
-        console.log("Token refresh failed, user logged out");
-      }
-    }
-
+    // Sadece hatayı döndür
     return Promise.reject(error);
   }
 );

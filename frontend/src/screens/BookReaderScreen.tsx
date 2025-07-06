@@ -33,14 +33,50 @@ const BookReaderScreen = ({ route }: any) => {
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>("success");
+  const [chapters, setChapters] = useState<string[]>([]);
+  const [currentChapter, setCurrentChapter] = useState(0);
 
   useEffect(() => {
-    loadBookMetadata();
+    let isMounted = true;
+    const fetchProgressAndLoad = async () => {
+      try {
+        const progress = await bookService.getBookProgress(bookId);
+        if (isMounted && progress && progress > 0) {
+          setCurrentPage(progress);
+        }
+      } catch (e) {
+        // Progress yoksa sorun değil, 1. sayfadan başla
+      } finally {
+        loadBookMetadata();
+        fetchChapters();
+      }
+    };
+    fetchProgressAndLoad();
+    return () => { isMounted = false; };
   }, [bookId]);
 
+  // Kitap bölümlerini çek
+  const fetchChapters = async () => {
+    try {
+      const data = await bookService.getBookChapters(bookId);
+      setChapters(data.chapters);
+      setCurrentChapter(0);
+    } catch (e) {
+      // Bölüm yoksa sorun değil
+    }
+  };
+
+  // Sayfa değiştiğinde içeriği yükle
   useEffect(() => {
     loadBookPage();
   }, [currentPage]);
+
+  // Ekran kapatılırken progress'i kaydet
+  useEffect(() => {
+    return () => {
+      bookService.saveBookProgress(bookId, currentPage).catch(() => {});
+    };
+  }, [bookId, currentPage]);
 
   const loadBookMetadata = async () => {
     try {
@@ -167,8 +203,34 @@ const BookReaderScreen = ({ route }: any) => {
               {...panResponder.panHandlers}
               style={styles.contentWrapper}
             >
-              <View style={styles.pageContent}>{renderWords(content)}</View>
+              <View style={styles.pageContent}>
+                {/* Eğer chapter varsa, chapter'ı göster, yoksa normal content göster */}
+                {chapters.length > 0
+                  ? chapters[currentChapter] && renderWords(chapters[currentChapter])
+                  : renderWords(content)}
+              </View>
             </View>
+
+            {/* Chapter navigation bar */}
+            {chapters.length > 0 && (
+              <View style={styles.chapterControls}>
+                <TouchableOpacity
+                  onPress={() => setCurrentChapter((prev) => Math.max(prev - 1, 0))}
+                  disabled={currentChapter === 0}
+                >
+                  <Text>◀</Text>
+                </TouchableOpacity>
+                <Text>
+                  Bölüm {currentChapter + 1} / {chapters.length}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => setCurrentChapter((prev) => Math.min(prev + 1, chapters.length - 1))}
+                  disabled={currentChapter === chapters.length - 1}
+                >
+                  <Text>▶</Text>
+                </TouchableOpacity>
+              </View>
+            )}
 
             {showPagination && (
               <View style={styles.pagination}>
@@ -319,6 +381,15 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto_400Regular",
     minWidth: 60,
     textAlign: "center",
+  },
+  chapterControls: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingVertical: 10,
+    backgroundColor: '#f0f0f0',
+    borderTopWidth: 1,
+    borderColor: '#ccc',
   },
 });
 
