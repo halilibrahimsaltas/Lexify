@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { BlurView } from 'expo-blur';
 import translationService from "../services/translation.service";
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface WordSelectorProps {
   visible: boolean;
@@ -149,6 +150,7 @@ const WordSelector: React.FC<WordSelectorProps> = ({
                       style={styles.saveButton}
                       onPress={handleSaveWord}
                     >
+                      <Ionicons name="bookmark-outline" size={20} color="#4E2B1B" style={{ marginRight: 6, alignSelf: 'center' }} />
                       <Text style={styles.saveButtonText}>Kaydet</Text>
                     </TouchableOpacity>
                   )}
@@ -173,7 +175,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   modalContent: {
-    backgroundColor: "rgba(30,30,30,0.7)",
+    backgroundColor: "#FFF8E1",
     borderRadius: 16,
     padding: 16,
     width: 240,
@@ -183,11 +185,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
+    borderWidth: 1,
+    borderColor: '#4E2B1B',
+    justifyContent: 'center',
   },
   selectedWord: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#fff",
+    color: "#4E2B1B",
     marginVertical: 6,
     textAlign: "center",
     fontFamily: "Roboto_500Medium",
@@ -215,14 +220,14 @@ const styles = StyleSheet.create({
   },
   arrowText: {
     fontSize: 32,
-    color: "#fff",
+    color: "#4E2B1B",
     fontWeight: "bold",
     fontFamily: "Roboto_500Medium",
     opacity: 1,
   },
   arrowTextDisabled: {
     fontSize: 32,
-    color: "#444",
+    color: "#4E2B1B",
     fontWeight: "bold",
     fontFamily: "Roboto_500Medium",
     opacity: 0.5,
@@ -231,40 +236,48 @@ const styles = StyleSheet.create({
     minWidth: 160,
     maxWidth: 220,
     padding: 12,
-    backgroundColor: "rgba(30,30,30,0.92)",
+    backgroundColor: "#FFF8E1",
     borderRadius: 8,
     alignItems: "center",
     marginHorizontal: 8,
+    borderWidth: 1,
+    borderColor: '#4E2B1B',
+    justifyContent: 'center',
   },
   translationText: {
     fontSize: 18,
-    color: "#fff",
+    color: "#4E2B1B",
     fontWeight: "bold",
     textAlign: "center",
     fontFamily: "Roboto_500Medium",
   },
   categoryText: {
     fontSize: 13,
-    color: "#fff",
+    color: "#4E2B1B",
     marginTop: 2,
     textAlign: "center",
     fontWeight: "bold",
     fontFamily: "Roboto_400Regular",
   },
   saveButton: {
-    backgroundColor: "#fff",
+    backgroundColor: "#FFF8E1",
     paddingVertical: 7,
     paddingHorizontal: 24,
     borderRadius: 8,
     alignItems: "center",
     marginTop: 10,
     minWidth: 80,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#4E2B1B',
   },
   saveButtonText: {
-    color: "#222",
+    color: "#4E2B1B",
     fontSize: 16,
     fontWeight: "bold",
     fontFamily: "Roboto_500Medium",
+    textAlign: 'center',
   },
 });
 

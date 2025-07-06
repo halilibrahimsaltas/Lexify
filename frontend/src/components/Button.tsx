@@ -50,25 +50,31 @@ const Button: React.FC<ButtonProps> = ({
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: 10,
+    minHeight: 44,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    marginVertical: 6,
+    backgroundColor: 'transparent', // default
+    // Gölge kaldırıldı, tamamen düz
   },
   // Variants
   primary: {
-    backgroundColor: '#FEC84B',
+    backgroundColor: '#32341f',
+    borderColor: '#32341f',
     borderWidth: 1,
-    borderColor: '#007AFF',
   },
   secondary: {
-    backgroundColor: '#FAF3DD',
-    borderWidth: 1,
-    borderColor: '#bdbdbd',
+    backgroundColor: '#FFF8E1',
+    borderWidth: 1.5,
+    borderColor: '#32341f',
   },
   outline: {
-    backgroundColor: '#FFF8E1',
-    borderWidth: 1,
-    borderColor: '#007AFF',
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: '#32341f',
   },
   // Sizes
   small: {
@@ -85,16 +91,17 @@ const styles = StyleSheet.create({
   },
   // Text styles
   text: {
-    fontWeight: '600',
+    fontWeight: '500',
+    fontFamily: 'Roboto_500Medium',
   },
   primaryText: {
-    color: '#007AFF',
+    color: '#FFF8E1',
   },
   secondaryText: {
-    color: '#333',
+    color: '#32341f',
   },
   outlineText: {
-    color: '#007AFF',
+    color: '#32341f',
   },
   smallText: {
     fontSize: 14,
@@ -110,7 +117,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   disabledText: {
-    color: '#999',
+    color: '#bdbdbd',
   },
 });
 

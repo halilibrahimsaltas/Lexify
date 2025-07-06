@@ -222,14 +222,14 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: '#FAFAFA',
     borderRadius: 10,
     paddingHorizontal: 16,
     paddingVertical: 10,
     fontSize: 16,
     marginRight: 8,
     borderWidth: 1,
-    borderColor: "#F7C873",
+    borderColor: '#E0E0E0',
   },
   addButton: {
     width: 44,
@@ -250,10 +250,12 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 20,
+    padding: 0,
   },
   booksList: {
-    gap: 18,
+    gap: 0,
+    margin: 0,
+    padding: 0,
   },
   loadingContainer: {
     flex: 1,

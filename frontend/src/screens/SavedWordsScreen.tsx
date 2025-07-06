@@ -75,7 +75,7 @@ const SavedWordsScreen = ({ navigation }: any) => {
         {deletingId === item.id ? (
           <ActivityIndicator size={20} color="#FF3B30" />
         ) : (
-          <MaterialIcons name="delete" size={24} color="#FF3B30" />
+          <MaterialIcons name="delete" size={24} color="#4E2B1B" />
         )}
       </TouchableOpacity>
       <Text style={styles.wordText}>{item.originalText}</Text>
@@ -189,16 +189,17 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto_400Regular',
   },
   wordItem: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 16,
-    marginBottom: 12,
-    marginHorizontal: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 6,
+    backgroundColor: '#FFF8E1',
+    borderRadius: 0,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginBottom: 0,
+    marginHorizontal: 0,
+    borderWidth: 0,
+    shadowColor: 'transparent',
+    width: '100%',
+    minWidth: '100%',
+    maxWidth: '100%',
     position: 'relative',
   },
   deleteIcon: {
@@ -207,30 +208,30 @@ const styles = StyleSheet.create({
     right: 12,
     zIndex: 2,
     backgroundColor: '#FFF8E1',
-    borderRadius: 16,
+    borderRadius: 8,
     padding: 4,
   },
   wordText: {
-    fontSize: 19,
-    fontWeight: '600',
-    color: '#4B3F2F',
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#4E2B1B',
     fontFamily: 'Roboto_500Medium',
   },
   translationText: {
-    fontSize: 17,
-    color: '#007AFF',
+    fontSize: 15,
+    color: '#F7C873',
     marginTop: 6,
     fontFamily: 'Roboto_400Regular',
   },
   metaText: {
-    fontSize: 13,
-    color: '#666',
+    fontSize: 12,
+    color: '#4E2B1B',
     marginTop: 6,
     fontFamily: 'Roboto_400Regular',
   },
   dateText: {
-    fontSize: 12,
-    color: '#999',
+    fontSize: 11,
+    color: '#4E2B1B',
     marginTop: 4,
     textAlign: 'right',
     fontFamily: 'Roboto_400Regular',

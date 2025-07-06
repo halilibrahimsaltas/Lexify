@@ -69,17 +69,18 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: '#4E2B1B',
     marginBottom: 8,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: '#E0E0E0',
     borderRadius: 10,
-    padding: 15,
+    paddingVertical: 15,
+    paddingHorizontal: 16,
     fontSize: 16,
-    backgroundColor: 'white',
-    color: '#333',
+    backgroundColor: '#FAFAFA',
+    color: '#4E2B1B',
   },
   multilineInput: {
     minHeight: 100,
@@ -93,7 +94,7 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   errorText: {
-    color: '#FF3B30',
+    color: '#4E2B1B',
     fontSize: 14,
     marginTop: 4,
   },

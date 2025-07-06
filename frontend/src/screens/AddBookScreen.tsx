@@ -12,6 +12,7 @@ import Alert from "../components/Alert";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as DocumentPicker from "expo-document-picker";
 import bookService from "../services/book.service";
+import Button from '../components/Button';
 
 const AddBookScreen = ({ navigation }: any) => {
   const [loading, setLoading] = useState(false);
@@ -136,27 +137,21 @@ const AddBookScreen = ({ navigation }: any) => {
           onChangeText={setCoverImage}
         />
 
-        <TouchableOpacity style={styles.fileButton} onPress={handleFilePick}>
-          <Text style={styles.fileButtonText}>
-            {selectedFile ? (
-              <Text>{selectedFile.name}</Text>
-            ) : (
-              <Text>Dosyası Seç</Text>
-            )}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.uploadButton, loading && styles.disabledButton]}
-          onPress={handleUploadPdf}
+        <Button
+          title={selectedFile ? selectedFile.name : 'Dosya Seç'}
+          onPress={handleFilePick}
+          variant="outline"
+          size="medium"
           disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <Text style={styles.uploadButtonText}>Kaydet</Text>
-          )}
-        </TouchableOpacity>
+          style={{ marginBottom: 16 }}
+        />
+        <Button
+          title={loading ? 'Yükleniyor...' : 'Kaydet'}
+          onPress={handleUploadPdf}
+          variant="primary"
+          size="large"
+          disabled={loading}
+        />
       </ScrollView>
 
       {/* Custom Alert Component */}

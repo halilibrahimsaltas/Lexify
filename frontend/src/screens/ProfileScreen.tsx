@@ -15,6 +15,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "../contexts/AuthContext";
 import userService, { User, UpdateUserRequest } from "../services/user.service";
 import wordService, { Word } from "../services/word.service";
+// @ts-ignore (MaterialCommunityIcons, Feather, Ionicons importlarının üstüne).
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+// @ts-ignore (MaterialCommunityIcons, Feather, Ionicons importlarının üstüne).
+import Feather from 'react-native-vector-icons/Feather';
+// @ts-ignore (MaterialCommunityIcons, Feather, Ionicons importlarının üstüne).
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const ProfileScreen = ({ navigation }: any) => {
   const { user, logout, updateUser } = useAuth();
@@ -126,49 +132,49 @@ const ProfileScreen = ({ navigation }: any) => {
       id: "1",
       title: "Hesap Bilgileri",
       subtitle: "Kişisel bilgilerinizi düzenleyin",
-      icon: "👤",
+      icon: <Feather name="user" size={26} color="#FFF8E1" />,
       onPress: () => setEditModalVisible(true),
     },
     {
       id: "2",
       title: "Kitaplarım",
       subtitle: "Eklediğiniz kitapları görüntüleyin",
-      icon: "📚",
+      icon: <MaterialCommunityIcons name="bookshelf" size={26} color="#FFF8E1" />,
       onPress: () => navigation.navigate("MainDrawer", { screen: "Kitaplarım" }),
     },
     {
       id: "3",
       title: "Favori Kelimeler",
       subtitle: "Kaydettiğiniz kelimeleri görün",
-      icon: "❤️",
+      icon: <Feather name="star" size={26} color="#FFF8E1" />,
       onPress: () => navigation.navigate("MainDrawer", { screen: "Favori Kelimeler" }),
     },
     {
       id: "4",
       title: "Sözlük",
       subtitle: "Kelime çeviri aracı",
-      icon: "📖",
+      icon: <Ionicons name="book-outline" size={26} color="#FFF8E1" />,
       onPress: () => navigation.navigate("MainDrawer", { screen: "Sözlük" }),
     },
     {
       id: "5",
       title: "Öğrenme İstatistikleri",
       subtitle: "İlerlemenizi görüntüleyin",
-      icon: "📊",
+      icon: <Feather name="bar-chart-2" size={26} color="#FFF8E1" />,
       onPress: () => showAlert("Bilgi", "Bu özellik yakında eklenecek", 'info'),
     },
     {
       id: "6",
       title: "Ayarlar",
       subtitle: "Uygulama ayarlarını düzenleyin",
-      icon: "⚙️",
+      icon: <Feather name="settings" size={26} color="#FFF8E1" />,
       onPress: () => showAlert("Bilgi", "Bu özellik yakında eklenecek", 'info'),
     },
     {
       id: "7",
       title: "Yardım",
       subtitle: "Destek ve SSS",
-      icon: "❓",
+      icon: <Feather name="help-circle" size={26} color="#FFF8E1" />,
       onPress: () => showAlert("Bilgi", "Bu özellik yakında eklenecek", 'info'),
     },
   ];
@@ -180,7 +186,7 @@ const ProfileScreen = ({ navigation }: any) => {
       onPress={item.onPress}
     >
       <View style={styles.menuItemLeft}>
-        <Text style={styles.menuIcon}>{item.icon}</Text>
+        {item.icon}
         <View style={styles.menuTextContainer}>
           <Text style={styles.menuTitle}>{item.title}</Text>
           <Text style={styles.menuSubtitle}>{item.subtitle}</Text>
@@ -209,88 +215,20 @@ const ProfileScreen = ({ navigation }: any) => {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Kullanıcı Bilgileri */}
         <View style={styles.userSection}>
-          <View style={styles.avatarContainer}>
-            <Text style={styles.avatar}>👤</Text>
-          </View>
           <View style={styles.userInfo}>
             <Text style={styles.userName}>{user.name}</Text>
             <Text style={styles.userEmail}>{user.email}</Text>
-            <Text style={styles.userLevel}>
-              <Text>Seviye: </Text>
-              <Text>{user.role === "ADMIN" ? "Yönetici" : "Kullanıcı"}</Text>
-            </Text>
+            
           </View>
         </View>
 
-        {/* İstatistikler */}
-        <View style={styles.statsSection}>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{userWords.length}</Text>
-            <Text style={styles.statLabel}>Kaydedilen Kelime</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>7</Text>
-            <Text style={styles.statLabel}>Günlük Seri</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>85%</Text>
-            <Text style={styles.statLabel}>Doğruluk Oranı</Text>
-          </View>
-        </View>
-
-        {/* Kayıtlı Kelimeler */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Kayıtlı Kelimeler</Text>
-          {userWords.length === 0 ? (
-            <Text style={{ color: "#666" }}>Henüz kelime eklenmemiş.</Text>
-          ) : (
-            userWords.slice(0, 10).map((word) => (
-              <Text
-                key={word.id}
-                style={{ color: "#333", fontSize: 15, marginBottom: 4 }}
-              >
-                <Text>{word.originalText}</Text>
-                <Text> - </Text>
-                <Text>{word.translatedText}</Text>
-              </Text>
-            ))
-          )}
-        </View>
+    
 
         {/* Menü Öğeleri */}
         <View style={styles.menuSection}>{menuItems.map(renderMenuItem)}</View>
 
         {/* Ayarlar */}
-        <View style={styles.settingsSection}>
-          <Text style={styles.sectionTitle}>Ayarlar</Text>
-
-          <View style={styles.settingItem}>
-            <View style={styles.settingLeft}>
-              <Text style={styles.settingIcon}>🔔</Text>
-              <Text style={styles.settingTitle}>Bildirimler</Text>
-            </View>
-            <Switch
-              value={notificationsEnabled}
-              onValueChange={setNotificationsEnabled}
-              trackColor={{ false: "#767577", true: "#007AFF" }}
-              thumbColor={notificationsEnabled ? "#f4f3f4" : "#f4f3f4"}
-            />
-          </View>
-
-          <View style={styles.settingItem}>
-            <View style={styles.settingLeft}>
-              <Text style={styles.settingIcon}>🌙</Text>
-              <Text style={styles.settingTitle}>Karanlık Mod</Text>
-            </View>
-            <Switch
-              value={darkModeEnabled}
-              onValueChange={setDarkModeEnabled}
-              trackColor={{ false: "#767577", true: "#007AFF" }}
-              thumbColor={darkModeEnabled ? "#f4f3f4" : "#f4f3f4"}
-            />
-          </View>
-        </View>
-
+        
         {/* Çıkış Butonu */}
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutButtonText}>Çıkış Yap</Text>
@@ -434,17 +372,17 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   userSection: {
-    backgroundColor: "white",
-    borderRadius: 16,
+    backgroundColor: "#FFF8E1",
+    borderRadius: 0,
     padding: 24,
     marginBottom: 20,
     flexDirection: "row",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowColor: 'transparent',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
   },
   avatarContainer: {
     marginRight: 20,
@@ -459,36 +397,36 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   userName: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#4B3F2F",
+    fontSize: 17,
+    fontWeight: "700",
+    color: "#4E2B1B",
     marginBottom: 6,
     fontFamily: "Roboto_500Medium",
   },
   userEmail: {
-    fontSize: 15,
-    color: "#666",
+    fontSize: 13,
+    color: "#4E2B1B",
     marginBottom: 6,
     fontFamily: "Roboto_400Regular",
   },
   userLevel: {
-    fontSize: 14,
-    color: "#007AFF",
+    fontSize: 12,
+    color: "#4E2B1B",
     fontWeight: "600",
     fontFamily: "Roboto_500Medium",
   },
   statsSection: {
-    backgroundColor: "white",
-    borderRadius: 16,
+    backgroundColor: "#FFF8E1",
+    borderRadius: 0,
     padding: 24,
     marginBottom: 20,
     flexDirection: "row",
     justifyContent: "space-around",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowColor: 'transparent',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
   },
   statItem: {
     alignItems: "center",
@@ -507,14 +445,14 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto_400Regular",
   },
   menuSection: {
-    backgroundColor: "white",
-    borderRadius: 16,
+    backgroundColor: "#FFF8E1",
+    borderRadius: 0,
     marginBottom: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowColor: 'transparent',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
   },
   menuItem: {
     flexDirection: "row",
@@ -591,19 +529,21 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto_400Regular",
   },
   logoutButton: {
-    backgroundColor: "#FF3B30",
+    backgroundColor: "#32341f",
+    borderColor: "#32341f",
+    borderWidth: 1,
     padding: 18,
     borderRadius: 12,
     alignItems: "center",
     marginBottom: 20,
-    shadowColor: "#FF3B30",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowColor: 'transparent',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
   },
   logoutButtonText: {
-    color: "white",
+    color: "#FFF8E1",
     fontSize: 17,
     fontWeight: "600",
     fontFamily: "Roboto_500Medium",
@@ -616,15 +556,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modalContent: {
-    backgroundColor: "white",
-    borderRadius: 20,
+    backgroundColor: "#FFF8E1",
+    borderRadius: 12,
+    borderColor: "#32341f",
+    borderWidth: 1,
     width: "90%",
     maxHeight: "80%",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.25,
-    shadowRadius: 20,
-    elevation: 10,
+    shadowColor: 'transparent',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
   },
   modalHeader: {
     flexDirection: "row",
@@ -637,12 +579,12 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#4B3F2F",
+    color: "#4E2B1B",
     fontFamily: "Roboto_500Medium",
   },
   modalClose: {
     fontSize: 26,
-    color: "#666",
+    color: "#4E2B1B",
     fontWeight: "bold",
   },
   modalBody: {
@@ -654,18 +596,20 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#4B3F2F",
+    color: "#4E2B1B",
     marginBottom: 8,
     fontFamily: "Roboto_500Medium",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderColor: '#E0E0E0',
     borderRadius: 12,
     padding: 16,
+    paddingHorizontal: 16,
     fontSize: 16,
-    backgroundColor: "white",
-    fontFamily: "Roboto_400Regular",
+    backgroundColor: '#FAFAFA',
+    fontFamily: 'Roboto_400Regular',
+    color: '#4E2B1B',
   },
   modalFooter: {
     flexDirection: "row",
@@ -680,39 +624,40 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginHorizontal: 6,
     borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderColor: "#32341f",
+    backgroundColor: '#FFF8E1',
   },
   modalButtonPrimary: {
-    backgroundColor: "#007AFF",
-    borderColor: "#007AFF",
-    shadowColor: "#007AFF",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    backgroundColor: "#32341f",
+    borderColor: "#32341f",
+    shadowColor: 'transparent',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
   },
   modalButtonText: {
-    color: "#4B3F2F",
+    color: "#32341f",
     fontSize: 16,
     fontWeight: "600",
     fontFamily: "Roboto_500Medium",
   },
   modalButtonPrimaryText: {
-    color: "white",
+    color: "#FFF8E1",
     fontSize: 16,
     fontWeight: "600",
     fontFamily: "Roboto_500Medium",
   },
   section: {
-    backgroundColor: "white",
-    borderRadius: 16,
+    backgroundColor: "#FFF8E1",
+    borderRadius: 0,
     padding: 24,
     marginBottom: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowColor: 'transparent',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
   },
 });
 

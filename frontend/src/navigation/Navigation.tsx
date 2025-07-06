@@ -25,91 +25,101 @@ import DictionaryScreen from '../screens/DictionaryScreen';
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
-const CustomDrawerContent = (props: DrawerContentComponentProps) => (
-  <DrawerContentScrollView {...props} contentContainerStyle={{ flex: 1, paddingTop: 0 }}>
-    {/* Header */}
-    <View style={styles.drawerHeader}>
-      <MaterialCommunityIcons name="book-open-page-variant" size={44} color="#007AFF" style={{ marginBottom: 8 }} />
-      <Text style={styles.drawerAppName}>Lexify</Text>
-    </View>
-    {/* Main Menu */}
-    <View style={styles.menuSection}>
-      <DrawerItem
-        label="Kitaplarım"
-        icon={({ color, size }) => <MaterialCommunityIcons name="bookshelf" size={size} color={color} />}
-        onPress={() => props.navigation.navigate('Kitaplarım')}
-        labelStyle={styles.menuLabel}
-      />
-      <DrawerItem
-        label="Favori Kelimeler"
-        icon={({ color, size }) => <Feather name="star" size={size} color={color} />}
-        onPress={() => props.navigation.navigate('Favori Kelimeler')}
-        labelStyle={styles.menuLabel}
-      />
-      <DrawerItem
-        label="Sözlük"
-        icon={({ color, size }) => <Ionicons name="book-outline" size={size} color={color} />}
-        onPress={() => props.navigation.navigate('Sözlük')}
-        labelStyle={styles.menuLabel}
-      />
-      <DrawerItem
-        label="Profil"
-        icon={({ color, size }) => <Feather name="user" size={size} color={color} />}
-        onPress={() => props.navigation.navigate('Profil')}
-        labelStyle={styles.menuLabel}
-      />
-    </View>
-    {/* Divider */}
-    <View style={styles.divider} />
-    {/* Bottom Menu */}
-    <View style={styles.menuSection}>
-      <DrawerItem
-        label="Ayarlar"
-        icon={({ color, size }) => <Feather name="settings" size={size} color={color} />}
-        onPress={() => {}}
-        labelStyle={styles.menuLabel}
-      />
-      <DrawerItem
-        label="Geri Bildirim Gönder"
-        icon={({ color, size }) => <Feather name="message-square" size={size} color={color} />}
-        onPress={() => {}}
-        labelStyle={styles.menuLabel}
-      />
-      <DrawerItem
-        label="Çıkış Yap"
-        icon={({ color, size }) => <MaterialCommunityIcons name="logout" size={size} color={color} />}
-        onPress={() => props.navigation.navigate('Çıkış Yap')}
-        labelStyle={styles.menuLabel}
-      />
-    </View>
-  </DrawerContentScrollView>
-);
+const CustomDrawerContent = (props: DrawerContentComponentProps) => {
+  const state = props.state;
+  const activeRoute = state.routeNames[state.index];
+  return (
+    <DrawerContentScrollView {...props} contentContainerStyle={{ flex: 1, paddingTop: 0 }}>
+      {/* Header */}
+      <View style={styles.drawerHeader}>
+        <MaterialCommunityIcons name="book-open-page-variant" size={44} color="#4E2B1B" style={{ marginBottom: 8 }} />
+        <Text style={styles.drawerAppName}>Lexify</Text>
+      </View>
+      {/* Main Menu */}
+      <View style={styles.menuSection}>
+        <DrawerItem
+          label="Kitaplarım"
+          icon={({ size }) => <MaterialCommunityIcons name="bookshelf" size={size} color="#4E2B1B" />}
+          onPress={() => props.navigation.navigate('Kitaplarım')}
+          labelStyle={styles.menuLabel}
+          focused={activeRoute === 'Kitaplarım'}
+        />
+        <DrawerItem
+          label="Favori Kelimeler"
+          icon={({ size }) => <Feather name="star" size={size} color="#4E2B1B" />}
+          onPress={() => props.navigation.navigate('Favori Kelimeler')}
+          labelStyle={styles.menuLabel}
+          focused={activeRoute === 'Favori Kelimeler'}
+        />
+        <DrawerItem
+          label="Sözlük"
+          icon={({ size }) => <Ionicons name="book-outline" size={size} color="#4E2B1B" />}
+          onPress={() => props.navigation.navigate('Sözlük')}
+          labelStyle={styles.menuLabel}
+          focused={activeRoute === 'Sözlük'}
+        />
+        <DrawerItem
+          label="Profil"
+          icon={({ size }) => <Feather name="user" size={size} color="#4E2B1B" />}
+          onPress={() => props.navigation.navigate('Profil')}
+          labelStyle={styles.menuLabel}
+          focused={activeRoute === 'Profil'}
+        />
+      </View>
+      {/* Divider */}
+      <View style={styles.divider} />
+      {/* Bottom Menu */}
+      <View style={styles.menuSection}>
+        <DrawerItem
+          label="Ayarlar"
+          icon={({ size }) => <Feather name="settings" size={size} color="#4E2B1B" />}
+          onPress={() => {}}
+          labelStyle={styles.menuLabel}
+        />
+        <DrawerItem
+          label="Geri Bildirim Gönder"
+          icon={({ size }) => <Feather name="message-square" size={size} color="#4E2B1B" />}
+          onPress={() => {}}
+          labelStyle={styles.menuLabel}
+        />
+        <DrawerItem
+          label="Çıkış Yap"
+          icon={({ size }) => <MaterialCommunityIcons name="logout" size={size} color="#4E2B1B" />}
+          onPress={() => props.navigation.navigate('Çıkış Yap')}
+          labelStyle={styles.menuLabel}
+          focused={activeRoute === 'Çıkış Yap'}
+        />
+      </View>
+    </DrawerContentScrollView>
+  );
+};
 
 const DrawerNavigator = () => (
   <Drawer.Navigator
     initialRouteName="Kitaplarım"
     drawerContent={props => <CustomDrawerContent {...props} />}
-    screenOptions={{
-      headerShown: true, // Hamburger menüsü ve başlık barı gözüksün
-      swipeEnabled: true, // Kaydırarak açma aktif
-      headerTitle: "Lexify", // Başlıkta uygulama adı
+    screenOptions={({ route }) => ({
+      headerShown: true,
+      swipeEnabled: true,
+      headerTitle: route.name, // Aktif sayfa adı
       headerStyle: {
         backgroundColor: '#FFF8E1',
       },
-      headerTintColor: '#4B3F2F',
+      headerTintColor: '#4E2B1B',
       headerTitleStyle: {
         fontWeight: 'bold',
         fontSize: 20,
         fontFamily: 'Roboto_500Medium',
+        color: '#4E2B1B',
       },
-      drawerActiveTintColor: '#007AFF',
-      drawerInactiveTintColor: '#4B3F2F',
-      drawerActiveBackgroundColor: '#FAF3DD',
+      drawerActiveTintColor: '#4E2B1B',
+      drawerInactiveTintColor: '#4E2B1B',
+      drawerActiveBackgroundColor: '#F7C873',
       drawerStyle: {
         backgroundColor: '#FFF8E1',
         width: 280,
       },
-    }}
+    })}
   >
     <Drawer.Screen name="Kitaplarım" component={BooksScreen} />
     <Drawer.Screen name="Favori Kelimeler" component={SavedWordsScreen} />
@@ -180,7 +190,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     marginLeft: -10,
-    color: '#5D4037', // burada da kullanabilirsin
+    color: '#4E2B1B',
     fontFamily: 'Roboto_500Medium',
   },
   divider: {

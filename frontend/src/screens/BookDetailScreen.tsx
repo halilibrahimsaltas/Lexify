@@ -181,12 +181,16 @@ const BookReaderScreen = ({ navigation, route }: any) => {
       </View>
 
       {/* Word Selector */}
-      <WordSelector
-        visible={wordSelectorVisible}
-        selectedWord={selectedWord}
-        onClose={() => setWordSelectorVisible(false)}
-        onWordSave={handleWordSave}
-      />
+      {wordSelectorVisible && (
+        <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, alignItems: 'center', zIndex: 100 }}>
+          <WordSelector
+            visible={true}
+            selectedWord={selectedWord}
+            onClose={() => setWordSelectorVisible(false)}
+            onWordSave={handleWordSave}
+          />
+        </View>
+      )}
 
       {/* Custom Alert Component */}
       <Alert

@@ -99,34 +99,16 @@ const DictionaryScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-     
-      
-      <View style={styles.searchContainer}>
-        <View style={styles.searchWrapper}>
-          <Text style={styles.searchIcon}>🔍</Text>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Kelime ara..."
-            placeholderTextColor="#999"
-            value={searchQuery}
-            onChangeText={handleSearch}
-            autoCapitalize="none"
-            autoCorrect={false}
-            returnKeyType="search"
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity 
-              style={styles.clearButton}
-              onPress={() => {
-                setSearchQuery('');
-                setWords([]);
-              }}
-            >
-              <Text style={styles.clearButtonText}>✕</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      </View>
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Kelime ara..."
+        placeholderTextColor="#999"
+        value={searchQuery}
+        onChangeText={handleSearch}
+        autoCapitalize="none"
+        autoCorrect={false}
+        returnKeyType="search"
+      />
 
       <FlatList
         data={words}
@@ -192,10 +174,18 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   searchInput: {
-    flex: 1,
-    fontSize: 16,
+    width: '100%',
+    fontSize: 18,
     color: '#333',
     fontFamily: 'Roboto_400Regular',
+    backgroundColor: '#FCFCFC',
+    borderColor: 'transparent',
+    borderWidth: 0,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    margin: 0,
+    marginTop: 0,
   },
   clearButton: {
     width: 24,

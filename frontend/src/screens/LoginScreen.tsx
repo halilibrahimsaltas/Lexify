@@ -239,11 +239,12 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: '#E0E0E0',
     borderRadius: 10,
     padding: 15,
+    paddingHorizontal: 16,
     fontSize: 16,
-    backgroundColor: 'white',
+    backgroundColor: '#FAFAFA',
   },
   forgotPassword: {
     alignSelf: 'flex-end',
