@@ -33,53 +33,38 @@ const LoginScreen = () => {
       showAlert('Hata', 'Lütfen tüm alanları doldurun', 'primary');
       return false;
     }
-
     if (!isLogin && !name.trim()) {
       showAlert('Hata', 'Lütfen adınızı girin', 'primary');
       return false;
     }
-
-    // Email formatı kontrolü
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       showAlert('Hata', 'Geçerli bir e-posta adresi girin', 'primary');
       return false;
     }
-
-    // Şifre uzunluğu kontrolü (backend DTO'ya uygun)
     if (password.length < 8) {
       showAlert('Hata', 'Şifre en az 8 karakter olmalıdır', 'primary');
       return false;
     }
-
-    // İsim uzunluğu kontrolü (backend DTO'ya uygun)
     if (!isLogin && (name.length < 2 || name.length > 50)) {
       showAlert('Hata', 'İsim 2-50 karakter arasında olmalıdır', 'primary');
       return false;
     }
-
     return true;
   };
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
-
     setLoading(true);
     try {
       if (isLogin) {
-        // Giriş işlemi
         await login(email, password);
       } else {
-        // Kayıt işlemi
         await register(email, password, name);
-        // Kayıt başarılıysa otomatik giriş yapmayı dene
         try {
           await login(email, password);
-          // Giriş başarılıysa zaten yönlendirilir
         } catch (loginError) {
-          // Kayıt başarılı, login başarısız
           showAlert('Bilgi', 'Kayıt başarılı, ancak otomatik giriş yapılamadı. Lütfen giriş yapın.', 'primary');
-          // İsteğe bağlı: login ekranına yönlendir
         }
       }
     } catch (error: any) {
@@ -107,7 +92,6 @@ const LoginScreen = () => {
             {isLogin ? 'Hesabınıza giriş yapın' : 'Yeni hesap oluşturun'}
           </Text>
         </View>
-
         {/* Form */}
         <View style={styles.form}>
           {!isLogin && (
@@ -120,10 +104,10 @@ const LoginScreen = () => {
                 onChangeText={setName}
                 autoCapitalize="words"
                 autoCorrect={false}
+                placeholderTextColor="#BCA27F"
               />
             </View>
           )}
-
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>E-posta</Text>
             <TextInput
@@ -134,9 +118,9 @@ const LoginScreen = () => {
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
+              placeholderTextColor="#BCA27F"
             />
           </View>
-
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Şifre</Text>
             <TextInput
@@ -146,22 +130,21 @@ const LoginScreen = () => {
               onChangeText={setPassword}
               secureTextEntry
               autoCapitalize="none"
+              placeholderTextColor="#BCA27F"
             />
           </View>
-
           {isLogin && (
             <TouchableOpacity style={styles.forgotPassword}>
               <Text style={styles.forgotPasswordText}>Şifremi unuttum</Text>
             </TouchableOpacity>
           )}
-
           <TouchableOpacity 
             style={[styles.submitButton, loading && styles.submitButtonDisabled]} 
             onPress={handleSubmit}
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="white" />
+              <ActivityIndicator color="#FFF8E1" />
             ) : (
               <Text style={styles.submitButtonText}>
                 {isLogin ? 'Giriş Yap' : 'Kayıt Ol'}
@@ -169,7 +152,6 @@ const LoginScreen = () => {
             )}
           </TouchableOpacity>
         </View>
-
         {/* Alt Bağlantı */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>
@@ -181,7 +163,6 @@ const LoginScreen = () => {
             </Text>
           </TouchableOpacity>
         </View>
-
         {/* Sosyal Giriş */}
         <View style={styles.socialContainer}>
           <Text style={styles.socialText}>veya</Text>
@@ -190,7 +171,6 @@ const LoginScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
-
       {/* Custom Alert Component */}
       <Alert
         visible={alertVisible}
@@ -206,7 +186,7 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#FFF8E1',
   },
   content: {
     flex: 1,
@@ -215,7 +195,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 36,
   },
   logo: {
     fontSize: 60,
@@ -224,94 +204,113 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
+    color: '#4E2B1B',
+    marginBottom: 8,
+    fontFamily: 'Roboto_500Medium',
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: '#4E2B1B',
     textAlign: 'center',
+    fontFamily: 'Roboto_400Regular',
   },
   form: {
-    marginBottom: 30,
+    marginBottom: 24,
+    backgroundColor: '#FFF8E1',
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: 'transparent',
+    elevation: 0,
   },
   inputContainer: {
-    marginBottom: 20,
+    marginBottom: 18,
   },
   inputLabel: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
+    color: '#4E2B1B',
+    marginBottom: 7,
+    fontFamily: 'Roboto_500Medium',
   },
   input: {
     borderWidth: 1,
     borderColor: '#E0E0E0',
-    borderRadius: 10,
+    borderRadius: 12,
     padding: 15,
-    paddingHorizontal: 16,
     fontSize: 16,
     backgroundColor: '#FAFAFA',
+    color: '#4E2B1B',
+    fontFamily: 'Roboto_400Regular',
   },
   forgotPassword: {
     alignSelf: 'flex-end',
-    marginBottom: 20,
+    marginBottom: 18,
   },
   forgotPasswordText: {
     color: '#007AFF',
     fontSize: 14,
+    fontFamily: 'Roboto_400Regular',
   },
   submitButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#32341f',
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 12,
     alignItems: 'center',
+    marginTop: 8,
+    shadowColor: 'transparent',
+    elevation: 0,
   },
   submitButtonDisabled: {
     backgroundColor: '#ccc',
   },
   submitButtonText: {
-    color: 'white',
+    color: '#FFF8E1',
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: 'Roboto_500Medium',
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 18,
   },
   footerText: {
-    color: '#666',
+    color: '#4E2B1B',
     fontSize: 14,
+    fontFamily: 'Roboto_400Regular',
   },
   footerLink: {
     color: '#007AFF',
     fontSize: 14,
     fontWeight: '600',
     marginLeft: 5,
+    fontFamily: 'Roboto_500Medium',
   },
   socialContainer: {
     alignItems: 'center',
+    marginTop: 8,
   },
   socialText: {
-    color: '#666',
+    color: '#4E2B1B',
     fontSize: 14,
-    marginBottom: 15,
+    marginBottom: 12,
+    fontFamily: 'Roboto_400Regular',
   },
   socialButton: {
     borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderRadius: 10,
+    borderColor: '#E0E0E0',
+    borderRadius: 12,
     padding: 15,
-    backgroundColor: 'white',
+    backgroundColor: '#FAFAFA',
     width: '100%',
     alignItems: 'center',
   },
   socialButtonText: {
-    color: '#333',
+    color: '#4E2B1B',
     fontSize: 16,
     fontWeight: '500',
+    fontFamily: 'Roboto_500Medium',
   },
 });
 
