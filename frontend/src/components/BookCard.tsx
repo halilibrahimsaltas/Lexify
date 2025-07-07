@@ -11,6 +11,13 @@ interface BookCardProps {
   onEdit: () => void;
 }
 
+const localCovers = [
+  require("../assets/bookcover/bookcard/ComfyUI_cover1_.png"),
+  require("../assets/bookcover/bookcard/ComfyUI_cover2_.png"),
+  require("../assets/bookcover/bookcard/ComfyUI_cover3_.png"),
+  require("../assets/bookcover/bookcard/ComfyUI_cover5_.png"),
+];
+
 const BookCard: React.FC<BookCardProps> = ({
   book,
   onPress,
@@ -26,14 +33,14 @@ const BookCard: React.FC<BookCardProps> = ({
     ? (userProgress.currentPage || 0) / totalPages
     : 0;
 
+  const randomCover = React.useMemo(() => {
+    return localCovers[Math.floor(Math.random() * localCovers.length)];
+  }, []);
+
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.8}>
       <Image
-        source={{
-          uri:
-            book.coverImage ||
-            "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fstatic.vecteezy.com%2Fsystem%2Fresources%2Fpreviews%2F026%2F452%2F722%2Foriginal%2Fcute-book-icon-isolated-white-background-free-png.png&f=1&nofb=1&ipt=92cb83e0919b9cc8129a11cc47ba26d560d30ba343b4e72217b9801ac9f48b16",
-        }}
+        source={book.coverImage ? { uri: book.coverImage } : randomCover}
         style={styles.cover}
         resizeMode="cover"
       />
@@ -78,27 +85,27 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
     backgroundColor: "#FFF8E1",
-    borderRadius: 10,
-    elevation: 0,
-    paddingVertical: 8,
-    paddingHorizontal: 8,
-    marginBottom: 10,
+    borderRadius: 14,
+    elevation: 2,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    marginBottom: 16,
     alignItems: "center",
     borderWidth: 0,
-    shadowColor: "transparent",
+    shadowColor: "rgba(0,0,0,0.08)",
     width: "100%",
     minWidth: "100%",
     maxWidth: "100%",
   },
   cover: {
-    width: 56,
-    height: 80,
-    borderRadius: 8,
+    width: 90,
+    height: 128,
+    borderRadius: 10,
     backgroundColor: "#FFF8E1",
     alignItems: "center",
     justifyContent: "center",
     marginLeft: 8,
-    marginRight: 12,
+    marginRight: 20,
   },
   info: {
     flex: 1,
@@ -114,7 +121,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   title: {
-    fontSize: 15,
+    fontSize: 20,
     fontWeight: "700",
     color: "#4E2B1B",
     flex: 1,
@@ -123,37 +130,37 @@ const styles = StyleSheet.create({
   },
   author: {
     color: "#4E2B1B",
-    fontSize: 13,
-    marginTop: 2,
+    fontSize: 16,
+    marginTop: 4,
     textAlign: "left",
   },
   meta: {
     color: "#4E2B1B",
-    fontSize: 11,
-    marginTop: 2,
+    fontSize: 13,
+    marginTop: 4,
     textAlign: "left",
   },
   deleteButton: {
-    padding: 4,
-    marginLeft: 8,
+    padding: 8,
+    marginLeft: 12,
   },
   editButton: {
-    padding: 4,
+    padding: 8,
     marginTop: 2,
     alignItems: "center",
   },
   progressBarContainer: {
-    height: 4,
+    height: 8,
     backgroundColor: "#F3E6C4",
-    borderRadius: 2,
+    borderRadius: 4,
     overflow: "hidden",
-    marginTop: 10,
+    marginTop: 16,
     width: "100%",
   },
   progressBar: {
     height: "100%",
     backgroundColor: "#4E2B1B",
-    borderRadius: 2,
+    borderRadius: 4,
     marginRight: 0,
   },
 });
