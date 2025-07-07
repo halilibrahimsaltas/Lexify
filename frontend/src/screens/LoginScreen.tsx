@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../contexts/AuthContext';
 import Alert from '../components/Alert';
+import * as Google from 'expo-auth-session/providers/google';
+import * as WebBrowser from 'expo-web-browser';
+import { Image } from 'react-native';
+import api from '../services/api';
+
+WebBrowser.maybeCompleteAuthSession();
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
@@ -16,6 +22,7 @@ const LoginScreen = () => {
     message: '',
     type: 'primary' as 'primary' | 'secondary',
   });
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const { login, register } = useAuth();
 
@@ -81,12 +88,56 @@ const LoginScreen = () => {
     setName('');
   };
 
+  // Google Auth Session
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    clientId: 'GOOGLE_CLIENT_ID.apps.googleusercontent.com',
+    iosClientId: 'IOS_CLIENT_ID.apps.googleusercontent.com',
+    androidClientId: 'ANDROID_CLIENT_ID.apps.googleusercontent.com',
+    webClientId: 'WEB_CLIENT_ID.apps.googleusercontent.com',
+  });
+
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { idToken } = response.authentication || {};
+      if (idToken) {
+        handleGoogleLogin(idToken);
+      }
+    }
+  }, [response]);
+
+  const handleGoogleLogin = async (idToken: string) => {
+    setGoogleLoading(true);
+    try {
+      const res = await api.post('/auth/google-mobile', { idToken });
+      // JWT'yi kaydet, login işlemi yap
+      await login(res.data.user.email, 'google'); // Şifre 'google' olarak set edildiği için
+    } catch (error: any) {
+      showAlert('Hata', error.message || 'Google ile giriş başarısız', 'primary');
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         {/* Logo ve Başlık */}
         <View style={styles.header}>
-          <Text style={styles.logo}>📚</Text>
+          <Image 
+            source={require('../assets/icon/Lexify_icon.png')} 
+            style={{ 
+              width: 80, 
+              height: 80, 
+              marginBottom: 12, 
+              borderRadius: 24, 
+              backgroundColor: '#FFF8E1',
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.12,
+              shadowRadius: 8,
+              alignSelf: 'center',
+            }} 
+          />
           <Text style={styles.title}>Lexify</Text>
           <Text style={styles.subtitle}>
             {isLogin ? 'Hesabınıza giriş yapın' : 'Yeni hesap oluşturun'}
@@ -166,8 +217,12 @@ const LoginScreen = () => {
         {/* Sosyal Giriş */}
         <View style={styles.socialContainer}>
           <Text style={styles.socialText}>veya</Text>
-          <TouchableOpacity style={styles.socialButton} disabled={loading}>
-            <Text style={styles.socialButtonText}>Google ile devam et</Text>
+          <TouchableOpacity style={styles.socialButton} disabled={loading || googleLoading} onPress={() => promptAsync()}>
+            {googleLoading ? (
+              <ActivityIndicator color="#4E2B1B" />
+            ) : (
+              <Text style={styles.socialButtonText}>Google ile devam et</Text>
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -206,7 +261,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#4E2B1B',
     marginBottom: 8,
-    fontFamily: 'Roboto_500Medium',
+    fontFamily: 'Lobster_400Regular',
   },
   subtitle: {
     fontSize: 16,

@@ -51,11 +51,17 @@ export class AuthController {
     return req.user;
   }
 
+
   @Post('logout')
   @ApiOperation({ summary: 'User logout' })
   @ApiResponse({ status: 200, description: 'Logout successful' })
   logout() {
     // If you want, you can implement token blacklist logic here.
     return { message: 'Logout successful' };
+  }
+
+  @Post('google-mobile')
+  async googleMobile(@Body('idToken') idToken: string) {
+    return this.authService.googleMobileLogin(idToken);
   }
 }

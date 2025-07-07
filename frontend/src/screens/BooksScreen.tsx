@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -16,6 +16,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import bookService from "../services/book.service";
 import { Book } from "../types";
 import BookCard from "../components/BookCard";
+import { Image } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 const BooksScreen = ({ navigation }: any) => {
   const [books, setBooks] = useState<Book[]>([]);
@@ -26,16 +28,22 @@ const BooksScreen = ({ navigation }: any) => {
   const [searchResults, setSearchResults] = useState<Book[] | null>(null);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertConfig, setAlertConfig] = useState({
-    title: '',
-    message: '',
-    type: 'primary' as 'primary' | 'secondary',
+    title: "",
+    message: "",
+    type: "primary" as "primary" | "secondary",
   });
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
-  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>("success");
+  const [toastType, setToastType] = useState<"success" | "error" | "info">(
+    "success"
+  );
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
 
-  const showAlert = (title: string, message: string, type: 'primary' | 'secondary' = 'primary') => {
+  const showAlert = (
+    title: string,
+    message: string,
+    type: "primary" | "secondary" = "primary"
+  ) => {
     setAlertConfig({ title, message, type });
     setAlertVisible(true);
   };
@@ -62,7 +70,7 @@ const BooksScreen = ({ navigation }: any) => {
       showAlert(
         "Hata",
         error.message || "Kitaplar yüklenirken bir hata oluştu",
-        'primary'
+        "primary"
       );
     } finally {
       setLoading(false);
@@ -80,7 +88,7 @@ const BooksScreen = ({ navigation }: any) => {
     setAlertConfig({
       title: "Kitabı Sil",
       message: "Bu kitabı silmek istediğinizden emin misiniz?",
-      type: 'secondary',
+      type: "secondary",
     });
     setAlertVisible(true);
   };
@@ -93,11 +101,11 @@ const BooksScreen = ({ navigation }: any) => {
       await bookService.deleteBook(confirmDeleteId);
       setBooks(books.filter((book) => book.id !== confirmDeleteId));
       setToastMessage("Kitap başarıyla silindi");
-      setToastType('success');
+      setToastType("success");
       setToastVisible(true);
     } catch (error: any) {
       setToastMessage(error.message || "Kitap silinirken bir hata oluştu");
-      setToastType('error');
+      setToastType("error");
       setToastVisible(true);
     } finally {
       setDeleteLoading(null);
@@ -115,16 +123,22 @@ const BooksScreen = ({ navigation }: any) => {
       const results = await bookService.searchBooks(search.trim());
       setSearchResults(results);
     } catch (error: any) {
-      showAlert("Hata", error.message || "Arama sırasında hata oluştu", 'primary');
+      showAlert(
+        "Hata",
+        error.message || "Arama sırasında hata oluştu",
+        "primary"
+      );
     }
   };
 
-  const filteredBooks = searchResults !== null
-    ? searchResults
-    : search.trim()
-      ? books.filter((book) =>
-          book.title.toLowerCase().includes(search.toLowerCase()) ||
-          book.author.toLowerCase().includes(search.toLowerCase())
+  const filteredBooks =
+    searchResults !== null
+      ? searchResults
+      : search.trim()
+      ? books.filter(
+          (book) =>
+            book.title.toLowerCase().includes(search.toLowerCase()) ||
+            book.author.toLowerCase().includes(search.toLowerCase())
         )
       : books;
 
@@ -144,6 +158,7 @@ const BooksScreen = ({ navigation }: any) => {
         book={book}
         onPress={() => navigation.navigate("BookReader", { bookId: book.id })}
         onDelete={() => handleDeleteBook(book.id)}
+        onEdit={() => navigation.navigate("EditBook", { book })}
       />
     );
   };
@@ -186,14 +201,24 @@ const BooksScreen = ({ navigation }: any) => {
       >
         {filteredBooks.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyIcon}>📚</Text>
+            <TouchableOpacity onPress={() => navigation.navigate("AddBook")}>
+              <View style={styles.emptyImageWrapper}>
+                <Image
+                  source={require("../assets/bookcover/ComfyUI_addbook_.png")}
+                  style={styles.emptyImage}
+                />
+              </View>
+            </TouchableOpacity>
+
             <Text style={styles.emptyTitle}>Hiç kitap bulunamadı</Text>
             <Text style={styles.emptyDescription}>
-              Yeni kitap eklemek için sağdaki + butonunu kullanabilirsin
+              Kitap eklemek için sağdaki + kullanabilirsiniz.
             </Text>
           </View>
         ) : (
-          <View style={styles.booksList}>{filteredBooks.map(renderBookItem)}</View>
+          <View style={styles.booksList}>
+            {filteredBooks.map(renderBookItem)}
+          </View>
         )}
       </ScrollView>
 
@@ -202,22 +227,22 @@ const BooksScreen = ({ navigation }: any) => {
         visible={alertVisible}
         title={alertConfig.title}
         message={alertConfig.message}
-        type={alertConfig.type as 'primary' | 'secondary'}
+        type={alertConfig.type as "primary" | "secondary"}
         onClose={handleCloseAlert}
         buttons={[
           {
-            text: 'İptal',
+            text: "İptal",
             onPress: () => setAlertVisible(false),
-            variant: 'secondary',
-            iconName: 'close',
-            iconFamily: 'MaterialIcons',
+            variant: "secondary",
+            iconName: "close",
+            iconFamily: "MaterialIcons",
           },
           {
-            text: 'Sil',
+            text: "Sil",
             onPress: confirmDelete,
-            variant: 'primary',
-            iconName: 'delete',
-            iconFamily: 'MaterialIcons',
+            variant: "primary",
+            iconName: "delete",
+            iconFamily: "MaterialIcons",
           },
         ]}
       />
@@ -243,16 +268,24 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF8E1",
     gap: 10,
   },
+
+  emptyImage: {
+    width: 80, // daha büyük
+    height: 80,
+    resizeMode: "cover", // daha fazla yakınlaşma
+    borderRadius: 12,
+    marginBottom: 10,
+  },
   searchInput: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: "#FAFAFA",
     borderRadius: 10,
     paddingHorizontal: 16,
     paddingVertical: 10,
     fontSize: 16,
     marginRight: 8,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: "#E0E0E0",
   },
   addButton: {
     width: 44,
@@ -313,6 +346,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 30,
     lineHeight: 24,
+  },
+  emptyImageWrapper: {
+    width: 80, // daha büyük
+    height: 80,
+    borderRadius: 12,
+    overflow: "hidden",
+    marginBottom: 10,
   },
 });
 

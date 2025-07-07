@@ -1,18 +1,21 @@
 import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Book } from "../types";
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Ionicons from "react-native-vector-icons/Ionicons";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 interface BookCardProps {
   book: Book;
   onPress: () => void;
   onDelete: () => void;
+  onEdit: () => void;
 }
 
 const BookCard: React.FC<BookCardProps> = ({
   book,
   onPress,
   onDelete,
+  onEdit,
 }) => {
   const userProgress =
     Array.isArray(book.progress) && book.progress.length > 0
@@ -39,14 +42,32 @@ const BookCard: React.FC<BookCardProps> = ({
           <Text style={styles.title} numberOfLines={1}>
             {book.title}
           </Text>
-          <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
-            <Ionicons name="trash-outline" size={22} color="#4E2B1B" />
-          </TouchableOpacity>
+          <View style={{ alignItems: "center", flexDirection: "row" }}>
+            <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
+              <Ionicons name="trash-outline" size={22} color="#4E2B1B" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.editButton} onPress={onEdit}>
+              <MaterialCommunityIcons
+                name="square-edit-outline"
+                size={22}
+                color="#4E2B1B"
+              />
+            </TouchableOpacity>
+          </View>
         </View>
-        <Text style={styles.author} numberOfLines={1}>{book.author}</Text>
-        <Text style={styles.meta} numberOfLines={1}>{book.category}</Text>
+        <Text style={styles.author} numberOfLines={1}>
+          {book.author}
+        </Text>
+        <Text style={styles.meta} numberOfLines={1}>
+          {book.category}
+        </Text>
         <View style={styles.progressBarContainer}>
-          <View style={[styles.progressBar, { width: `${Math.round(progress * 100)}%` }]} />
+          <View
+            style={[
+              styles.progressBar,
+              { width: `${Math.round(progress * 100)}%` },
+            ]}
+          />
         </View>
       </View>
     </TouchableOpacity>
@@ -65,10 +86,10 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     marginHorizontal: 0,
     borderWidth: 0,
-    shadowColor: 'transparent',
-    width: '100%',
-    minWidth: '100%',
-    maxWidth: '100%',
+    shadowColor: "transparent",
+    width: "100%",
+    minWidth: "100%",
+    maxWidth: "100%",
   },
   cover: {
     width: 80,
@@ -84,14 +105,14 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 0,
     justifyContent: "center",
-    alignItems: 'flex-start',
+    alignItems: "flex-start",
     marginRight: 18,
   },
   headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    width: '100%',
+    width: "100%",
   },
   title: {
     fontSize: 17,
@@ -99,23 +120,23 @@ const styles = StyleSheet.create({
     color: "#4E2B1B",
     flex: 1,
     marginRight: 8,
-    textAlign: 'left',
+    textAlign: "left",
   },
   author: {
     color: "#4E2B1B",
     fontSize: 14,
     marginTop: 2,
-    textAlign: 'left',
+    textAlign: "left",
   },
   meta: {
     color: "#4E2B1B",
     fontSize: 12,
     marginTop: 2,
-    textAlign: 'left',
+    textAlign: "left",
   },
   deleteButton: {
-    padding: 4,
-    marginLeft: 8,
+    padding: 0,
+    marginLeft: 4,
   },
   deleteText: {
     fontSize: 16,
@@ -127,13 +148,19 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     overflow: "hidden",
     marginTop: 20,
-    width: '100%',
+    width: "100%",
   },
   progressBar: {
     height: "100%",
     backgroundColor: "#F7C873",
     borderRadius: 3,
     marginRight: 10,
+  },
+  editButton: {
+    padding: 0,
+    marginTop: 4,
+    marginLeft: 4,
+    alignItems: "center",
   },
 });
 

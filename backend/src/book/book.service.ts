@@ -141,6 +141,17 @@ export class BookService {
     return book;
   }
 
+  async update(id: number, userId: number, updateBookDto: Partial<{ title: string; author: string; category: string; coverImage: string }>): Promise<Book> {
+    const book = await this.findOneByUser(id, userId);
+    if (!book) throw new NotFoundException('Book not found');
+    if (updateBookDto.title !== undefined) book.title = updateBookDto.title;
+    if (updateBookDto.author !== undefined) book.author = updateBookDto.author;
+    if (updateBookDto.category !== undefined) book.category = updateBookDto.category;
+    if (updateBookDto.coverImage !== undefined) book.coverImage = updateBookDto.coverImage;
+    await this.bookRepository.save(book);
+    return book;
+  }
+
   async remove(id: number, userId: number): Promise<void> {
     const book = await this.findOneByUser(id, userId);
     if (book.filePath) {

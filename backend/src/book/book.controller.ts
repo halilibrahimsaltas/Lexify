@@ -11,10 +11,12 @@ import {
   Request,
   ParseIntPipe,
   Query,
+  Patch,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { BookService } from './book.service';
 import { CreateBookDto } from './dto/create-book.dto';
+import { UpdateBookDto } from './dto/update-book.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 import {
@@ -79,6 +81,17 @@ export class BookController {
   @ApiParam({ name: 'id', type: Number, description: 'Kitap ID değeri' })
   async findOne(@Request() req, @Param('id', ParseIntPipe) id: number) {
     return this.bookService.findOneByUser(id, req.user.sub);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update a book' })
+  @ApiParam({ name: 'id', type: Number, description: 'Kitap ID değeri' })
+  async update(
+    @Request() req,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateBookDto: UpdateBookDto,
+  ) {
+    return this.bookService.update(id, req.user.sub, updateBookDto);
   }
 
   @Get(':id/content')

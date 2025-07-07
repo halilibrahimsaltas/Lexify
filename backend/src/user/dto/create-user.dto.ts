@@ -47,6 +47,15 @@ export class CreateUserDto {
         message: 'Password must contain only letters, numbers, and allowed special characters.',
     })
     password: string;
+
+    @ApiProperty({
+        description: 'User provider',
+        example: 'local',
+        required: false,
+        default: 'local',
+    })
+    @IsString()
+    provider?: string = 'local';
 }
 
   

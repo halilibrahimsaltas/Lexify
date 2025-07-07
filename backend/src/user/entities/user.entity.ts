@@ -59,6 +59,9 @@ export class User {
   })
   password: string;
 
+  @Column({ default: 'local' })
+  provider: string; // 'local' veya 'google'
+
   @ManyToMany(() => Word, (word) => word.users, { cascade: true })
   @JoinTable({
     name: 'user_words',

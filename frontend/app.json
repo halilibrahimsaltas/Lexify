@@ -38,6 +38,7 @@
         "asset": "./src/assets/fonts/Merriweather-Italic-VariableFont_opsz,wdth,wght.ttf",
         "family": "Merriweather-Italic"
       }
-    ]
+    ],
+    "scheme": "lexify-mobile"
   }
 }

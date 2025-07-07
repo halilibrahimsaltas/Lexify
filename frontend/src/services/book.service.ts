@@ -68,6 +68,14 @@ class BookService {
     await api.delete(`/books/${id}`);
   }
 
+  async updateBook(id: number, data: { title?: string; author?: string; category?: string; coverImage?: string }) {
+    const token = await storageService.getAuthToken();
+    const response = await api.patch(`/books/${id}`, data, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  }
+
   async getBookContent(bookId: number, page: number) {
     const token = await storageService.getAuthToken();
     const response = await api.get(`/books/${bookId}/content?page=${page}`, {

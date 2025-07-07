@@ -4,9 +4,13 @@ import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
 import { User } from '../user/entities/user.entity';
+import { OAuth2Client } from 'google-auth-library';
+import { UserRole } from '../common/enum/user-role.enum';
 
 @Injectable()
 export class AuthService {
+  private googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
   constructor(
     private readonly jwtService: JwtService,
     private readonly userService: UserService,
@@ -23,6 +27,12 @@ export class AuthService {
 
       if (!user) {
         console.log('User not found');
+        return null;
+      }
+
+      // Sadece provider 'local' olanlar şifreyle giriş yapabilir
+      if (user.provider !== 'local') {
+        console.log('User provider is not local');
         return null;
       }
 
@@ -63,6 +73,31 @@ export class AuthService {
         role: user.role,
       },
     };
+  }
+
+  async googleMobileLogin(idToken: string) {
+    // 1. Google token'ı doğrula
+    const ticket = await this.googleClient.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    if (!payload?.email) throw new UnauthorizedException('Google doğrulama başarısız');
+
+    // 2. Kullanıcıyı bul veya oluştur
+    let user = await this.userService.findUserByEmail(payload.email);
+    if (!user) {
+      user = await this.userService.createUser({
+        name: payload.name || payload.email,
+        email: payload.email,
+        password: 'google', // Google ile girişte şifreye gerek yok
+        role: UserRole.USER,
+        provider: 'google',
+      });
+    }
+
+    // 3. JWT üret ve dön (mevcut login fonksiyonunu kullanabilirsin)
+    return this.login(user);
   }
 
   async hashPassword(password: string): Promise<string> {
