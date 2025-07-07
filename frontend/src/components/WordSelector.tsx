@@ -8,16 +8,20 @@ import {
   ActivityIndicator,
   Alert,
   Pressable,
+  Dimensions,
 } from "react-native";
-import { BlurView } from 'expo-blur';
 import translationService from "../services/translation.service";
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Ionicons from "react-native-vector-icons/Ionicons";
+
+const SCREEN_HEIGHT = Dimensions.get("window").height;
+const SCREEN_WIDTH = Dimensions.get("window").width;
 
 interface WordSelectorProps {
   visible: boolean;
   selectedWord: string;
   onClose: () => void;
   onWordSave?: (word: string, translation: string) => void;
+  anchorPosition?: { x: number; y: number; width: number; height: number };
 }
 
 const WordSelector: React.FC<WordSelectorProps> = ({
@@ -25,6 +29,7 @@ const WordSelector: React.FC<WordSelectorProps> = ({
   selectedWord,
   onClose,
   onWordSave,
+  anchorPosition,
 }) => {
   const [alternatives, setAlternatives] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -93,6 +98,16 @@ const WordSelector: React.FC<WordSelectorProps> = ({
 
   const current = alternatives[currentIndex];
 
+  // Konum hesaplama
+  const containerStyle = {
+    position: "absolute" as const,
+    top: 10,
+    left: SCREEN_WIDTH / 2 - 110,
+    zIndex: 9999,
+    width: 300,
+    maxHeight: SCREEN_HEIGHT - 16,
+  };
+
   return (
     <Modal
       visible={visible}
@@ -101,7 +116,7 @@ const WordSelector: React.FC<WordSelectorProps> = ({
       onRequestClose={onClose}
     >
       <Pressable style={styles.modalOverlay} onPress={onClose}>
-        <BlurView intensity={20} tint="dark" style={styles.blurCard}>
+        <View style={[containerStyle]} pointerEvents="box-none">
           <View style={styles.modalContent} pointerEvents="box-none">
             {/* Seçilen Kelime */}
             <Text style={styles.selectedWord}>{selectedWord}</Text>
@@ -117,7 +132,15 @@ const WordSelector: React.FC<WordSelectorProps> = ({
                     onPress={handlePrev}
                     disabled={currentIndex === 0}
                   >
-                    <Text style={currentIndex === 0 ? styles.arrowTextDisabled : styles.arrowText}>{"‹"}</Text>
+                    <Text
+                      style={
+                        currentIndex === 0
+                          ? styles.arrowTextDisabled
+                          : styles.arrowText
+                      }
+                    >
+                      {"‹"}
+                    </Text>
                   </TouchableOpacity>
                   <View style={styles.translationBox}>
                     <Text style={styles.translationText}>
@@ -144,7 +167,15 @@ const WordSelector: React.FC<WordSelectorProps> = ({
                     onPress={handleNext}
                     disabled={currentIndex === alternatives.length - 1}
                   >
-                    <Text style={currentIndex === alternatives.length - 1 ? styles.arrowTextDisabled : styles.arrowText}>{"›"}</Text>
+                    <Text
+                      style={
+                        currentIndex === alternatives.length - 1
+                          ? styles.arrowTextDisabled
+                          : styles.arrowText
+                      }
+                    >
+                      {"›"}
+                    </Text>
                   </TouchableOpacity>
                 </View>
                 {/* Kaydet Butonu */}
@@ -155,14 +186,13 @@ const WordSelector: React.FC<WordSelectorProps> = ({
                       style={styles.saveButton}
                       onPress={handleSaveWord}
                     >
-                      <Ionicons name="bookmark-outline" size={20} color="#4E2B1B" style={{ marginRight: 6, alignSelf: 'center' }} />
                       <Text style={styles.saveButtonText}>Kaydet</Text>
                     </TouchableOpacity>
                   )}
               </View>
             )}
           </View>
-        </BlurView>
+        </View>
       </Pressable>
     </Modal>
   );
@@ -171,41 +201,25 @@ const WordSelector: React.FC<WordSelectorProps> = ({
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: "transparent",
-    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.08)",
+    justifyContent: "flex-start",
     alignItems: "center",
   },
-  blurCard: {
-    borderRadius: 20,
-    overflow: "hidden",
-    shadowColor: '#000',
-    shadowOpacity: 0.12,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 12,
-    maxWidth: '90%',
-  },
+
   modalContent: {
-    backgroundColor: "#FFF8E1",
-    borderRadius: 20,
-    padding: 20,
-    width: 270,
+    backgroundColor: "#32341f",
+    borderRadius: 10,
+    padding: 6, // azaltıldı
+    width: 220, // biraz daha daraltıldı
     alignItems: "center",
-    elevation: 10,
-    shadowColor: "#000",
-    shadowOpacity: 0.10,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    borderWidth: 2,
-    borderColor: '#4E2B1B',
-    justifyContent: 'center',
-    maxWidth: '90%',
+    justifyContent: "center",
+    maxWidth: "90%",
   },
   selectedWord: {
-    fontSize: 26,
+    fontSize: 16, // biraz küçültüldü
+    marginBottom: 6, // azaltıldı
     fontWeight: "bold",
-    color: "#4E2B1B",
-    marginVertical: 10,
+    color: "rgba(245, 245, 245, 0.85)",
     textAlign: "center",
     fontFamily: "Roboto_500Medium",
     letterSpacing: 0.5,
@@ -213,75 +227,61 @@ const styles = StyleSheet.create({
   translationSection: {
     alignItems: "center",
     width: "100%",
-    marginTop: 6,
+    // marginTop kaldırıldı
   },
   altNavRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 2, // azaltıldı
     width: "100%",
     justifyContent: "center",
+    minHeight: 32, // Satır yüksekliğini sınırla
   },
   arrowButton: {
-    backgroundColor: "#FFF8E1",
-    borderWidth: 1,
-    borderColor: '#F7C873',
-    marginHorizontal: 8,
     padding: 0,
-    minWidth: 38,
-    minHeight: 38,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 19,
-    shadowColor: '#000',
-    shadowOpacity: 0.10,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 4,
+    height: 28, // Sabit yükseklik
+    width: 32, // Sabit genişlik
+    overflow: "visible",
   },
   arrowText: {
-    fontSize: 32,
-    color: "#4E2B1B",
+    fontSize: 50, // Büyük ok
+    lineHeight: 28, // Satır yüksekliğini sınırla
+    color: "rgba(245, 245, 245, 0.85)",
     fontWeight: "bold",
     fontFamily: "Roboto_500Medium",
     opacity: 1,
   },
   arrowTextDisabled: {
-    fontSize: 32,
-    color: "#4E2B1B",
+    fontSize: 40, // biraz küçültüldü
+    color: "rgba(245, 245, 245, 0.85)",
     fontWeight: "bold",
     fontFamily: "Roboto_500Medium",
     opacity: 0.3,
   },
   translationBox: {
-    minWidth: 160,
-    maxWidth: 200,
-    padding: 16,
-    backgroundColor: "#FFF8E1",
-    borderRadius: 14,
+    minWidth: 120, // azaltıldı
+    maxWidth: 200, // azaltıldı
+    padding: 6, // azaltıldı
+    backgroundColor: "#32341f",
+    borderRadius: 8, // azaltıldı
     alignItems: "center",
-    marginHorizontal: 8,
-    borderWidth: 1.5,
-    borderColor: '#F7C873',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 4,
+    marginHorizontal: 2, // azaltıldı
+    justifyContent: "center",
   },
   translationText: {
-    fontSize: 20,
-    color: "#4E2B1B",
+    fontSize: 18, // biraz küçültüldü
+    color: "#F7C873",
     fontWeight: "bold",
     textAlign: "center",
     fontFamily: "Roboto_500Medium",
-    marginBottom: 2,
+    marginBottom: 1, // azaltıldı
   },
   categoryText: {
-    fontSize: 13,
-    color: "#4E2B1B",
-    marginTop: 2,
+    fontSize: 10, // biraz küçültüldü
+    color: "rgba(245, 245, 245, 0.85)",
+    marginTop: 1, // azaltıldı
     textAlign: "center",
     fontWeight: "bold",
     fontFamily: "Roboto_400Regular",
@@ -289,29 +289,21 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     backgroundColor: "#F7C873",
-    paddingVertical: 10,
-    paddingHorizontal: 32,
-    borderRadius: 22,
+    paddingVertical: 6, // azaltıldı
+    paddingHorizontal: 12, // azaltıldı
+    borderRadius: 8, // azaltıldı
+    marginTop: 6, // azaltıldı
+    width: "100%",
     alignItems: "center",
-    marginTop: 16,
-    minWidth: 120,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    borderWidth: 1.5,
-    borderColor: '#4E2B1B',
-    shadowColor: '#000',
-    shadowOpacity: 0.10,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 6,
+    justifyContent: "center",
   },
   saveButtonText: {
-    color: "#4E2B1B",
-    fontSize: 17,
+    color: "#32341f",
+    fontSize: 13,
     fontWeight: "bold",
     fontFamily: "Roboto_500Medium",
-    textAlign: 'center',
-    letterSpacing: 0.2,
+    textAlign: "center",
+    letterSpacing: 0.1,
   },
 });
 

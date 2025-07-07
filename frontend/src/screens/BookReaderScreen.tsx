@@ -7,14 +7,15 @@ import {
   ActivityIndicator,
   PanResponder,
   Dimensions,
+  findNodeHandle,
 } from "react-native";
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Ionicons from "react-native-vector-icons/Ionicons";
 import Toast from "../components/Toast";
 import { SafeAreaView } from "react-native-safe-area-context";
 import WordSelector from "../components/WordSelector";
 import { Book } from "../types";
 import bookService from "../services/book.service";
-import wordService from '../services/word.service';
+import wordService from "../services/word.service";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
@@ -26,13 +27,22 @@ const BookReaderScreen = ({ route }: any) => {
   const [loading, setLoading] = useState(true);
   const [selectedWord, setSelectedWord] = useState("");
   const [wordSelectorVisible, setWordSelectorVisible] = useState(false);
+  const [selectedWordPosition, setSelectedWordPosition] = useState<{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null>(null);
+  const wordRefs = useRef<{ [key: string]: any }>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [showPagination, setShowPagination] = useState(true);
   const hideTimer = useRef<NodeJS.Timeout | null>(null);
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
-  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>("success");
+  const [toastType, setToastType] = useState<"success" | "error" | "info">(
+    "success"
+  );
   const [chapters, setChapters] = useState<string[]>([]);
   const [currentChapter, setCurrentChapter] = useState(0);
 
@@ -52,7 +62,9 @@ const BookReaderScreen = ({ route }: any) => {
       }
     };
     fetchProgressAndLoad();
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, [bookId]);
 
   // Kitap bölümlerini çek
@@ -84,7 +96,7 @@ const BookReaderScreen = ({ route }: any) => {
       setBook(bookData);
     } catch (error: any) {
       setToastMessage(error.message || "Kitap bilgisi yüklenemedi");
-      setToastType('error');
+      setToastType("error");
       setToastVisible(true);
     }
   };
@@ -97,18 +109,29 @@ const BookReaderScreen = ({ route }: any) => {
       setTotalPages(data.totalPages || 1);
     } catch (error: any) {
       setToastMessage(error.message || "Sayfa yüklenemedi");
-      setToastType('error');
+      setToastType("error");
       setToastVisible(true);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleWordSelect = (word: string) => {
+  const handleWordSelect = (word: string, key: string) => {
     const cleanWord = word.replace(/[^\w\s]/g, "").trim();
     if (cleanWord.length > 0) {
       setSelectedWord(cleanWord);
       setWordSelectorVisible(true);
+      // Pozisyon ölçümü
+      setTimeout(() => {
+        const ref = wordRefs.current[key];
+        if (ref) {
+          ref.measureInWindow(
+            (x: number, y: number, width: number, height: number) => {
+              setSelectedWordPosition({ x, y, width, height });
+            }
+          );
+        }
+      }, 10);
     }
   };
 
@@ -117,15 +140,15 @@ const BookReaderScreen = ({ route }: any) => {
       await wordService.addUserWord({
         originalText: word,
         translatedText: translation,
-        sourceLanguage: 'en',
-        targetLanguage: 'tr',
+        sourceLanguage: "en",
+        targetLanguage: "tr",
       });
-      setToastMessage('Kelime favorilere eklendi');
-      setToastType('success');
+      setToastMessage("Kelime favorilere eklendi");
+      setToastType("success");
       setToastVisible(true);
     } catch (error) {
-      setToastMessage('Kelime eklenemedi');
-      setToastType('error');
+      setToastMessage("Kelime eklenemedi");
+      setToastType("error");
       setToastVisible(true);
     }
   };
@@ -139,7 +162,9 @@ const BookReaderScreen = ({ route }: any) => {
 
   useEffect(() => {
     resetPaginationTimer();
-    return () => { if (hideTimer.current) clearTimeout(hideTimer.current); };
+    return () => {
+      if (hideTimer.current) clearTimeout(hideTimer.current);
+    };
   }, [currentPage, resetPaginationTimer]);
 
   // Ekrana dokununca pagination tekrar göster
@@ -151,16 +176,29 @@ const BookReaderScreen = ({ route }: any) => {
   const renderWords = (text: string) => {
     return text.split("\n\n").map((paragraph, pIndex) => (
       <Text key={pIndex} style={styles.bookContentText}>
-        {paragraph.trim().split(/\s+/).map((word, wIndex) => (
-          <Text
-            key={`${pIndex}-${wIndex}`}
-            style={styles.wordText}
-            onPress={() => handleWordSelect(word)}
-          >
-            {word}
-            <Text> </Text>
-          </Text>
-        ))}
+        {paragraph
+          .trim()
+          .split(/\s+/)
+          .map((word, wIndex) => {
+            const key = `${pIndex}-${wIndex}`;
+            const isSelected =
+              wordSelectorVisible &&
+              selectedWord &&
+              selectedWord === word.replace(/[^\w\s]/g, "").trim();
+            return (
+              <Text
+                key={key}
+                ref={(ref) => {
+                  wordRefs.current[key] = ref;
+                }}
+                style={[styles.wordText, isSelected && styles.selectedWordText]}
+                onPress={() => handleWordSelect(word, key)}
+              >
+                {word}
+                <Text> </Text>
+              </Text>
+            );
+          })}
       </Text>
     ));
   };
@@ -199,14 +237,12 @@ const BookReaderScreen = ({ route }: any) => {
           </View>
         ) : (
           <>
-            <View
-              {...panResponder.panHandlers}
-              style={styles.contentWrapper}
-            >
+            <View {...panResponder.panHandlers} style={styles.contentWrapper}>
               <View style={styles.pageContent}>
                 {/* Eğer chapter varsa, chapter'ı göster, yoksa normal content göster */}
                 {chapters.length > 0
-                  ? chapters[currentChapter] && renderWords(chapters[currentChapter])
+                  ? chapters[currentChapter] &&
+                    renderWords(chapters[currentChapter])
                   : renderWords(content)}
               </View>
             </View>
@@ -215,7 +251,9 @@ const BookReaderScreen = ({ route }: any) => {
             {chapters.length > 0 && (
               <View style={styles.chapterControls}>
                 <TouchableOpacity
-                  onPress={() => setCurrentChapter((prev) => Math.max(prev - 1, 0))}
+                  onPress={() =>
+                    setCurrentChapter((prev) => Math.max(prev - 1, 0))
+                  }
                   disabled={currentChapter === 0}
                 >
                   <Text>◀</Text>
@@ -224,7 +262,11 @@ const BookReaderScreen = ({ route }: any) => {
                   Bölüm {currentChapter + 1} / {chapters.length}
                 </Text>
                 <TouchableOpacity
-                  onPress={() => setCurrentChapter((prev) => Math.min(prev + 1, chapters.length - 1))}
+                  onPress={() =>
+                    setCurrentChapter((prev) =>
+                      Math.min(prev + 1, chapters.length - 1)
+                    )
+                  }
                   disabled={currentChapter === chapters.length - 1}
                 >
                   <Text>▶</Text>
@@ -235,11 +277,18 @@ const BookReaderScreen = ({ route }: any) => {
             {showPagination && (
               <View style={styles.pagination}>
                 <TouchableOpacity
-                  style={[styles.navButton, currentPage === 1 && styles.disabled]}
+                  style={[
+                    styles.navButton,
+                    currentPage === 1 && styles.disabled,
+                  ]}
                   onPress={() => goToPage("prev")}
                   disabled={currentPage === 1}
                 >
-                  <Ionicons name="chevron-back" size={22} color={currentPage === 1 ? '#bdbdbd' : '#32341f'} />
+                  <Ionicons
+                    name="chevron-back"
+                    size={22}
+                    color={currentPage === 1 ? "#bdbdbd" : "#32341f"}
+                  />
                 </TouchableOpacity>
                 <Text style={styles.pageText}>
                   {currentPage} / {totalPages}
@@ -252,7 +301,11 @@ const BookReaderScreen = ({ route }: any) => {
                   onPress={() => goToPage("next")}
                   disabled={currentPage === totalPages}
                 >
-                  <Ionicons name="chevron-forward" size={22} color={currentPage === totalPages ? '#bdbdbd' : '#32341f'} />
+                  <Ionicons
+                    name="chevron-forward"
+                    size={22}
+                    color={currentPage === totalPages ? "#bdbdbd" : "#32341f"}
+                  />
                 </TouchableOpacity>
               </View>
             )}
@@ -260,14 +313,12 @@ const BookReaderScreen = ({ route }: any) => {
         )}
 
         {wordSelectorVisible && (
-          <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, alignItems: 'center', zIndex: 100 }}>
-            <WordSelector
-              visible={true}
-              selectedWord={selectedWord}
-              onClose={() => setWordSelectorVisible(false)}
-              onWordSave={handleWordSave}
-            />
-          </View>
+          <WordSelector
+            visible={true}
+            selectedWord={selectedWord}
+            onClose={() => setWordSelectorVisible(false)}
+            onWordSave={handleWordSave}
+          />
         )}
 
         <Toast
@@ -383,13 +434,21 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   chapterControls: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
     paddingVertical: 10,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
     borderTopWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
+  },
+  selectedWordText: {
+    backgroundColor: "#F7C873",
+    borderRadius: 6,
+    borderWidth: 1.5,
+    borderColor: "#F7C873",
+    color: "#4E2B1B",
+    fontWeight: "bold",
   },
 });
 
