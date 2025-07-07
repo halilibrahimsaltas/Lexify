@@ -16,6 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "../contexts/AuthContext";
 import userService, { User, UpdateUserRequest } from "../services/user.service";
 import wordService, { Word } from "../services/word.service";
+import Toast from '../components/Toast';
 // @ts-ignore (MaterialCommunityIcons, Feather, Ionicons importlarının üstüne).
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 // @ts-ignore (MaterialCommunityIcons, Feather, Ionicons importlarının üstüne).
@@ -32,8 +33,8 @@ const ProfileScreen = ({ navigation }: any) => {
   const [editLoading, setEditLoading] = useState(false);
   const [editForm, setEditForm] = useState({
     name: "",
-    email: "",
     password: "",
+    passwordRepeat: "",
   });
   const [userWords, setUserWords] = useState<Word[]>([]);
   const [alertVisible, setAlertVisible] = useState(false);
@@ -42,8 +43,11 @@ const ProfileScreen = ({ navigation }: any) => {
     message: '',
     type: 'primary' as 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info',
   });
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
 
-  const showAlert = (title: string, message: string, type: 'primary' | 'secondary' = 'primary') => {
+  const showAlert = (title: string, message: string, type: 'primary' | 'secondary' | 'success' | 'error' = 'primary') => {
     setAlertConfig({ title, message, type });
     setAlertVisible(true);
   };
@@ -52,12 +56,18 @@ const ProfileScreen = ({ navigation }: any) => {
     setAlertVisible(false);
   };
 
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToastMessage(message);
+    setToastType(type);
+    setToastVisible(true);
+  };
+
   useEffect(() => {
     if (user) {
       setEditForm({
         name: user.name,
-        email: user.email,
         password: "",
+        passwordRepeat: "",
       });
       loadUserWords();
     }
@@ -68,8 +78,8 @@ const ProfileScreen = ({ navigation }: any) => {
       if (user) {
         setEditForm({
           name: user.name,
-          email: user.email,
           password: "",
+          passwordRepeat: "",
         });
         loadUserWords();
       }
@@ -90,55 +100,64 @@ const ProfileScreen = ({ navigation }: any) => {
   const handleEditProfile = async () => {
     if (!user) return;
 
+    if (editForm.password !== editForm.passwordRepeat) {
+      showAlert("Hata", "Parolalar eşleşmiyor", 'error');
+      showToast("Parolalar eşleşmiyor", 'error');
+      return;
+    }
+
     const updateData: UpdateUserRequest = {};
     if (editForm.name !== user.name) updateData.name = editForm.name;
-    if (editForm.email !== user.email) updateData.email = editForm.email;
     if (editForm.password.trim()) updateData.password = editForm.password;
 
     if (Object.keys(updateData).length === 0) {
       showAlert("Bilgi", "Değişiklik yapılmadı", 'primary');
+      showToast("Değişiklik yapılmadı", 'info');
       return;
     }
 
     setEditLoading(true);
     try {
       const updatedUser = await userService.updateUser(user.id, updateData);
-
-      // AuthContext'teki kullanıcı verilerini güncelle
       updateUser({
         id: updatedUser.id,
         name: updatedUser.name,
         email: updatedUser.email,
         role: updatedUser.role,
       });
-
       setEditModalVisible(false);
       showAlert("Başarılı", "Profil güncellendi", 'primary');
+      showToast("Profil başarıyla güncellendi", 'success');
     } catch (error: any) {
       showAlert("Hata", error.message, 'primary');
+      showToast(error.message || "Bir hata oluştu", 'error');
     } finally {
       setEditLoading(false);
     }
   };
 
   const handleLogout = async () => {
-    showAlert(
-      "Çıkış Yap", 
-      "Çıkış yapmak istediğinizden emin misiniz?", 
-      'secondary'
-    );
-    
-    // Çıkış onayı için özel butonlar
+    // Onay alerti göster
     setAlertConfig({
       title: "Çıkış Yap",
       message: "Çıkış yapmak istediğinizden emin misiniz?",
       type: 'secondary',
     });
     setAlertVisible(true);
-    
-    const confirmLogout = async () => {
+    // onClose fonksiyonunda onaylanırsa çıkış işlemini başlat
+    // Alert componentinde onay butonu yoksa, burada custom bir modal ile onay alabilirsin
+    // Şimdilik doğrudan çıkış işlemini yapalım (kullanıcıdan onay alınmadan)
+    // Eğer Alert componentinde onay butonu varsa, oraya taşıyabilirsin
+  };
+
+  // Alert kapandığında çıkış işlemini başlat
+  const handleAlertClose = async (confirmed?: boolean) => {
+    setAlertVisible(false);
+    if (alertConfig.title === "Çıkış Yap" && confirmed !== false) {
       await logout();
-    };
+      showToast('Çıkış yapıldı', 'success');
+      
+    }
   };
 
   const menuItems = [
@@ -248,7 +267,15 @@ const ProfileScreen = ({ navigation }: any) => {
         title={alertConfig.title}
         message={alertConfig.message}
         type={alertConfig.type as 'primary' | 'secondary'}
-        onClose={handleCloseAlert}
+        onClose={handleAlertClose}
+      />
+
+      {/* Toast Component */}
+      <Toast
+        visible={toastVisible}
+        message={toastMessage}
+        type={toastType}
+        onHide={() => setToastVisible(false)}
       />
 
       {/* Profil Düzenleme Modal */}
@@ -281,20 +308,6 @@ const ProfileScreen = ({ navigation }: any) => {
               </View>
 
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>E-posta</Text>
-                <TextInput
-                  style={styles.input}
-                  value={editForm.email}
-                  onChangeText={(text) =>
-                    setEditForm({ ...editForm, email: text })
-                  }
-                  placeholder="E-posta adresinizi girin"
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
-              </View>
-
-              <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Yeni Şifre (Opsiyonel)</Text>
                 <TextInput
                   style={styles.input}
@@ -303,6 +316,19 @@ const ProfileScreen = ({ navigation }: any) => {
                     setEditForm({ ...editForm, password: text })
                   }
                   placeholder="Yeni şifrenizi girin"
+                  secureTextEntry
+                />
+              </View>
+
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Yeni Şifreyi Tekrar Girin</Text>
+                <TextInput
+                  style={styles.input}
+                  value={editForm.passwordRepeat}
+                  onChangeText={(text) =>
+                    setEditForm({ ...editForm, passwordRepeat: text })
+                  }
+                  placeholder="Yeni şifrenizi tekrar girin"
                   secureTextEntry
                 />
               </View>

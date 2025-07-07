@@ -81,12 +81,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const register = async (email: string, password: string, name: string) => {
-    try {
-      const response = await authService.register({ email, password, name });
-      setUser(response.user);
-    } catch (error) {
-      throw error;
-    }
+    await authService.register({ email, password, name });
+    // Oturum açma işlemi burada yapılmaz!
   };
 
   const logout = async () => {

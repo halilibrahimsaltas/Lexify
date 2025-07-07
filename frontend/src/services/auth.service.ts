@@ -46,17 +46,10 @@ class AuthService {
     }
   }
 
-  async register(userData: RegisterRequest): Promise<AuthResponse> {
+  async register(userData: RegisterRequest): Promise<any> {
     try {
-      // Kayıt endpointi backend'de /users olduğu için burası güncellendi
       const response = await api.post("/users", userData);
-      const authData = response.data;
-      // Token ve kullanıcı verilerini storage'a kaydet
-      await storageService.setAuthToken(authData.access_token);
-      await storageService.setUserData(authData.user);
-      // API header'ına token'ı set et
-      this.setAuthToken(authData.access_token);
-      return authData;
+      return response.data; // Sadece kullanıcı objesi döner
     } catch (error: any) {
       if (error.response?.status === 409) {
         throw new Error("Bu e-posta adresi zaten kullanımda");

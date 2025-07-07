@@ -69,11 +69,18 @@ const LoginScreen = () => {
       if (isLogin) {
         // Giriş işlemi
         await login(email, password);
-        
       } else {
         // Kayıt işlemi
         await register(email, password, name);
-        showAlert('Başarılı', 'Hesap oluşturuldu', 'primary');
+        // Kayıt başarılıysa otomatik giriş yapmayı dene
+        try {
+          await login(email, password);
+          // Giriş başarılıysa zaten yönlendirilir
+        } catch (loginError) {
+          // Kayıt başarılı, login başarısız
+          showAlert('Bilgi', 'Kayıt başarılı, ancak otomatik giriş yapılamadı. Lütfen giriş yapın.', 'primary');
+          // İsteğe bağlı: login ekranına yönlendir
+        }
       }
     } catch (error: any) {
       showAlert('Hata', error.message || 'Bir hata oluştu', 'primary');

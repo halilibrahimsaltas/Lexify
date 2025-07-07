@@ -15,14 +15,6 @@ export class UpdateUserDto {
     name?: string;
 
     @ApiPropertyOptional({
-        description: 'User email address',
-        example: 'user@example.com'
-    })
-    @IsOptional()
-    @IsEmail({}, { message: 'Invalid email format.' })
-    email?: string;
-
-    @ApiPropertyOptional({
         description: 'User role',
         example: UserRole.USER,
         enum: UserRole

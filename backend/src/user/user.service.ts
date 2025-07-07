@@ -44,7 +44,7 @@ export class UserService {
     }
 
     async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-        const { words, ...userData } = updateUserDto;
+        const { words, password, ...userData } = updateUserDto;
         const user = await this.userRepository.findOne({ 
             where: { id },
             relations: ['words']
@@ -57,7 +57,6 @@ export class UserService {
         if (words) {
             // Mevcut kelimeleri sil
             await this.wordRepository.delete({ users: { id: user.id } });
-            
             // Yeni kelimeleri ekle
             const wordEntities = words.map(wordText => {
                 const word = new Word();
@@ -69,6 +68,12 @@ export class UserService {
                 return word;
             });
             await this.wordRepository.save(wordEntities);
+        }
+
+
+        // Parola güncelleniyorsa hashle
+        if (password && password.trim()) {
+            user.password = await bcrypt.hash(password, 10);
         }
 
         Object.assign(user, userData);

@@ -59,7 +59,7 @@ export class User {
   })
   password: string;
 
-  @ManyToMany(() => Word, (word) => word.users)
+  @ManyToMany(() => Word, (word) => word.users, { cascade: true })
   @JoinTable({
     name: 'user_words',
     joinColumn: {
