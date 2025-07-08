@@ -1,30 +1,51 @@
-import React, { useEffect, useState } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import wordService, { Word } from '../services/word.service';
-import Toast from '../components/Toast';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import Alert from '../components/Alert';
-
+import React, { useEffect, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+  TouchableOpacity,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import wordService, { Word } from "../services/word.service";
+import Toast from "../components/Toast";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import Alert from "../components/Alert";
 
 const SavedWordsScreen = ({ navigation }: any) => {
   const [words, setWords] = useState<Word[]>([]);
   const [loading, setLoading] = useState(true);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertConfig, setAlertConfig] = useState({
-    title: '',
-    message: '',
-    type: 'primary' as 'primary' | 'secondary',
+    title: "",
+    message: "",
+    type: "primary" as "primary" | "secondary",
   });
   const [deletingId, setDeletingId] = useState<number | null>(null);
-  const [confirmDelete, setConfirmDelete] = useState<{ id: number; word: string } | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<{
+    id: number;
+    word: string;
+  } | null>(null);
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
-  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>("success");
-  const languageNames: Record<string, string> = { en: 'İngilizce', tr: 'Türkçe', de: 'Almanca', fr: 'Fransızca', es: 'İspanyolca' };
+  const [toastType, setToastType] = useState<"success" | "error" | "info">(
+    "success"
+  );
+  const languageNames: Record<string, string> = {
+    en: "İngilizce",
+    tr: "Türkçe",
+    de: "Almanca",
+    fr: "Fransızca",
+    es: "İspanyolca",
+  };
 
-  const showAlert = (title: string, message: string, type: 'primary' | 'secondary' = 'primary') => {
+  const showAlert = (
+    title: string,
+    message: string,
+    type: "primary" | "secondary" = "primary"
+  ) => {
     setAlertConfig({ title, message, type });
     setAlertVisible(true);
   };
@@ -44,12 +65,12 @@ const SavedWordsScreen = ({ navigation }: any) => {
     try {
       await wordService.deleteUserWord(confirmDelete.id);
       setWords((prev) => prev.filter((w) => w.id !== confirmDelete.id));
-      setToastMessage('Kelime favorilerden kaldırıldı.');
-      setToastType('success');
+      setToastMessage("Kelime favorilerden kaldırıldı.");
+      setToastType("success");
       setToastVisible(true);
     } catch (error) {
-      setToastMessage('Kelime silinemedi.');
-      setToastType('error');
+      setToastMessage("Kelime silinemedi.");
+      setToastType("error");
       setToastVisible(true);
     } finally {
       setDeletingId(null);
@@ -69,12 +90,13 @@ const SavedWordsScreen = ({ navigation }: any) => {
   const fetchWords = async () => {
     setLoading(true);
     try {
-      const data = (await wordService.getUserWords()).sort((a, b) =>
-     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+      const data = (await wordService.getUserWords()).sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
       setWords(data);
     } catch (error) {
-      showAlert('Hata', 'Kaydedilmiş kelimeler alınamadı', 'primary');
+      showAlert("Hata", "Kaydedilmiş kelimeler alınamadı", "primary");
     } finally {
       setLoading(false);
     }
@@ -100,17 +122,17 @@ const SavedWordsScreen = ({ navigation }: any) => {
         <Text> → </Text>
         <Text>{languageNames[item.targetLanguage] || item.targetLanguage}</Text>
       </Text>
-      <Text style={styles.dateText}>{new Date(item.createdAt).toLocaleString('tr-TR')}</Text>
+      <Text style={styles.dateText}>
+        {new Date(item.createdAt).toLocaleString("tr-TR")}
+      </Text>
     </View>
   );
 
   return (
     <SafeAreaView style={styles.container}>
-     
-
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
+          <ActivityIndicator size="large" color="#4E2B1B" />
           <Text style={styles.loadingText}>Kelimeler yükleniyor...</Text>
         </View>
       ) : (
@@ -118,12 +140,15 @@ const SavedWordsScreen = ({ navigation }: any) => {
           data={words}
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={words.length === 0 ? styles.emptyContainer : undefined}
+          contentContainerStyle={
+            words.length === 0 ? styles.emptyContainer : undefined
+          }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyTitle}>Henüz kelime kaydetmediniz</Text>
               <Text style={styles.emptyText}>
-                Kitap okurken kelimeleri favorilere ekleyerek burada görüntüleyebilirsiniz.
+                Kitap okurken kelimeleri favorilere ekleyerek burada
+                görüntüleyebilirsiniz.
               </Text>
             </View>
           }
@@ -146,18 +171,18 @@ const SavedWordsScreen = ({ navigation }: any) => {
         onClose={() => setConfirmDelete(null)}
         buttons={[
           {
-            text: 'İptal',
+            text: "İptal",
             onPress: () => setConfirmDelete(null),
-            variant: 'secondary',
-            iconName: 'close',
-            iconFamily: 'MaterialIcons',
+            variant: "secondary",
+            iconName: "close",
+            iconFamily: "MaterialIcons",
           },
           {
-            text: 'Sil',
+            text: "Sil",
             onPress: handleConfirmDelete,
-            variant: 'primary',
-            iconName: 'delete',
-            iconFamily: 'MaterialIcons',
+            variant: "primary",
+            iconName: "delete",
+            iconFamily: "MaterialIcons",
           },
         ]}
       />
@@ -168,91 +193,91 @@ const SavedWordsScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF8E1',
+    backgroundColor: "#FFF8E1",
   },
   header: {
     padding: 24,
-    backgroundColor: '#FFF8E1',
+    backgroundColor: "#FFF8E1",
     borderBottomWidth: 1,
-    borderBottomColor: '#F7C873',
-    alignItems: 'center',
+    borderBottomColor: "#F7C873",
+    alignItems: "center",
   },
   title: {
     fontSize: 26,
-    fontWeight: 'bold',
-    color: '#4B3F2F',
+    fontWeight: "bold",
+    color: "#4B3F2F",
     marginBottom: 6,
-    fontFamily: 'Roboto_500Medium',
+    fontFamily: "Roboto_500Medium",
   },
   subtitle: {
     fontSize: 15,
-    color: '#666',
-    fontFamily: 'Roboto_400Regular',
+    color: "#666",
+    fontFamily: "Roboto_400Regular",
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FFF8E1',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FFF8E1",
   },
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#666',
-    fontFamily: 'Roboto_400Regular',
+    color: "#666",
+    fontFamily: "Roboto_400Regular",
   },
   wordItem: {
-    backgroundColor: '#FFF8E1',
+    backgroundColor: "#FFF8E1",
     borderRadius: 0,
     paddingVertical: 12,
     paddingHorizontal: 16,
     marginBottom: 0,
     marginHorizontal: 0,
     borderWidth: 0,
-    shadowColor: 'transparent',
-    width: '100%',
-    minWidth: '100%',
-    maxWidth: '100%',
-    position: 'relative',
+    shadowColor: "transparent",
+    width: "100%",
+    minWidth: "100%",
+    maxWidth: "100%",
+    position: "relative",
   },
   deleteIcon: {
-    position: 'absolute',
+    position: "absolute",
     top: 12,
     right: 12,
     zIndex: 2,
-    backgroundColor: '#FFF8E1',
+    backgroundColor: "#FFF8E1",
     borderRadius: 8,
     padding: 4,
   },
   wordText: {
     fontSize: 17,
-    fontWeight: '700',
-    color: '#4E2B1B',
-    fontFamily: 'Roboto_500Medium',
+    fontWeight: "700",
+    color: "#4E2B1B",
+    fontFamily: "Roboto_500Medium",
   },
   translationText: {
     fontSize: 15,
-    color: '#F7C873',
+    color: "#F7C873",
     marginTop: 6,
-    fontFamily: 'Roboto_400Regular',
+    fontFamily: "Roboto_400Regular",
   },
   metaText: {
     fontSize: 12,
-    color: '#4E2B1B',
+    color: "#4E2B1B",
     marginTop: 6,
-    fontFamily: 'Roboto_400Regular',
+    fontFamily: "Roboto_400Regular",
   },
   dateText: {
     fontSize: 11,
-    color: '#4E2B1B',
+    color: "#4E2B1B",
     marginTop: 4,
-    textAlign: 'right',
-    fontFamily: 'Roboto_400Regular',
+    textAlign: "right",
+    fontFamily: "Roboto_400Regular",
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 40,
   },
   emptyIcon: {
@@ -261,18 +286,18 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#4B3F2F',
+    fontWeight: "bold",
+    color: "#4B3F2F",
     marginBottom: 10,
-    textAlign: 'center',
-    fontFamily: 'Roboto_500Medium',
+    textAlign: "center",
+    fontFamily: "Roboto_500Medium",
   },
   emptyText: {
     fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
+    color: "#666",
+    textAlign: "center",
     lineHeight: 24,
-    fontFamily: 'Roboto_400Regular',
+    fontFamily: "Roboto_400Regular",
   },
 });
 

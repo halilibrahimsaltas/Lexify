@@ -232,7 +232,7 @@ const BookReaderScreen = ({ route }: any) => {
       <View style={{ flex: 1 }} onTouchStart={handleScreenTouch}>
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#007AFF" />
+            <ActivityIndicator size="large" color="#4E2B1B" />
             <Text style={styles.loadingText}>Yükleniyor...</Text>
           </View>
         ) : (
@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
     borderColor: "#bdbdbd",
   },
   navButtonText: {
-    color: "#007AFF",
+    color: "#4E2B1B",
     fontSize: 18,
     fontWeight: "bold",
     fontFamily: "Roboto_500Medium",

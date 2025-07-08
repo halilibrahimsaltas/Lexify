@@ -12,21 +12,27 @@ import Toast from "../components/Toast";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as DocumentPicker from "expo-document-picker";
 import bookService from "../services/book.service";
-import Button from '../components/Button';
+import Button from "../components/Button";
 
 const AddBookScreen = ({ navigation }: any) => {
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<any>(null);
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
-  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>("success");
+  const [toastType, setToastType] = useState<"success" | "error" | "info">(
+    "success"
+  );
 
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [category, setCategory] = useState("");
   const [coverImage, setCoverImage] = useState("");
 
-  const showAlert = (title: string, message: string, type: 'primary' | 'secondary' = 'primary') => {
+  const showAlert = (
+    title: string,
+    message: string,
+    type: "primary" | "secondary" = "primary"
+  ) => {
     // This function is no longer used for alerts, but kept for now.
     // The new Toast component handles its own visibility.
   };
@@ -47,11 +53,11 @@ const AddBookScreen = ({ navigation }: any) => {
       const file = result.assets[0];
       setSelectedFile(file);
       setToastMessage(`${file.name} dosyası seçildi`);
-      setToastType('success');
+      setToastType("success");
       setToastVisible(true);
     } catch (error) {
       setToastMessage("Dosya seçilirken bir hata oluştu");
-      setToastType('error');
+      setToastType("error");
       setToastVisible(true);
     }
   };
@@ -59,7 +65,7 @@ const AddBookScreen = ({ navigation }: any) => {
   const handleUploadPdf = async () => {
     if (!selectedFile || !title || !author || !category) {
       setToastMessage("Lütfen tüm zorunlu alanları doldurun ve dosya seçin");
-      setToastType('info');
+      setToastType("info");
       setToastVisible(true);
       return;
     }
@@ -81,7 +87,7 @@ const AddBookScreen = ({ navigation }: any) => {
       });
       console.log("Kitap yükleme sonucu:", result);
       setToastMessage("Kitap başarıyla yüklendi");
-      setToastType('success');
+      setToastType("success");
       setToastVisible(true);
       setTimeout(() => navigation.navigate("MainDrawer"), 1500);
     } catch (error: any) {
@@ -97,10 +103,10 @@ const AddBookScreen = ({ navigation }: any) => {
       }
       setToastMessage(
         error?.response?.data?.message ||
-        error.message ||
-        "Kitap yüklenirken hata oluştu"
+          error.message ||
+          "Kitap yüklenirken hata oluştu"
       );
-      setToastType('error');
+      setToastType("error");
       setToastVisible(true);
     } finally {
       setLoading(false);
@@ -139,7 +145,7 @@ const AddBookScreen = ({ navigation }: any) => {
         />
 
         <Button
-          title={selectedFile ? selectedFile.name : 'Dosya Seç'}
+          title={selectedFile ? selectedFile.name : "Dosya Seç"}
           onPress={handleFilePick}
           variant="outline"
           size="medium"
@@ -147,7 +153,7 @@ const AddBookScreen = ({ navigation }: any) => {
           style={{ marginBottom: 16 }}
         />
         <Button
-          title={loading ? 'Yükleniyor...' : 'Kaydet'}
+          title={loading ? "Yükleniyor..." : "Kaydet"}
           onPress={handleUploadPdf}
           variant="primary"
           size="large"
@@ -170,7 +176,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFF8E1",
   },
-  scrollContent: { padding: 20, },
+  scrollContent: { padding: 20 },
   title: {
     fontSize: 26,
     fontWeight: "bold",
@@ -187,7 +193,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   fileButton: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#4E2B1B",
     padding: 14,
     borderRadius: 8,
     alignItems: "center",

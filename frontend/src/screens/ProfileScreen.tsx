@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -16,13 +16,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "../contexts/AuthContext";
 import userService, { User, UpdateUserRequest } from "../services/user.service";
 import wordService, { Word } from "../services/word.service";
-import Toast from '../components/Toast';
+import Toast from "../components/Toast";
 // @ts-ignore (MaterialCommunityIcons, Feather, Ionicons importlarının üstüne).
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 // @ts-ignore (MaterialCommunityIcons, Feather, Ionicons importlarının üstüne).
-import Feather from 'react-native-vector-icons/Feather';
+import Feather from "react-native-vector-icons/Feather";
 // @ts-ignore (MaterialCommunityIcons, Feather, Ionicons importlarının üstüne).
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 const ProfileScreen = ({ navigation }: any) => {
   const { user, logout, updateUser } = useAuth();
@@ -39,15 +39,27 @@ const ProfileScreen = ({ navigation }: any) => {
   const [userWords, setUserWords] = useState<Word[]>([]);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertConfig, setAlertConfig] = useState({
-    title: '',
-    message: '',
-    type: 'primary' as 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info',
+    title: "",
+    message: "",
+    type: "primary" as
+      | "primary"
+      | "secondary"
+      | "success"
+      | "error"
+      | "warning"
+      | "info",
   });
   const [toastVisible, setToastVisible] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
-  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState<"success" | "error" | "info">(
+    "success"
+  );
 
-  const showAlert = (title: string, message: string, type: 'primary' | 'secondary' | 'success' | 'error' = 'primary') => {
+  const showAlert = (
+    title: string,
+    message: string,
+    type: "primary" | "secondary" | "success" | "error" = "primary"
+  ) => {
     setAlertConfig({ title, message, type });
     setAlertVisible(true);
   };
@@ -56,7 +68,10 @@ const ProfileScreen = ({ navigation }: any) => {
     setAlertVisible(false);
   };
 
-  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+  const showToast = (
+    message: string,
+    type: "success" | "error" | "info" = "success"
+  ) => {
     setToastMessage(message);
     setToastType(type);
     setToastVisible(true);
@@ -101,8 +116,8 @@ const ProfileScreen = ({ navigation }: any) => {
     if (!user) return;
 
     if (editForm.password !== editForm.passwordRepeat) {
-      showAlert("Hata", "Parolalar eşleşmiyor", 'error');
-      showToast("Parolalar eşleşmiyor", 'error');
+      showAlert("Hata", "Parolalar eşleşmiyor", "error");
+      showToast("Parolalar eşleşmiyor", "error");
       return;
     }
 
@@ -111,8 +126,8 @@ const ProfileScreen = ({ navigation }: any) => {
     if (editForm.password.trim()) updateData.password = editForm.password;
 
     if (Object.keys(updateData).length === 0) {
-      showAlert("Bilgi", "Değişiklik yapılmadı", 'primary');
-      showToast("Değişiklik yapılmadı", 'info');
+      showAlert("Bilgi", "Değişiklik yapılmadı", "primary");
+      showToast("Değişiklik yapılmadı", "info");
       return;
     }
 
@@ -126,11 +141,11 @@ const ProfileScreen = ({ navigation }: any) => {
         role: updatedUser.role,
       });
       setEditModalVisible(false);
-      showAlert("Başarılı", "Profil güncellendi", 'primary');
-      showToast("Profil başarıyla güncellendi", 'success');
+      showAlert("Başarılı", "Profil güncellendi", "primary");
+      showToast("Profil başarıyla güncellendi", "success");
     } catch (error: any) {
-      showAlert("Hata", error.message, 'primary');
-      showToast(error.message || "Bir hata oluştu", 'error');
+      showAlert("Hata", error.message, "primary");
+      showToast(error.message || "Bir hata oluştu", "error");
     } finally {
       setEditLoading(false);
     }
@@ -141,7 +156,7 @@ const ProfileScreen = ({ navigation }: any) => {
     setAlertConfig({
       title: "Çıkış Yap",
       message: "Çıkış yapmak istediğinizden emin misiniz?",
-      type: 'secondary',
+      type: "secondary",
     });
     setAlertVisible(true);
     // onClose fonksiyonunda onaylanırsa çıkış işlemini başlat
@@ -155,8 +170,7 @@ const ProfileScreen = ({ navigation }: any) => {
     setAlertVisible(false);
     if (alertConfig.title === "Çıkış Yap" && confirmed !== false) {
       await logout();
-      showToast('Çıkış yapıldı', 'success');
-      
+      showToast("Çıkış yapıldı", "success");
     }
   };
 
@@ -172,15 +186,19 @@ const ProfileScreen = ({ navigation }: any) => {
       id: "2",
       title: "Kitaplarım",
       subtitle: "Eklediğiniz kitapları görüntüleyin",
-      icon: <MaterialCommunityIcons name="bookshelf" size={26} color="#FFF8E1" />,
-      onPress: () => navigation.navigate("MainDrawer", { screen: "Kitaplarım" }),
+      icon: (
+        <MaterialCommunityIcons name="bookshelf" size={26} color="#FFF8E1" />
+      ),
+      onPress: () =>
+        navigation.navigate("MainDrawer", { screen: "Kitaplarım" }),
     },
     {
       id: "3",
       title: "Favori Kelimeler",
       subtitle: "Kaydettiğiniz kelimeleri görün",
       icon: <Feather name="star" size={26} color="#FFF8E1" />,
-      onPress: () => navigation.navigate("MainDrawer", { screen: "Favori Kelimeler" }),
+      onPress: () =>
+        navigation.navigate("MainDrawer", { screen: "Favori Kelimeler" }),
     },
     {
       id: "4",
@@ -194,14 +212,16 @@ const ProfileScreen = ({ navigation }: any) => {
       title: "Ayarlar",
       subtitle: "Uygulama ayarlarını düzenleyin",
       icon: <Feather name="settings" size={26} color="#FFF8E1" />,
-      onPress: () => showAlert("Bilgi", "Bu özellik yakında eklenecek", 'primary'),
+      onPress: () =>
+        showAlert("Bilgi", "Bu özellik yakında eklenecek", "primary"),
     },
     {
       id: "7",
       title: "Yardım",
       subtitle: "Destek ve SSS",
       icon: <Feather name="help-circle" size={26} color="#FFF8E1" />,
-      onPress: () => showAlert("Bilgi", "Bu özellik yakında eklenecek", 'primary'),
+      onPress: () =>
+        showAlert("Bilgi", "Bu özellik yakında eklenecek", "primary"),
     },
   ];
 
@@ -226,7 +246,7 @@ const ProfileScreen = ({ navigation }: any) => {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
+          <ActivityIndicator size="large" color="#4E2B1B" />
           <Text style={styles.loadingText}>
             Kullanıcı bilgileri yükleniyor...
           </Text>
@@ -237,24 +257,20 @@ const ProfileScreen = ({ navigation }: any) => {
 
   return (
     <SafeAreaView style={styles.container}>
-
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Kullanıcı Bilgileri */}
         <View style={styles.userSection}>
           <View style={styles.userInfo}>
             <Text style={styles.userName}>{user.name}</Text>
             <Text style={styles.userEmail}>{user.email}</Text>
-            
           </View>
         </View>
-
-    
 
         {/* Menü Öğeleri */}
         <View style={styles.menuSection}>{menuItems.map(renderMenuItem)}</View>
 
         {/* Ayarlar */}
-        
+
         {/* Çıkış Butonu */}
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutButtonText}>Çıkış Yap</Text>
@@ -266,7 +282,7 @@ const ProfileScreen = ({ navigation }: any) => {
         visible={alertVisible}
         title={alertConfig.title}
         message={alertConfig.message}
-        type={alertConfig.type as 'primary' | 'secondary'}
+        type={alertConfig.type as "primary" | "secondary"}
         onClose={handleAlertClose}
       />
 
@@ -377,7 +393,7 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   backButtonText: {
-    color: "#007AFF",
+    color: "#4E2B1B",
     fontSize: 16,
     fontWeight: "600",
   },
@@ -411,7 +427,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     flexDirection: "row",
     alignItems: "center",
-    shadowColor: 'transparent',
+    shadowColor: "transparent",
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0,
     shadowRadius: 0,
@@ -455,7 +471,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     flexDirection: "row",
     justifyContent: "space-around",
-    shadowColor: 'transparent',
+    shadowColor: "transparent",
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0,
     shadowRadius: 0,
@@ -467,7 +483,7 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#007AFF",
+    color: "#4E2B1B",
     marginBottom: 6,
     fontFamily: "Roboto_500Medium",
   },
@@ -481,7 +497,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF8E1",
     borderRadius: 0,
     marginBottom: 20,
-    shadowColor: 'transparent',
+    shadowColor: "transparent",
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0,
     shadowRadius: 0,
@@ -569,7 +585,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     marginBottom: 20,
-    shadowColor: 'transparent',
+    shadowColor: "transparent",
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0,
     shadowRadius: 0,
@@ -595,7 +611,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     width: "90%",
     maxHeight: "80%",
-    shadowColor: 'transparent',
+    shadowColor: "transparent",
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0,
     shadowRadius: 0,
@@ -635,14 +651,14 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: "#E0E0E0",
     borderRadius: 12,
     padding: 16,
     paddingHorizontal: 16,
     fontSize: 16,
-    backgroundColor: '#FAFAFA',
-    fontFamily: 'Roboto_400Regular',
-    color: '#4E2B1B',
+    backgroundColor: "#FAFAFA",
+    fontFamily: "Roboto_400Regular",
+    color: "#4E2B1B",
   },
   modalFooter: {
     flexDirection: "row",
@@ -658,12 +674,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 6,
     borderWidth: 1,
     borderColor: "#32341f",
-    backgroundColor: '#FFF8E1',
+    backgroundColor: "#FFF8E1",
   },
   modalButtonPrimary: {
     backgroundColor: "#32341f",
     borderColor: "#32341f",
-    shadowColor: 'transparent',
+    shadowColor: "transparent",
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0,
     shadowRadius: 0,
@@ -686,7 +702,7 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     padding: 24,
     marginBottom: 20,
-    shadowColor: 'transparent',
+    shadowColor: "transparent",
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0,
     shadowRadius: 0,

@@ -1,32 +1,47 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useAuth } from '../contexts/AuthContext';
-import Alert from '../components/Alert';
-import * as Google from 'expo-auth-session/providers/google';
-import * as WebBrowser from 'expo-web-browser';
-import { Image } from 'react-native';
-import api from '../services/api';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useAuth } from "../contexts/AuthContext";
+import Alert from "../components/Alert";
+import * as Google from "expo-auth-session/providers/google";
+import * as WebBrowser from "expo-web-browser";
+import { Image } from "react-native";
+import api from "../services/api";
+import Constants from "expo-constants";
+import authService from "../services/auth.service";
+import storageService from "../services/storage.service";
+import * as AuthSession from "expo-auth-session";
 
 WebBrowser.maybeCompleteAuthSession();
 
 const LoginScreen = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertConfig, setAlertConfig] = useState({
-    title: '',
-    message: '',
-    type: 'primary' as 'primary' | 'secondary',
+    title: "",
+    message: "",
+    type: "primary" as "primary" | "secondary",
   });
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  const { login, register } = useAuth();
+  const { login, register, updateUser } = useAuth();
 
-  const showAlert = (title: string, message: string, type: 'primary' | 'secondary' = 'primary') => {
+  const showAlert = (
+    title: string,
+    message: string,
+    type: "primary" | "secondary" = "primary"
+  ) => {
     setAlertConfig({ title, message, type });
     setAlertVisible(true);
   };
@@ -37,24 +52,24 @@ const LoginScreen = () => {
 
   const validateForm = () => {
     if (!email.trim() || !password.trim()) {
-      showAlert('Hata', 'Lütfen tüm alanları doldurun', 'primary');
+      showAlert("Hata", "Lütfen tüm alanları doldurun", "primary");
       return false;
     }
     if (!isLogin && !name.trim()) {
-      showAlert('Hata', 'Lütfen adınızı girin', 'primary');
+      showAlert("Hata", "Lütfen adınızı girin", "primary");
       return false;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      showAlert('Hata', 'Geçerli bir e-posta adresi girin', 'primary');
+      showAlert("Hata", "Geçerli bir e-posta adresi girin", "primary");
       return false;
     }
     if (password.length < 8) {
-      showAlert('Hata', 'Şifre en az 8 karakter olmalıdır', 'primary');
+      showAlert("Hata", "Şifre en az 8 karakter olmalıdır", "primary");
       return false;
     }
     if (!isLogin && (name.length < 2 || name.length > 50)) {
-      showAlert('Hata', 'İsim 2-50 karakter arasında olmalıdır', 'primary');
+      showAlert("Hata", "İsim 2-50 karakter arasında olmalıdır", "primary");
       return false;
     }
     return true;
@@ -71,11 +86,15 @@ const LoginScreen = () => {
         try {
           await login(email, password);
         } catch (loginError) {
-          showAlert('Bilgi', 'Kayıt başarılı, ancak otomatik giriş yapılamadı. Lütfen giriş yapın.', 'primary');
+          showAlert(
+            "Bilgi",
+            "Kayıt başarılı, ancak otomatik giriş yapılamadı. Lütfen giriş yapın.",
+            "primary"
+          );
         }
       }
     } catch (error: any) {
-      showAlert('Hata', error.message || 'Bir hata oluştu', 'primary');
+      showAlert("Hata", error.message || "Bir hata oluştu", "primary");
     } finally {
       setLoading(false);
     }
@@ -83,21 +102,23 @@ const LoginScreen = () => {
 
   const toggleMode = () => {
     setIsLogin(!isLogin);
-    setEmail('');
-    setPassword('');
-    setName('');
+    setEmail("");
+    setPassword("");
+    setName("");
   };
 
-  // Google Auth Session
+  const redirectUri = AuthSession.makeRedirectUri();
+
   const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId: 'GOOGLE_CLIENT_ID.apps.googleusercontent.com',
-    iosClientId: 'IOS_CLIENT_ID.apps.googleusercontent.com',
-    androidClientId: 'ANDROID_CLIENT_ID.apps.googleusercontent.com',
-    webClientId: 'WEB_CLIENT_ID.apps.googleusercontent.com',
+    clientId: Constants.expoConfig?.extra?.GOOGLE_CLIENT_ID,
+    iosClientId: Constants.expoConfig?.extra?.GOOGLE_IOS_CLIENT_ID,
+    androidClientId: Constants.expoConfig?.extra?.GOOGLE_ANDROID_CLIENT_ID,
+    webClientId: Constants.expoConfig?.extra?.GOOGLE_WEB_CLIENT_ID,
+    redirectUri,
   });
 
   useEffect(() => {
-    if (response?.type === 'success') {
+    if (response?.type === "success") {
       const { idToken } = response.authentication || {};
       if (idToken) {
         handleGoogleLogin(idToken);
@@ -108,11 +129,26 @@ const LoginScreen = () => {
   const handleGoogleLogin = async (idToken: string) => {
     setGoogleLoading(true);
     try {
-      const res = await api.post('/auth/google-mobile', { idToken });
-      // JWT'yi kaydet, login işlemi yap
-      await login(res.data.user.email, 'google'); // Şifre 'google' olarak set edildiği için
+      const res = await api.post("/auth/google-mobile", { idToken });
+      const { access_token, user } = res.data;
+
+      // Token ve kullanıcıyı storage'a kaydet
+      await storageService.setAuthToken(access_token);
+      await storageService.setUserData(user);
+
+      // Token'ı API header'ına set et
+      authService.setAuthToken(access_token);
+
+      // Kullanıcıyı context'e yaz
+      updateUser(user);
     } catch (error: any) {
-      showAlert('Hata', error.message || 'Google ile giriş başarısız', 'primary');
+      showAlert(
+        "Hata",
+        error.response?.data?.message ||
+          error.message ||
+          "Google ile giriş başarısız",
+        "primary"
+      );
     } finally {
       setGoogleLoading(false);
     }
@@ -123,24 +159,24 @@ const LoginScreen = () => {
       <View style={styles.content}>
         {/* Logo ve Başlık */}
         <View style={styles.header}>
-          <Image 
-            source={require('../assets/icon/Lexify_icon.png')} 
-            style={{ 
-              width: 80, 
-              height: 80, 
-              marginBottom: 12, 
-              borderRadius: 24, 
-              backgroundColor: '#FFF8E1',
-              shadowColor: '#000',
+          <Image
+            source={require("../assets/icon/Lexify_icon.png")}
+            style={{
+              width: 80,
+              height: 80,
+              marginBottom: 12,
+              borderRadius: 24,
+              backgroundColor: "#FFF8E1",
+              shadowColor: "#000",
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.12,
               shadowRadius: 8,
-              alignSelf: 'center',
-            }} 
+              alignSelf: "center",
+            }}
           />
           <Text style={styles.title}>Lexify</Text>
           <Text style={styles.subtitle}>
-            {isLogin ? 'Hesabınıza giriş yapın' : 'Yeni hesap oluşturun'}
+            {isLogin ? "Hesabınıza giriş yapın" : "Yeni hesap oluşturun"}
           </Text>
         </View>
         {/* Form */}
@@ -189,8 +225,11 @@ const LoginScreen = () => {
               <Text style={styles.forgotPasswordText}>Şifremi unuttum</Text>
             </TouchableOpacity>
           )}
-          <TouchableOpacity 
-            style={[styles.submitButton, loading && styles.submitButtonDisabled]} 
+          <TouchableOpacity
+            style={[
+              styles.submitButton,
+              loading && styles.submitButtonDisabled,
+            ]}
             onPress={handleSubmit}
             disabled={loading}
           >
@@ -198,7 +237,7 @@ const LoginScreen = () => {
               <ActivityIndicator color="#FFF8E1" />
             ) : (
               <Text style={styles.submitButtonText}>
-                {isLogin ? 'Giriş Yap' : 'Kayıt Ol'}
+                {isLogin ? "Giriş Yap" : "Kayıt Ol"}
               </Text>
             )}
           </TouchableOpacity>
@@ -206,18 +245,22 @@ const LoginScreen = () => {
         {/* Alt Bağlantı */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            {isLogin ? 'Hesabınız yok mu?' : 'Zaten hesabınız var mı?'}
+            {isLogin ? "Hesabınız yok mu?" : "Zaten hesabınız var mı?"}
           </Text>
           <TouchableOpacity onPress={toggleMode} disabled={loading}>
             <Text style={styles.footerLink}>
-              {isLogin ? 'Kayıt olun' : 'Giriş yapın'}
+              {isLogin ? "Kayıt olun" : "Giriş yapın"}
             </Text>
           </TouchableOpacity>
         </View>
         {/* Sosyal Giriş */}
         <View style={styles.socialContainer}>
           <Text style={styles.socialText}>veya</Text>
-          <TouchableOpacity style={styles.socialButton} disabled={loading || googleLoading} onPress={() => promptAsync()}>
+          <TouchableOpacity
+            style={styles.socialButton}
+            disabled={loading || googleLoading}
+            onPress={() => promptAsync()}
+          >
             {googleLoading ? (
               <ActivityIndicator color="#4E2B1B" />
             ) : (
@@ -231,7 +274,7 @@ const LoginScreen = () => {
         visible={alertVisible}
         title={alertConfig.title}
         message={alertConfig.message}
-        type={alertConfig.type as 'primary' | 'secondary'}
+        type={alertConfig.type as "primary" | "secondary"}
         onClose={handleCloseAlert}
       />
     </SafeAreaView>
@@ -241,15 +284,15 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF8E1',
+    backgroundColor: "#FFF8E1",
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     padding: 20,
   },
   header: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 36,
   },
   logo: {
@@ -258,23 +301,23 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
-    color: '#4E2B1B',
+    fontWeight: "bold",
+    color: "#4E2B1B",
     marginBottom: 8,
-    fontFamily: 'Lobster_400Regular',
+    fontFamily: "Lobster_400Regular",
   },
   subtitle: {
     fontSize: 16,
-    color: '#4E2B1B',
-    textAlign: 'center',
-    fontFamily: 'Roboto_400Regular',
+    color: "#4E2B1B",
+    textAlign: "center",
+    fontFamily: "Roboto_400Regular",
   },
   form: {
     marginBottom: 24,
-    backgroundColor: '#FFF8E1',
+    backgroundColor: "#FFF8E1",
     borderRadius: 16,
     padding: 20,
-    shadowColor: 'transparent',
+    shadowColor: "transparent",
     elevation: 0,
   },
   inputContainer: {
@@ -282,90 +325,90 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#4E2B1B',
+    fontWeight: "600",
+    color: "#4E2B1B",
     marginBottom: 7,
-    fontFamily: 'Roboto_500Medium',
+    fontFamily: "Roboto_500Medium",
   },
   input: {
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: "#E0E0E0",
     borderRadius: 12,
     padding: 15,
     fontSize: 16,
-    backgroundColor: '#FAFAFA',
-    color: '#4E2B1B',
-    fontFamily: 'Roboto_400Regular',
+    backgroundColor: "#FAFAFA",
+    color: "#4E2B1B",
+    fontFamily: "Roboto_400Regular",
   },
   forgotPassword: {
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
     marginBottom: 18,
   },
   forgotPasswordText: {
-    color: '#007AFF',
+    color: "#4E2B1B",
     fontSize: 14,
-    fontFamily: 'Roboto_400Regular',
+    fontFamily: "Roboto_400Regular",
   },
   submitButton: {
-    backgroundColor: '#32341f',
+    backgroundColor: "#32341f",
     padding: 15,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 8,
-    shadowColor: 'transparent',
+    shadowColor: "transparent",
     elevation: 0,
   },
   submitButtonDisabled: {
-    backgroundColor: '#ccc',
+    backgroundColor: "#ccc",
   },
   submitButtonText: {
-    color: '#FFF8E1',
+    color: "#FFF8E1",
     fontSize: 16,
-    fontWeight: '600',
-    fontFamily: 'Roboto_500Medium',
+    fontWeight: "600",
+    fontFamily: "Roboto_500Medium",
   },
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 18,
   },
   footerText: {
-    color: '#4E2B1B',
+    color: "#4E2B1B",
     fontSize: 14,
-    fontFamily: 'Roboto_400Regular',
+    fontFamily: "Roboto_400Regular",
   },
   footerLink: {
-    color: '#007AFF',
+    color: "#4E2B1B",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     marginLeft: 5,
-    fontFamily: 'Roboto_500Medium',
+    fontFamily: "Roboto_500Medium",
   },
   socialContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 8,
   },
   socialText: {
-    color: '#4E2B1B',
+    color: "#4E2B1B",
     fontSize: 14,
     marginBottom: 12,
-    fontFamily: 'Roboto_400Regular',
+    fontFamily: "Roboto_400Regular",
   },
   socialButton: {
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: "#E0E0E0",
     borderRadius: 12,
     padding: 15,
-    backgroundColor: '#FAFAFA',
-    width: '100%',
-    alignItems: 'center',
+    backgroundColor: "#FAFAFA",
+    width: "100%",
+    alignItems: "center",
   },
   socialButtonText: {
-    color: '#4E2B1B',
+    color: "#4E2B1B",
     fontSize: 16,
-    fontWeight: '500',
-    fontFamily: 'Roboto_500Medium',
+    fontWeight: "500",
+    fontFamily: "Roboto_500Medium",
   },
 });
 

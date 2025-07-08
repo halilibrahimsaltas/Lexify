@@ -1,9 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import dictionaryService from '../services/dictionary.service';
-import wordService from '../services/word.service';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  FlatList,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import dictionaryService from "../services/dictionary.service";
+import wordService from "../services/word.service";
 
 interface Word {
   id: string;
@@ -15,13 +24,17 @@ interface Word {
 }
 
 const DictionaryScreen = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [words, setWords] = useState<Word[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [stats, setStats] = useState<any>(null);
   const [addingId, setAddingId] = useState<string | null>(null);
   const [alertVisible, setAlertVisible] = useState(false);
-  const [alertConfig, setAlertConfig] = useState({ title: '', message: '', type: 'primary' as 'primary' | 'secondary' });
+  const [alertConfig, setAlertConfig] = useState({
+    title: "",
+    message: "",
+    type: "primary" as "primary" | "secondary",
+  });
 
   useEffect(() => {
     loadDictionaryStats();
@@ -32,7 +45,7 @@ const DictionaryScreen = () => {
       const statsData = await dictionaryService.getDictionaryStats();
       setStats(statsData);
     } catch (error) {
-      console.error('Sözlük istatistikleri yüklenemedi:', error);
+      console.error("Sözlük istatistikleri yüklenemedi:", error);
     }
   };
 
@@ -44,10 +57,13 @@ const DictionaryScreen = () => {
 
     setIsLoading(true);
     try {
-      const result = await dictionaryService.searchWords({ query: query.trim(), limit: 50 });
+      const result = await dictionaryService.searchWords({
+        query: query.trim(),
+        limit: 50,
+      });
       setWords(result.words);
     } catch (error) {
-      Alert.alert('Hata', 'Kelime arama başarısız');
+      Alert.alert("Hata", "Kelime arama başarısız");
       setWords([]);
     } finally {
       setIsLoading(false);
@@ -64,7 +80,11 @@ const DictionaryScreen = () => {
     return () => clearTimeout(timeoutId);
   };
 
-  const showAlert = (title: string, message: string, type: 'primary' | 'secondary' = 'primary') => {
+  const showAlert = (
+    title: string,
+    message: string,
+    type: "primary" | "secondary" = "primary"
+  ) => {
     setAlertConfig({ title, message, type });
     setAlertVisible(true);
   };
@@ -76,11 +96,11 @@ const DictionaryScreen = () => {
         originalText: item.word,
         translatedText: item.translation,
         sourceLanguage: item.language,
-        targetLanguage: 'tr', // veya uygun hedef dil
+        targetLanguage: "tr", // veya uygun hedef dil
       });
-      showAlert('Başarılı', 'Kelime favorilere eklendi', 'primary');
+      showAlert("Başarılı", "Kelime favorilere eklendi", "primary");
     } catch (error) {
-      showAlert('Hata', 'Kelime eklenemedi', 'primary');
+      showAlert("Hata", "Kelime eklenemedi", "primary");
     } finally {
       setAddingId(null);
     }
@@ -105,7 +125,9 @@ const DictionaryScreen = () => {
       </View>
       <Text style={styles.translationText}>{item.translation}</Text>
       {item.category && (
-        <Text style={styles.categoryText}>{item.category} • {item.type}</Text>
+        <Text style={styles.categoryText}>
+          {item.category} • {item.type}
+        </Text>
       )}
     </View>
   );
@@ -125,10 +147,12 @@ const DictionaryScreen = () => {
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
       {isLoading ? (
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" color="#4E2B1B" />
       ) : (
         <Text style={styles.emptyText}>
-          {searchQuery ? 'Arama sonucu bulunamadı' : 'Kelime aramak için yazmaya başlayın'}
+          {searchQuery
+            ? "Arama sonucu bulunamadı"
+            : "Kelime aramak için yazmaya başlayın"}
         </Text>
       )}
     </View>
@@ -136,7 +160,6 @@ const DictionaryScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-  
       <TextInput
         style={styles.searchInput}
         placeholder="Kelime ara..."
@@ -155,18 +178,33 @@ const DictionaryScreen = () => {
         style={styles.wordList}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={renderEmpty}
-        contentContainerStyle={words.length === 0 ? styles.emptyListContainer : undefined}
+        contentContainerStyle={
+          words.length === 0 ? styles.emptyListContainer : undefined
+        }
       />
 
-    {/* Custom Alert Component */}
-    {alertVisible && (
-      <View style={{ position: 'absolute', left: 0, right: 0, bottom: 40, alignItems: 'center', zIndex: 100 }}>
-        <View style={{ backgroundColor: '#32341f', padding: 12, borderRadius: 8 }}>
-          <Text style={{ color: '#FFF8E1', fontWeight: 'bold' }}>{alertConfig.title}</Text>
-          <Text style={{ color: '#FFF8E1' }}>{alertConfig.message}</Text>
+      {/* Custom Alert Component */}
+      {alertVisible && (
+        <View
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: 40,
+            alignItems: "center",
+            zIndex: 100,
+          }}
+        >
+          <View
+            style={{ backgroundColor: "#32341f", padding: 12, borderRadius: 8 }}
+          >
+            <Text style={{ color: "#FFF8E1", fontWeight: "bold" }}>
+              {alertConfig.title}
+            </Text>
+            <Text style={{ color: "#FFF8E1" }}>{alertConfig.message}</Text>
+          </View>
         </View>
-      </View>
-    )}
+      )}
     </SafeAreaView>
   );
 };
@@ -174,43 +212,43 @@ const DictionaryScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF8E1',
+    backgroundColor: "#FFF8E1",
   },
   headerContainer: {
     padding: 24,
-    backgroundColor: '#FFF8E1',
+    backgroundColor: "#FFF8E1",
     borderBottomWidth: 1,
-    borderBottomColor: '#F7C873',
+    borderBottomColor: "#F7C873",
   },
   title: {
     fontSize: 26,
-    fontWeight: 'bold',
-    color: '#4B3F2F',
+    fontWeight: "bold",
+    color: "#4B3F2F",
     marginBottom: 8,
-    fontFamily: 'Roboto_500Medium',
+    fontFamily: "Roboto_500Medium",
   },
   statsContainer: {
     marginTop: 8,
   },
   statsText: {
     fontSize: 15,
-    color: '#666',
-    fontFamily: 'Roboto_400Regular',
+    color: "#666",
+    fontFamily: "Roboto_400Regular",
   },
   searchContainer: {
     padding: 20,
-    backgroundColor: '#FFF8E1',
+    backgroundColor: "#FFF8E1",
   },
   searchWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "white",
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderWidth: 2,
-    borderColor: '#F7C873',
-    shadowColor: '#000',
+    borderColor: "#F7C873",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -219,15 +257,15 @@ const styles = StyleSheet.create({
   searchIcon: {
     fontSize: 18,
     marginRight: 12,
-    color: '#666',
+    color: "#666",
   },
   searchInput: {
-    width: '100%',
+    width: "100%",
     fontSize: 18,
-    color: '#333',
-    fontFamily: 'Roboto_400Regular',
-    backgroundColor: '#FCFCFC',
-    borderColor: 'transparent',
+    color: "#333",
+    fontFamily: "Roboto_400Regular",
+    backgroundColor: "#FCFCFC",
+    borderColor: "transparent",
     borderWidth: 0,
     borderRadius: 16,
     paddingHorizontal: 16,
@@ -239,15 +277,15 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#f0f0f0",
+    justifyContent: "center",
+    alignItems: "center",
     marginLeft: 8,
   },
   clearButtonText: {
     fontSize: 14,
-    color: '#666',
-    fontWeight: 'bold',
+    color: "#666",
+    fontWeight: "bold",
   },
   wordList: {
     flex: 1,
@@ -255,23 +293,23 @@ const styles = StyleSheet.create({
   },
   emptyListContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingVertical: 60,
   },
   emptyText: {
     fontSize: 17,
-    color: '#666',
-    textAlign: 'center',
-    fontFamily: 'Roboto_400Regular',
+    color: "#666",
+    textAlign: "center",
+    fontFamily: "Roboto_400Regular",
   },
   wordItem: {
-    backgroundColor: '#FFF8E1',
+    backgroundColor: "#FFF8E1",
     borderRadius: 0,
     elevation: 0,
     paddingVertical: 12,
@@ -279,61 +317,61 @@ const styles = StyleSheet.create({
     marginBottom: 0,
     marginHorizontal: 0,
     borderWidth: 0,
-    shadowColor: 'transparent',
-    width: '100%',
-    minWidth: '100%',
-    maxWidth: '100%',
+    shadowColor: "transparent",
+    width: "100%",
+    minWidth: "100%",
+    maxWidth: "100%",
   },
   wordContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 8,
   },
   wordText: {
     fontSize: 17,
-    fontWeight: '700',
-    color: '#4E2B1B',
+    fontWeight: "700",
+    color: "#4E2B1B",
     flex: 1,
     marginRight: 8,
-    textAlign: 'left',
+    textAlign: "left",
   },
   languageTag: {
-    backgroundColor: '#32341f',
-    color: '#FFF8E1',
+    backgroundColor: "#32341f",
+    color: "#FFF8E1",
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 8,
     fontSize: 12,
-    fontWeight: '600',
-    fontFamily: 'Roboto_500Medium',
+    fontWeight: "600",
+    fontFamily: "Roboto_500Medium",
   },
   translationText: {
-    color: '#4E2B1B',
+    color: "#4E2B1B",
     fontSize: 14,
     marginTop: 2,
-    textAlign: 'left',
-    fontFamily: 'Roboto_400Regular',
+    textAlign: "left",
+    fontFamily: "Roboto_400Regular",
   },
   categoryText: {
     fontSize: 12,
-    color: '#4E2B1B',
+    color: "#4E2B1B",
     marginTop: 2,
-    textAlign: 'left',
-    fontFamily: 'Roboto_400Regular',
+    textAlign: "left",
+    fontFamily: "Roboto_400Regular",
   },
   addButton: {
     marginLeft: 8,
     borderWidth: 1,
-    borderColor: '#32341f',
+    borderColor: "#32341f",
     borderRadius: 8,
     padding: 2,
-    backgroundColor: 'transparent',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "transparent",
+    alignItems: "center",
+    justifyContent: "center",
     width: 28,
     height: 28,
   },
 });
 
-export default DictionaryScreen; 
+export default DictionaryScreen;

@@ -167,7 +167,7 @@ const BooksScreen = ({ navigation }: any) => {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
+          <ActivityIndicator size="large" color="#4E2B1B" />
           <Text style={styles.loadingText}>Kitaplar yükleniyor...</Text>
         </View>
       </SafeAreaView>

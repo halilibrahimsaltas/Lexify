@@ -7,6 +7,9 @@ import React, {
 } from "react";
 import authService from "../services/auth.service";
 import { StoredUserData } from "../services/storage.service";
+import * as AuthSession from "expo-auth-session";
+import * as Google from "expo-auth-session/providers/google";
+import Constants from "expo-constants";
 
 interface AuthContextType {
   user: StoredUserData | null;
@@ -99,6 +102,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const updateUser = (userData: StoredUserData) => {
     setUser(userData);
   };
+
+  const redirectUri = AuthSession.makeRedirectUri();
+
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    clientId: Constants.expoConfig?.extra?.GOOGLE_CLIENT_ID,
+    iosClientId: Constants.expoConfig?.extra?.GOOGLE_IOS_CLIENT_ID,
+    androidClientId: Constants.expoConfig?.extra?.GOOGLE_ANDROID_CLIENT_ID,
+    webClientId: Constants.expoConfig?.extra?.GOOGLE_WEB_CLIENT_ID,
+    redirectUri,
+  });
 
   const value: AuthContextType = {
     user,
