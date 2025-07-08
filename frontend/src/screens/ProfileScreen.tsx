@@ -212,8 +212,7 @@ const ProfileScreen = ({ navigation }: any) => {
       title: "Ayarlar",
       subtitle: "Uygulama ayarlarını düzenleyin",
       icon: <Feather name="settings" size={26} color="#FFF8E1" />,
-      onPress: () =>
-        showAlert("Bilgi", "Bu özellik yakında eklenecek", "primary"),
+      onPress: () => navigation.navigate("MainDrawer", { screen: "Ayarlar" }),
     },
     {
       id: "7",

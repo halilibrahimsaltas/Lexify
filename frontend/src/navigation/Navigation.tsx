@@ -27,6 +27,7 @@ import LoadingScreen from "../components/LoadingScreen";
 import DictionaryScreen from "../screens/DictionaryScreen";
 import EditBookScreen from "../screens/EditBookScreen";
 import FeedbackScreen from "../screens/FeedbackScreen";
+import SettingsScreen from "../screens/SettingsScreen";
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -109,7 +110,7 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
           icon={({ size }) => (
             <Feather name="settings" size={size} color="#4E2B1B" />
           )}
-          onPress={() => {}}
+          onPress={() => props.navigation.navigate("Ayarlar")}
           labelStyle={styles.menuLabel}
         />
         <DrawerItem
@@ -168,6 +169,7 @@ const DrawerNavigator = () => (
     <Drawer.Screen name="Favori Kelimeler" component={SavedWordsScreen} />
     <Drawer.Screen name="Sözlük" component={DictionaryScreen} />
     <Drawer.Screen name="Profil" component={ProfileScreen} />
+    <Drawer.Screen name="Ayarlar" component={SettingsScreen} />
     <Drawer.Screen name="Çıkış Yap" component={LogoutScreen} />
     <Drawer.Screen name="Geri Bildirim Gönder" component={FeedbackScreen} />
   </Drawer.Navigator>
