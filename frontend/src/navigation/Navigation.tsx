@@ -26,6 +26,7 @@ import LogoutScreen from "../screens/LogoutScreen";
 import LoadingScreen from "../components/LoadingScreen";
 import DictionaryScreen from "../screens/DictionaryScreen";
 import EditBookScreen from "../screens/EditBookScreen";
+import FeedbackScreen from "../screens/FeedbackScreen";
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -116,8 +117,9 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
           icon={({ size }) => (
             <Feather name="message-square" size={size} color="#4E2B1B" />
           )}
-          onPress={() => {}}
+          onPress={() => props.navigation.navigate("Geri Bildirim Gönder")}
           labelStyle={styles.menuLabel}
+          focused={activeRoute === "Geri Bildirim Gönder"}
         />
         <DrawerItem
           label="Çıkış Yap"
@@ -142,7 +144,7 @@ const DrawerNavigator = () => (
       swipeEnabled: true,
       headerTitle: route.name, // Aktif sayfa adı
       headerStyle: {
-        backgroundColor: "#FFF8E1",
+        backgroundColor: "rgb(248, 204, 123)",
       },
       headerTintColor: "#4E2B1B",
       headerTitleStyle: {
@@ -153,7 +155,7 @@ const DrawerNavigator = () => (
       },
       drawerActiveTintColor: "#4E2B1B",
       drawerInactiveTintColor: "#4E2B1B",
-      drawerActiveBackgroundColor: "#F7C873",
+      drawerActiveBackgroundColor: "rgb(248, 204, 123)",
       drawerStyle: {
         backgroundColor: "#FFF8E1",
         width: 280,
@@ -167,6 +169,7 @@ const DrawerNavigator = () => (
     <Drawer.Screen name="Sözlük" component={DictionaryScreen} />
     <Drawer.Screen name="Profil" component={ProfileScreen} />
     <Drawer.Screen name="Çıkış Yap" component={LogoutScreen} />
+    <Drawer.Screen name="Geri Bildirim Gönder" component={FeedbackScreen} />
   </Drawer.Navigator>
 );
 

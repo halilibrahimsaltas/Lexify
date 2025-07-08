@@ -11,6 +11,7 @@ import { DictionaryModule } from './dictionary/dictionary.module';
 import { BookModule } from './book/book.module';
 import { FileModule } from './file/file.module';
 import { BookProgressModule } from './book-progress/book-progress.module';
+import { FeedbackModule } from './feedback/feedback.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { BookProgressModule } from './book-progress/book-progress.module';
     BookModule,
     FileModule,
     BookProgressModule,
+    FeedbackModule,
   ],
   controllers: [AppController],
   providers: [AppService],

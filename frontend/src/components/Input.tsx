@@ -1,5 +1,12 @@
-import React from 'react';
-import { View, Text, TextInput, StyleSheet, ViewStyle, TextStyle } from 'react-native';
+import React from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  ViewStyle,
+  TextStyle,
+} from "react-native";
 
 interface InputProps {
   label?: string;
@@ -7,8 +14,8 @@ interface InputProps {
   value: string;
   onChangeText: (text: string) => void;
   secureTextEntry?: boolean;
-  keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
-  autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
+  keyboardType?: "default" | "email-address" | "numeric" | "phone-pad";
+  autoCapitalize?: "none" | "sentences" | "words" | "characters";
   autoCorrect?: boolean;
   multiline?: boolean;
   numberOfLines?: number;
@@ -24,8 +31,8 @@ const Input: React.FC<InputProps> = ({
   value,
   onChangeText,
   secureTextEntry = false,
-  keyboardType = 'default',
-  autoCapitalize = 'sentences',
+  keyboardType = "default",
+  autoCapitalize = "sentences",
   autoCorrect = true,
   multiline = false,
   numberOfLines = 1,
@@ -55,7 +62,7 @@ const Input: React.FC<InputProps> = ({
         multiline={multiline}
         numberOfLines={numberOfLines}
         editable={!disabled}
-        textAlignVertical={multiline ? 'top' : 'center'}
+        textAlignVertical={multiline ? "top" : "center"}
       />
       {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
@@ -68,36 +75,36 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#4E2B1B',
+    fontWeight: "600",
+    color: "#4E2B1B",
     marginBottom: 8,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: "#E0E0E0",
     borderRadius: 10,
     paddingVertical: 15,
     paddingHorizontal: 16,
     fontSize: 16,
-    backgroundColor: '#FAFAFA',
-    color: '#4E2B1B',
+    backgroundColor: "#FAFAFA",
+    color: "#4E2B1B",
   },
   multilineInput: {
     minHeight: 100,
-    textAlignVertical: 'top',
+    textAlignVertical: "top",
   },
   inputError: {
-    borderColor: '#FF3B30',
+    borderColor: "#FF3B30",
   },
   inputDisabled: {
-    backgroundColor: '#f5f5f5',
-    color: '#999',
+    backgroundColor: "#f5f5f5",
+    color: "#999",
   },
   errorText: {
-    color: '#4E2B1B',
+    color: "#4E2B1B",
     fontSize: 14,
     marginTop: 4,
   },
 });
 
-export default Input; 
+export default Input;

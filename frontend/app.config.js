@@ -15,7 +15,8 @@ export default {
       backgroundColor: '#ffffff',
     },
     plugins: [
-      "expo-font"
+      "expo-font",
+      "expo-mail-composer"
     ],
     assetBundlePatterns: ['**/*'],
     ios: {

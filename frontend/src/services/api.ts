@@ -36,3 +36,8 @@ api.interceptors.response.use(
 );
 
 export default api;
+
+// Feedback gönderme servisi
+export const postFeedback = async (subject: string, body: string) => {
+  return api.post("/feedback", { subject, body });
+};
