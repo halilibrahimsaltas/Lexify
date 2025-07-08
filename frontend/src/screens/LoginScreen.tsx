@@ -19,6 +19,7 @@ import authService from "../services/auth.service";
 import storageService from "../services/storage.service";
 import * as AuthSession from "expo-auth-session";
 import { useLanguage } from "../contexts/LanguageContext";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -269,9 +270,23 @@ const LoginScreen = () => {
             {googleLoading ? (
               <ActivityIndicator color="#4E2B1B" />
             ) : (
-              <Text style={styles.socialButtonText}>
-                {t("continue_with_google")}
-              </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <FontAwesome
+                  name="google"
+                  size={20}
+                  color="#EA4335"
+                  style={{ marginRight: 8 }}
+                />
+                <Text style={styles.socialButtonText}>
+                  {t("continue_with_google")}
+                </Text>
+              </View>
             )}
           </TouchableOpacity>
         </View>
