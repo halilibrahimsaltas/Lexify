@@ -1,9 +1,10 @@
-import React, { useCallback } from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { AuthProvider } from './contexts/AuthContext';
-import AppContent from './AppContent';
-import { useRobotoFonts } from './hooks/useFonts';
+import React, { useCallback } from "react";
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { AuthProvider } from "./contexts/AuthContext";
+import AppContent from "./AppContent";
+import { useRobotoFonts } from "./hooks/useFonts";
+import { LanguageProvider } from "./contexts/LanguageContext";
 
 export default function App() {
   const fontsLoaded = useRobotoFonts();
@@ -17,10 +18,12 @@ export default function App() {
   if (!fontsLoaded) return null;
   return (
     <SafeAreaProvider>
-      <AuthProvider>
-        <AppContent />
-        <StatusBar style="dark" /> {/* Tema rengine göre ayarlanabilir */}
-      </AuthProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <AppContent />
+          <StatusBar style="dark" /> {/* Tema rengine göre ayarlanabilir */}
+        </AuthProvider>
+      </LanguageProvider>
     </SafeAreaProvider>
   );
 }

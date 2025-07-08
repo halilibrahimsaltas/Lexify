@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import translationService from "../services/translation.service";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 const SCREEN_WIDTH = Dimensions.get("window").width;
@@ -34,6 +35,7 @@ const WordSelector: React.FC<WordSelectorProps> = ({
   const [alternatives, setAlternatives] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (visible && selectedWord) {
@@ -66,7 +68,7 @@ const WordSelector: React.FC<WordSelectorProps> = ({
       }
       setAlternatives(allAlternatives);
     } catch (error) {
-      Alert.alert("Hata", "Çeviri yapılırken bir hata oluştu");
+      Alert.alert(t("error"), t("translation_error"));
       setAlternatives([]);
     } finally {
       setIsLoading(false);
@@ -80,7 +82,7 @@ const WordSelector: React.FC<WordSelectorProps> = ({
         onClose();
       } else {
         // Sadece fallback için Alert, normalde Toast üst parent'ta gösterilecek
-        Alert.alert("Başarılı", "Kelime kaydedildi");
+        Alert.alert(t("success"), t("word_saved"));
         onClose();
       }
     }
@@ -147,7 +149,7 @@ const WordSelector: React.FC<WordSelectorProps> = ({
                       {current ? (
                         <Text>{current.translation}</Text>
                       ) : (
-                        <Text>Çeviri bulunamadı</Text>
+                        <Text>{t("translation_not_found")}</Text>
                       )}
                     </Text>
                     {current && (current.category || current.type) ? (
@@ -181,12 +183,12 @@ const WordSelector: React.FC<WordSelectorProps> = ({
                 {/* Kaydet Butonu */}
                 {current &&
                   current.translation &&
-                  current.translation !== "Çeviri bulunamadı" && (
+                  current.translation !== t("translation_not_found") && (
                     <TouchableOpacity
                       style={styles.saveButton}
                       onPress={handleSaveWord}
                     >
-                      <Text style={styles.saveButtonText}>Kaydet</Text>
+                      <Text style={styles.saveButtonText}>{t("save")}</Text>
                     </TouchableOpacity>
                   )}
               </View>

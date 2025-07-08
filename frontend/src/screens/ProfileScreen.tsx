@@ -17,6 +17,7 @@ import { useAuth } from "../contexts/AuthContext";
 import userService, { User, UpdateUserRequest } from "../services/user.service";
 import wordService, { Word } from "../services/word.service";
 import Toast from "../components/Toast";
+import { useLanguage } from "../contexts/LanguageContext";
 // @ts-ignore (MaterialCommunityIcons, Feather, Ionicons importlarının üstüne).
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 // @ts-ignore (MaterialCommunityIcons, Feather, Ionicons importlarının üstüne).
@@ -54,6 +55,7 @@ const ProfileScreen = ({ navigation }: any) => {
   const [toastType, setToastType] = useState<"success" | "error" | "info">(
     "success"
   );
+  const { t } = useLanguage();
 
   const showAlert = (
     title: string,
@@ -116,8 +118,8 @@ const ProfileScreen = ({ navigation }: any) => {
     if (!user) return;
 
     if (editForm.password !== editForm.passwordRepeat) {
-      showAlert("Hata", "Parolalar eşleşmiyor", "error");
-      showToast("Parolalar eşleşmiyor", "error");
+      showAlert(t("error"), t("passwords_do_not_match"), "error");
+      showToast(t("passwords_do_not_match"), "error");
       return;
     }
 
@@ -126,8 +128,8 @@ const ProfileScreen = ({ navigation }: any) => {
     if (editForm.password.trim()) updateData.password = editForm.password;
 
     if (Object.keys(updateData).length === 0) {
-      showAlert("Bilgi", "Değişiklik yapılmadı", "primary");
-      showToast("Değişiklik yapılmadı", "info");
+      showAlert(t("info"), t("no_changes"), "primary");
+      showToast(t("no_changes"), "info");
       return;
     }
 
@@ -141,64 +143,57 @@ const ProfileScreen = ({ navigation }: any) => {
         role: updatedUser.role,
       });
       setEditModalVisible(false);
-      showAlert("Başarılı", "Profil güncellendi", "primary");
-      showToast("Profil başarıyla güncellendi", "success");
+      showAlert(t("success"), t("profile_updated"), "primary");
+      showToast(t("profile_updated_success"), "success");
     } catch (error: any) {
-      showAlert("Hata", error.message, "primary");
-      showToast(error.message || "Bir hata oluştu", "error");
+      showAlert(t("error"), error.message, "primary");
+      showToast(error.message || t("something_went_wrong"), "error");
     } finally {
       setEditLoading(false);
     }
   };
 
   const handleLogout = async () => {
-    // Onay alerti göster
     setAlertConfig({
-      title: "Çıkış Yap",
-      message: "Çıkış yapmak istediğinizden emin misiniz?",
+      title: t("logout"),
+      message: t("logout_confirm"),
       type: "secondary",
     });
     setAlertVisible(true);
-    // onClose fonksiyonunda onaylanırsa çıkış işlemini başlat
-    // Alert componentinde onay butonu yoksa, burada custom bir modal ile onay alabilirsin
-    // Şimdilik doğrudan çıkış işlemini yapalım (kullanıcıdan onay alınmadan)
-    // Eğer Alert componentinde onay butonu varsa, oraya taşıyabilirsin
   };
 
-  // Alert kapandığında çıkış işlemini başlat
   const handleAlertClose = async (confirmed?: boolean) => {
     setAlertVisible(false);
-    if (alertConfig.title === "Çıkış Yap" && confirmed !== false) {
+    if (alertConfig.title === t("logout") && confirmed !== false) {
       await logout();
-      showToast("Çıkış yapıldı", "success");
+      showToast(t("logout_done"), "success");
     }
   };
 
   const menuItems = [
     {
       id: "1",
-      title: "Hesap Bilgileri",
-      subtitle: "Kişisel bilgilerinizi düzenleyin",
+      title: t("account_info"),
+      subtitle: t("edit_personal_info"),
       icon: <Feather name="user" size={26} color="#FFF8E1" />,
       onPress: () => setEditModalVisible(true),
     },
     {
       id: "2",
-      title: "Kitaplarım",
-      subtitle: "Eklediğiniz kitapları görüntüleyin",
+      title: t("books"),
+      subtitle: t("view_added_books"),
       icon: (
         <MaterialCommunityIcons name="bookshelf" size={26} color="#FFF8E1" />
       ),
-      onPress: () =>
-        navigation.navigate("MainDrawer", { screen: "Kitaplarım" }),
+      onPress: () => navigation.navigate("MainDrawer", { screen: t("books") }),
     },
     {
       id: "3",
-      title: "Favori Kelimeler",
-      subtitle: "Kaydettiğiniz kelimeleri görün",
+      title: t("saved_words"),
+      subtitle: t("view_saved_words"),
       icon: <Feather name="star" size={26} color="#FFF8E1" />,
       onPress: () =>
-        navigation.navigate("MainDrawer", { screen: "Favori Kelimeler" }),
+        navigation.navigate("MainDrawer", { screen: t("saved_words") }),
     },
     {
       id: "4",

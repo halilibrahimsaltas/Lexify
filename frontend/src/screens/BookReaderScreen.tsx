@@ -16,6 +16,7 @@ import WordSelector from "../components/WordSelector";
 import { Book } from "../types";
 import bookService from "../services/book.service";
 import wordService from "../services/word.service";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
@@ -45,6 +46,7 @@ const BookReaderScreen = ({ route }: any) => {
   );
   const [chapters, setChapters] = useState<string[]>([]);
   const [currentChapter, setCurrentChapter] = useState(0);
+  const { t } = useLanguage();
 
   useEffect(() => {
     let isMounted = true;
@@ -95,7 +97,7 @@ const BookReaderScreen = ({ route }: any) => {
       const bookData = await bookService.getBook(bookId);
       setBook(bookData);
     } catch (error: any) {
-      setToastMessage(error.message || "Kitap bilgisi yüklenemedi");
+      setToastMessage(error.message || t("book_info_load_error"));
       setToastType("error");
       setToastVisible(true);
     }
@@ -108,7 +110,7 @@ const BookReaderScreen = ({ route }: any) => {
       setContent(data.content);
       setTotalPages(data.totalPages || 1);
     } catch (error: any) {
-      setToastMessage(error.message || "Sayfa yüklenemedi");
+      setToastMessage(error.message || t("page_load_error"));
       setToastType("error");
       setToastVisible(true);
     } finally {
@@ -143,11 +145,11 @@ const BookReaderScreen = ({ route }: any) => {
         sourceLanguage: "en",
         targetLanguage: "tr",
       });
-      setToastMessage("Kelime favorilere eklendi");
+      setToastMessage(t("word_added_favorites"));
       setToastType("success");
       setToastVisible(true);
     } catch (error) {
-      setToastMessage("Kelime eklenemedi");
+      setToastMessage(t("word_add_failed"));
       setToastType("error");
       setToastVisible(true);
     }

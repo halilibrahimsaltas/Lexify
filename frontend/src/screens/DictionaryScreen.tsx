@@ -13,6 +13,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import dictionaryService from "../services/dictionary.service";
 import wordService from "../services/word.service";
+import { useLanguage } from "../contexts/LanguageContext";
 
 interface Word {
   id: string;
@@ -35,6 +36,7 @@ const DictionaryScreen = () => {
     message: "",
     type: "primary" as "primary" | "secondary",
   });
+  const { t } = useLanguage();
 
   useEffect(() => {
     loadDictionaryStats();
@@ -45,7 +47,7 @@ const DictionaryScreen = () => {
       const statsData = await dictionaryService.getDictionaryStats();
       setStats(statsData);
     } catch (error) {
-      console.error("Sözlük istatistikleri yüklenemedi:", error);
+      console.error(t("dictionary_stats_load_error"), error);
     }
   };
 
@@ -63,7 +65,7 @@ const DictionaryScreen = () => {
       });
       setWords(result.words);
     } catch (error) {
-      Alert.alert("Hata", "Kelime arama başarısız");
+      Alert.alert(t("error"), t("word_search_failed"));
       setWords([]);
     } finally {
       setIsLoading(false);
@@ -98,9 +100,9 @@ const DictionaryScreen = () => {
         sourceLanguage: item.language,
         targetLanguage: "tr", // veya uygun hedef dil
       });
-      showAlert("Başarılı", "Kelime favorilere eklendi", "primary");
+      showAlert(t("success"), t("word_added_favorites"), "primary");
     } catch (error) {
-      showAlert("Hata", "Kelime eklenemedi", "primary");
+      showAlert(t("error"), t("word_add_failed"), "primary");
     } finally {
       setAddingId(null);
     }
@@ -137,7 +139,7 @@ const DictionaryScreen = () => {
       {stats && (
         <View style={styles.statsContainer}>
           <Text style={styles.statsText}>
-            📚 {stats.totalWords.toLocaleString()} kelime
+            📚 {stats.totalWords.toLocaleString()} {t("word_count")}
           </Text>
         </View>
       )}
@@ -150,9 +152,7 @@ const DictionaryScreen = () => {
         <ActivityIndicator size="large" color="#4E2B1B" />
       ) : (
         <Text style={styles.emptyText}>
-          {searchQuery
-            ? "Arama sonucu bulunamadı"
-            : "Kelime aramak için yazmaya başlayın"}
+          {searchQuery ? t("no_search_result") : t("start_typing_to_search")}
         </Text>
       )}
     </View>
@@ -162,7 +162,7 @@ const DictionaryScreen = () => {
     <SafeAreaView style={styles.container}>
       <TextInput
         style={styles.searchInput}
-        placeholder="Kelime ara..."
+        placeholder={t("search_word")}
         placeholderTextColor="#999"
         value={searchQuery}
         onChangeText={handleSearch}

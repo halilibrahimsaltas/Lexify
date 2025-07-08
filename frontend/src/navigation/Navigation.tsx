@@ -15,6 +15,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import Feather from "react-native-vector-icons/Feather";
 // @ts-ignore
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { useLanguage } from "../contexts/LanguageContext";
 
 import BooksScreen from "../screens/BooksScreen";
 import SavedWordsScreen from "../screens/SavedWordsScreen";
@@ -35,6 +36,7 @@ const Drawer = createDrawerNavigator();
 const CustomDrawerContent = (props: DrawerContentComponentProps) => {
   const state = props.state;
   const activeRoute = state.routeNames[state.index];
+  const { t } = useLanguage();
   return (
     <DrawerContentScrollView
       {...props}
@@ -56,12 +58,12 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
             alignSelf: "center",
           }}
         />
-        <Text style={styles.drawerAppName}>Lexify</Text>
+        <Text style={styles.drawerAppName}>{t("app_title")}</Text>
       </View>
       {/* Main Menu */}
       <View style={styles.menuSection}>
         <DrawerItem
-          label="Kitaplarım"
+          label={t("books")}
           icon={({ size }) => (
             <MaterialCommunityIcons
               name="bookshelf"
@@ -69,36 +71,36 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
               color="#4E2B1B"
             />
           )}
-          onPress={() => props.navigation.navigate("Kitaplarım")}
+          onPress={() => props.navigation.navigate(t("books"))}
           labelStyle={styles.menuLabel}
-          focused={activeRoute === "Kitaplarım"}
+          focused={activeRoute === t("books")}
         />
         <DrawerItem
-          label="Favori Kelimeler"
+          label={t("saved_words")}
           icon={({ size }) => (
             <Feather name="star" size={size} color="#4E2B1B" />
           )}
-          onPress={() => props.navigation.navigate("Favori Kelimeler")}
+          onPress={() => props.navigation.navigate(t("saved_words"))}
           labelStyle={styles.menuLabel}
-          focused={activeRoute === "Favori Kelimeler"}
+          focused={activeRoute === t("saved_words")}
         />
         <DrawerItem
-          label="Sözlük"
+          label={t("dictionary")}
           icon={({ size }) => (
             <Ionicons name="book-outline" size={size} color="#4E2B1B" />
           )}
-          onPress={() => props.navigation.navigate("Sözlük")}
+          onPress={() => props.navigation.navigate(t("dictionary"))}
           labelStyle={styles.menuLabel}
-          focused={activeRoute === "Sözlük"}
+          focused={activeRoute === t("dictionary")}
         />
         <DrawerItem
-          label="Profil"
+          label={t("profile")}
           icon={({ size }) => (
             <Feather name="user" size={size} color="#4E2B1B" />
           )}
-          onPress={() => props.navigation.navigate("Profil")}
+          onPress={() => props.navigation.navigate(t("profile"))}
           labelStyle={styles.menuLabel}
-          focused={activeRoute === "Profil"}
+          focused={activeRoute === t("profile")}
         />
       </View>
       {/* Divider */}
@@ -106,74 +108,76 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
       {/* Bottom Menu */}
       <View style={styles.menuSection}>
         <DrawerItem
-          label="Ayarlar"
+          label={t("settings")}
           icon={({ size }) => (
             <Feather name="settings" size={size} color="#4E2B1B" />
           )}
-          onPress={() => props.navigation.navigate("Ayarlar")}
+          onPress={() => props.navigation.navigate(t("settings"))}
           labelStyle={styles.menuLabel}
         />
         <DrawerItem
-          label="Geri Bildirim Gönder"
+          label={t("feedback")}
           icon={({ size }) => (
             <Feather name="message-square" size={size} color="#4E2B1B" />
           )}
-          onPress={() => props.navigation.navigate("Geri Bildirim Gönder")}
+          onPress={() => props.navigation.navigate(t("feedback"))}
           labelStyle={styles.menuLabel}
-          focused={activeRoute === "Geri Bildirim Gönder"}
+          focused={activeRoute === t("feedback")}
         />
         <DrawerItem
-          label="Çıkış Yap"
+          label={t("logout")}
           icon={({ size }) => (
             <MaterialCommunityIcons name="logout" size={size} color="#4E2B1B" />
           )}
-          onPress={() => props.navigation.navigate("Çıkış Yap")}
+          onPress={() => props.navigation.navigate(t("logout"))}
           labelStyle={styles.menuLabel}
-          focused={activeRoute === "Çıkış Yap"}
+          focused={activeRoute === t("logout")}
         />
       </View>
     </DrawerContentScrollView>
   );
 };
 
-const DrawerNavigator = () => (
-  <Drawer.Navigator
-    initialRouteName="Kitaplarım"
-    drawerContent={(props) => <CustomDrawerContent {...props} />}
-    screenOptions={({ route }) => ({
-      headerShown: true,
-      swipeEnabled: true,
-      headerTitle: route.name, // Aktif sayfa adı
-      headerStyle: {
-        backgroundColor: "rgb(248, 204, 123)",
-      },
-      headerTintColor: "#4E2B1B",
-      headerTitleStyle: {
-        fontWeight: "bold",
-        fontSize: 20,
-        fontFamily: "Roboto_500Medium",
-        color: "#4E2B1B",
-      },
-      drawerActiveTintColor: "#4E2B1B",
-      drawerInactiveTintColor: "#4E2B1B",
-      drawerActiveBackgroundColor: "rgb(248, 204, 123)",
-      drawerStyle: {
-        backgroundColor: "#FFF8E1",
-        width: 280,
-      },
-      // Sadece Favori Kelimeler için unmountOnBlur: true
-      ...(route.name === "Favori Kelimeler" ? { unmountOnBlur: true } : {}),
-    })}
-  >
-    <Drawer.Screen name="Kitaplarım" component={BooksScreen} />
-    <Drawer.Screen name="Favori Kelimeler" component={SavedWordsScreen} />
-    <Drawer.Screen name="Sözlük" component={DictionaryScreen} />
-    <Drawer.Screen name="Profil" component={ProfileScreen} />
-    <Drawer.Screen name="Ayarlar" component={SettingsScreen} />
-    <Drawer.Screen name="Çıkış Yap" component={LogoutScreen} />
-    <Drawer.Screen name="Geri Bildirim Gönder" component={FeedbackScreen} />
-  </Drawer.Navigator>
-);
+const DrawerNavigator = () => {
+  const { t } = useLanguage();
+  return (
+    <Drawer.Navigator
+      initialRouteName={t("books")}
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
+      screenOptions={({ route }) => ({
+        headerShown: true,
+        swipeEnabled: true,
+        headerTitle: t(route.name),
+        headerStyle: {
+          backgroundColor: "rgb(248, 204, 123)",
+        },
+        headerTintColor: "#4E2B1B",
+        headerTitleStyle: {
+          fontWeight: "bold",
+          fontSize: 20,
+          fontFamily: "Roboto_500Medium",
+          color: "#4E2B1B",
+        },
+        drawerActiveTintColor: "#4E2B1B",
+        drawerInactiveTintColor: "#4E2B1B",
+        drawerActiveBackgroundColor: "rgb(248, 204, 123)",
+        drawerStyle: {
+          backgroundColor: "#FFF8E1",
+          width: 280,
+        },
+        ...(route.name === t("saved_words") ? { unmountOnBlur: true } : {}),
+      })}
+    >
+      <Drawer.Screen name={t("books")} component={BooksScreen} />
+      <Drawer.Screen name={t("saved_words")} component={SavedWordsScreen} />
+      <Drawer.Screen name={t("dictionary")} component={DictionaryScreen} />
+      <Drawer.Screen name={t("profile")} component={ProfileScreen} />
+      <Drawer.Screen name={t("settings")} component={SettingsScreen} />
+      <Drawer.Screen name={t("logout")} component={LogoutScreen} />
+      <Drawer.Screen name={t("feedback")} component={FeedbackScreen} />
+    </Drawer.Navigator>
+  );
+};
 
 const Navigation = () => {
   const { isAuthenticated, isLoading } = useAuth();

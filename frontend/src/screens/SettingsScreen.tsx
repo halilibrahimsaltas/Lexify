@@ -1,27 +1,45 @@
 import React from "react";
 import { View, Text, Switch, StyleSheet, Linking } from "react-native";
 import Constants from "expo-constants";
-import { useTheme } from "../contexts/ThemeContext";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const SettingsScreen = () => {
-  const { isDark, toggleTheme } = useTheme();
+  const { t, language, setLanguage } = useLanguage();
+  const isTR = language === "tr";
+
+  const handleToggle = () => {
+    setLanguage(isTR ? "en" : "tr");
+  };
 
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: isDark ? "#222" : "#FFF8E1" },
-      ]}
-    >
+    <View style={[styles.container, { backgroundColor: "#FFF8E1" }]}>
+      <View style={styles.row}>
+        <Text style={styles.label}>{t("language")}</Text>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text style={{ marginRight: 8 }}>
+            {t(isTR ? "turkish" : "english")}
+          </Text>
+          <Switch
+            value={!isTR}
+            onValueChange={handleToggle}
+            thumbColor={isTR ? "#F7C873" : "#32341f"}
+            trackColor={{ false: "#f7e7c6", true: "#F7C873" }}
+          />
+          <Text style={{ marginLeft: 8 }}>
+            {t(!isTR ? "turkish" : "english")}
+          </Text>
+        </View>
+      </View>
       <View style={styles.aboutBox}>
-        <Text style={styles.aboutTitle}>Hakkında</Text>
+        <Text style={styles.aboutTitle}>{t("about")}</Text>
         <Text style={styles.aboutText}>
-          Lexify - Kitap ve kelime uygulaması
+          Lexify - {t("app_title").toLowerCase()} {t("books").toLowerCase()}{" "}
+          {t("and")} {t("words").toLowerCase()} {t("application")}
         </Text>
-        <Text style={styles.aboutText}>Versiyon: 1.0.2</Text>
+        <Text style={styles.aboutText}>{t("version")}: 1.0.2</Text>
         <Text style={styles.aboutText}>Halil İbrahim Saltaş</Text>
         <Text style={styles.aboutText}>
-          İletişim: h.ibrahimsaltas@gmail.com
+          {t("contact")}: h.ibrahimsaltas@gmail.com
         </Text>
         <Text
           style={[

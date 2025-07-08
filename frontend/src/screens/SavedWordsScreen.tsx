@@ -13,6 +13,7 @@ import wordService, { Word } from "../services/word.service";
 import Toast from "../components/Toast";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Alert from "../components/Alert";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const SavedWordsScreen = ({ navigation }: any) => {
   const [words, setWords] = useState<Word[]>([]);
@@ -33,12 +34,13 @@ const SavedWordsScreen = ({ navigation }: any) => {
   const [toastType, setToastType] = useState<"success" | "error" | "info">(
     "success"
   );
+  const { t, language } = useLanguage();
   const languageNames: Record<string, string> = {
-    en: "İngilizce",
-    tr: "Türkçe",
-    de: "Almanca",
-    fr: "Fransızca",
-    es: "İspanyolca",
+    en: t("english"),
+    tr: t("turkish"),
+    de: t("german"),
+    fr: t("french"),
+    es: t("spanish"),
   };
 
   const showAlert = (
@@ -65,11 +67,11 @@ const SavedWordsScreen = ({ navigation }: any) => {
     try {
       await wordService.deleteUserWord(confirmDelete.id);
       setWords((prev) => prev.filter((w) => w.id !== confirmDelete.id));
-      setToastMessage("Kelime favorilerden kaldırıldı.");
+      setToastMessage(t("word_removed_favorites_saved"));
       setToastType("success");
       setToastVisible(true);
     } catch (error) {
-      setToastMessage("Kelime silinemedi.");
+      setToastMessage(t("word_delete_failed_saved"));
       setToastType("error");
       setToastVisible(true);
     } finally {
@@ -96,7 +98,7 @@ const SavedWordsScreen = ({ navigation }: any) => {
       );
       setWords(data);
     } catch (error) {
-      showAlert("Hata", "Kaydedilmiş kelimeler alınamadı", "primary");
+      showAlert(t("error"), t("saved_words_fetch_error"), "primary");
     } finally {
       setLoading(false);
     }
@@ -133,7 +135,7 @@ const SavedWordsScreen = ({ navigation }: any) => {
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#4E2B1B" />
-          <Text style={styles.loadingText}>Kelimeler yükleniyor...</Text>
+          <Text style={styles.loadingText}>{t("words_loading")}</Text>
         </View>
       ) : (
         <FlatList
@@ -145,11 +147,8 @@ const SavedWordsScreen = ({ navigation }: any) => {
           }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyTitle}>Henüz kelime kaydetmediniz</Text>
-              <Text style={styles.emptyText}>
-                Kitap okurken kelimeleri favorilere ekleyerek burada
-                görüntüleyebilirsiniz.
-              </Text>
+              <Text style={styles.emptyTitle}>{t("no_saved_words_saved")}</Text>
+              <Text style={styles.emptyText}>{t("add_words_info_saved")}</Text>
             </View>
           }
           showsVerticalScrollIndicator={false}
@@ -165,20 +164,22 @@ const SavedWordsScreen = ({ navigation }: any) => {
       {/* Delete confirm Alert */}
       <Alert
         visible={!!confirmDelete}
-        title="Favoriden Sil"
-        message={`"${confirmDelete?.word}" kelimesini favorilerden kaldırmak istediğinize emin misiniz?`}
+        title={t("remove_from_favorites_saved")}
+        message={`${
+          confirmDelete?.word ? '"' + confirmDelete.word + '" ' : ""
+        }${t("are_you_sure_remove_saved")}`}
         type="secondary"
         onClose={() => setConfirmDelete(null)}
         buttons={[
           {
-            text: "İptal",
+            text: t("cancel"),
             onPress: () => setConfirmDelete(null),
             variant: "secondary",
             iconName: "close",
             iconFamily: "MaterialIcons",
           },
           {
-            text: "Sil",
+            text: t("delete"),
             onPress: handleConfirmDelete,
             variant: "primary",
             iconName: "delete",

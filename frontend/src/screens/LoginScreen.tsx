@@ -18,6 +18,7 @@ import Constants from "expo-constants";
 import authService from "../services/auth.service";
 import storageService from "../services/storage.service";
 import * as AuthSession from "expo-auth-session";
+import { useLanguage } from "../contexts/LanguageContext";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -36,6 +37,7 @@ const LoginScreen = () => {
   const [googleLoading, setGoogleLoading] = useState(false);
 
   const { login, register, updateUser } = useAuth();
+  const { t } = useLanguage();
 
   const showAlert = (
     title: string,
@@ -52,24 +54,24 @@ const LoginScreen = () => {
 
   const validateForm = () => {
     if (!email.trim() || !password.trim()) {
-      showAlert("Hata", "Lütfen tüm alanları doldurun", "primary");
+      showAlert(t("error"), t("fill_all_fields"), "primary");
       return false;
     }
     if (!isLogin && !name.trim()) {
-      showAlert("Hata", "Lütfen adınızı girin", "primary");
+      showAlert(t("error"), t("enter_name"), "primary");
       return false;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      showAlert("Hata", "Geçerli bir e-posta adresi girin", "primary");
+      showAlert(t("error"), t("enter_valid_email"), "primary");
       return false;
     }
     if (password.length < 8) {
-      showAlert("Hata", "Şifre en az 8 karakter olmalıdır", "primary");
+      showAlert(t("error"), t("password_min_length"), "primary");
       return false;
     }
     if (!isLogin && (name.length < 2 || name.length > 50)) {
-      showAlert("Hata", "İsim 2-50 karakter arasında olmalıdır", "primary");
+      showAlert(t("error"), t("name_length"), "primary");
       return false;
     }
     return true;
@@ -87,14 +89,18 @@ const LoginScreen = () => {
           await login(email, password);
         } catch (loginError) {
           showAlert(
-            "Bilgi",
-            "Kayıt başarılı, ancak otomatik giriş yapılamadı. Lütfen giriş yapın.",
+            t("info"),
+            t("register_success_but_login_failed"),
             "primary"
           );
         }
       }
     } catch (error: any) {
-      showAlert("Hata", error.message || "Bir hata oluştu", "primary");
+      showAlert(
+        t("error"),
+        error.message || t("something_went_wrong"),
+        "primary"
+      );
     } finally {
       setLoading(false);
     }
@@ -176,17 +182,17 @@ const LoginScreen = () => {
           />
           <Text style={styles.title}>Lexify</Text>
           <Text style={styles.subtitle}>
-            {isLogin ? "Hesabınıza giriş yapın" : "Yeni hesap oluşturun"}
+            {isLogin ? t("login_subtitle") : t("register_subtitle")}
           </Text>
         </View>
         {/* Form */}
         <View style={styles.form}>
           {!isLogin && (
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Ad Soyad</Text>
+              <Text style={styles.inputLabel}>{t("name")}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Adınızı ve soyadınızı girin"
+                placeholder={t("enter_name_placeholder")}
                 value={name}
                 onChangeText={setName}
                 autoCapitalize="words"
@@ -196,50 +202,44 @@ const LoginScreen = () => {
             </View>
           )}
           <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>E-posta</Text>
+            <Text style={styles.inputLabel}>{t("email")}</Text>
             <TextInput
               style={styles.input}
-              placeholder="ornek@email.com"
+              placeholder={t("enter_email_placeholder")}
               value={email}
               onChangeText={setEmail}
+              autoCapitalize="none"
+              autoCorrect={false}
               keyboardType="email-address"
+              placeholderTextColor="#BCA27F"
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>{t("password")}</Text>
+            <TextInput
+              style={styles.input}
+              placeholder={t("enter_password_placeholder")}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
               autoCapitalize="none"
               autoCorrect={false}
               placeholderTextColor="#BCA27F"
             />
           </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Şifre</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Şifrenizi girin (en az 8 karakter)"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              autoCapitalize="none"
-              placeholderTextColor="#BCA27F"
-            />
-          </View>
-          {isLogin && (
-            <TouchableOpacity style={styles.forgotPassword}>
-              <Text style={styles.forgotPasswordText}>Şifremi unuttum</Text>
-            </TouchableOpacity>
-          )}
           <TouchableOpacity
-            style={[
-              styles.submitButton,
-              loading && styles.submitButtonDisabled,
-            ]}
+            style={styles.submitButton}
             onPress={handleSubmit}
             disabled={loading}
           >
-            {loading ? (
-              <ActivityIndicator color="#FFF8E1" />
-            ) : (
-              <Text style={styles.submitButtonText}>
-                {isLogin ? "Giriş Yap" : "Kayıt Ol"}
-              </Text>
-            )}
+            <Text style={styles.submitButtonText}>
+              {loading ? t("loading") : isLogin ? t("login") : t("register")}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.toggleButton} onPress={toggleMode}>
+            <Text style={styles.toggleButtonText}>
+              {isLogin ? t("no_account") : t("have_account")}
+            </Text>
           </TouchableOpacity>
         </View>
         {/* Alt Bağlantı */}
@@ -409,6 +409,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "500",
     fontFamily: "Roboto_500Medium",
+  },
+  toggleButton: {
+    alignSelf: "flex-end",
+    marginBottom: 18,
+  },
+  toggleButtonText: {
+    color: "#4E2B1B",
+    fontSize: 14,
+    fontFamily: "Roboto_400Regular",
   },
 });
 

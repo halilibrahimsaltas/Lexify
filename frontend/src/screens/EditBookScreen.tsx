@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import bookService from "../services/book.service";
 import Toast from "../components/Toast";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const EditBookScreen = ({ route, navigation }: any) => {
   const { book } = route.params;
@@ -25,6 +26,8 @@ const EditBookScreen = ({ route, navigation }: any) => {
     "success"
   );
 
+  const { t } = useLanguage();
+
   const handleSave = async () => {
     setLoading(true);
     try {
@@ -34,12 +37,12 @@ const EditBookScreen = ({ route, navigation }: any) => {
         coverImage,
         author, // Yazar bilgisini de gönder
       });
-      setToastMessage("Kitap güncellendi");
+      setToastMessage(t("book_updated"));
       setToastType("success");
       setToastVisible(true);
       setTimeout(() => navigation.goBack(), 1200);
     } catch (e: any) {
-      setToastMessage(e.message || "Güncelleme başarısız");
+      setToastMessage(e.message || t("update_failed"));
       setToastType("error");
       setToastVisible(true);
     } finally {
@@ -49,33 +52,33 @@ const EditBookScreen = ({ route, navigation }: any) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Kitap Adı</Text>
+      <Text style={styles.label}>{t("book_name")}</Text>
       <TextInput
         style={styles.input}
         value={title}
         onChangeText={setTitle}
-        placeholder="Kitap adı"
+        placeholder={t("book_name_placeholder")}
       />
-      <Text style={styles.label}>Yazar</Text>
+      <Text style={styles.label}>{t("author")}</Text>
       <TextInput
         style={styles.input}
         value={author}
         onChangeText={setAuthor}
-        placeholder="Yazar"
+        placeholder={t("author")}
       />
-      <Text style={styles.label}>Kategori</Text>
+      <Text style={styles.label}>{t("category")}</Text>
       <TextInput
         style={styles.input}
         value={category}
         onChangeText={setCategory}
-        placeholder="Kategori"
+        placeholder={t("category")}
       />
-      <Text style={styles.label}>Kapak Görseli URL</Text>
+      <Text style={styles.label}>{t("cover_image_url")}</Text>
       <TextInput
         style={styles.input}
         value={coverImage}
         onChangeText={setCoverImage}
-        placeholder="Kapak görseli URL’si"
+        placeholder={t("cover_image_url_placeholder")}
       />
       {coverImage ? (
         <Image source={{ uri: coverImage }} style={styles.coverImage} />
@@ -86,7 +89,7 @@ const EditBookScreen = ({ route, navigation }: any) => {
         disabled={loading}
       >
         <Text style={styles.saveButtonText}>
-          {loading ? "Kaydediliyor..." : "Kaydet"}
+          {loading ? t("saving") : t("save")}
         </Text>
       </TouchableOpacity>
       <Toast

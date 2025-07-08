@@ -3,6 +3,7 @@ import { View, Text, TextInput, StyleSheet } from "react-native";
 import { postFeedback } from "../services/api";
 import Toast from "../components/Toast";
 import Button from "../components/Button";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const FeedbackScreen = () => {
   const [subject, setSubject] = useState("");
@@ -13,18 +14,19 @@ const FeedbackScreen = () => {
   const [toastType, setToastType] = useState<"success" | "error" | "info">(
     "success"
   );
+  const { t } = useLanguage();
 
   const handleSend = async () => {
     setSending(true);
     try {
       await postFeedback(subject, body);
-      setToastMessage("Geri bildiriminiz gönderildi. Teşekkürler!");
+      setToastMessage(t("feedback_sent"));
       setToastType("success");
       setToastVisible(true);
       setSubject("");
       setBody("");
     } catch (e) {
-      setToastMessage("Geri bildirim gönderilemedi. Lütfen tekrar deneyin.");
+      setToastMessage(t("feedback_failed"));
       setToastType("error");
       setToastVisible(true);
     } finally {
@@ -34,23 +36,23 @@ const FeedbackScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Konu</Text>
+      <Text style={styles.label}>{t("subject")}</Text>
       <TextInput
         style={styles.input}
         value={subject}
         onChangeText={setSubject}
-        placeholder="Konu"
+        placeholder={t("subject")}
       />
-      <Text style={styles.label}>Açıklama</Text>
+      <Text style={styles.label}>{t("description")}</Text>
       <TextInput
         style={[styles.input, { height: 100 }]}
         value={body}
         onChangeText={setBody}
-        placeholder="Açıklama"
+        placeholder={t("description")}
         multiline
       />
       <Button
-        title={sending ? "Gönderiliyor..." : "Gönder"}
+        title={sending ? t("sending") : t("send")}
         onPress={handleSend}
         disabled={sending || !subject || !body}
         variant="primary"

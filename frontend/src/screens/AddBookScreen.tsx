@@ -13,6 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import * as DocumentPicker from "expo-document-picker";
 import bookService from "../services/book.service";
 import Button from "../components/Button";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const AddBookScreen = ({ navigation }: any) => {
   const [loading, setLoading] = useState(false);
@@ -27,6 +28,8 @@ const AddBookScreen = ({ navigation }: any) => {
   const [author, setAuthor] = useState("");
   const [category, setCategory] = useState("");
   const [coverImage, setCoverImage] = useState("");
+
+  const { t } = useLanguage();
 
   const showAlert = (
     title: string,
@@ -52,11 +55,11 @@ const AddBookScreen = ({ navigation }: any) => {
 
       const file = result.assets[0];
       setSelectedFile(file);
-      setToastMessage(`${file.name} dosyası seçildi`);
+      setToastMessage(`${file.name} ${t("file_selected")}`);
       setToastType("success");
       setToastVisible(true);
     } catch (error) {
-      setToastMessage("Dosya seçilirken bir hata oluştu");
+      setToastMessage(t("file_select_error"));
       setToastType("error");
       setToastVisible(true);
     }
@@ -64,7 +67,7 @@ const AddBookScreen = ({ navigation }: any) => {
 
   const handleUploadPdf = async () => {
     if (!selectedFile || !title || !author || !category) {
-      setToastMessage("Lütfen tüm zorunlu alanları doldurun ve dosya seçin");
+      setToastMessage(t("fill_required_fields"));
       setToastType("info");
       setToastVisible(true);
       return;
@@ -86,7 +89,7 @@ const AddBookScreen = ({ navigation }: any) => {
         coverImage: coverImage || undefined,
       });
       console.log("Kitap yükleme sonucu:", result);
-      setToastMessage("Kitap başarıyla yüklendi");
+      setToastMessage(t("book_upload_success"));
       setToastType("success");
       setToastVisible(true);
       setTimeout(() => navigation.navigate("MainDrawer"), 1500);
@@ -104,7 +107,7 @@ const AddBookScreen = ({ navigation }: any) => {
       setToastMessage(
         error?.response?.data?.message ||
           error.message ||
-          "Kitap yüklenirken hata oluştu"
+          t("book_upload_error")
       );
       setToastType("error");
       setToastVisible(true);
@@ -117,35 +120,35 @@ const AddBookScreen = ({ navigation }: any) => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>Kitap Ekle</Text>
+        <Text style={styles.title}>{t("add_book")}</Text>
 
         <TextInput
-          placeholder="Başlık"
+          placeholder={t("title")}
           style={styles.input}
           value={title}
           onChangeText={setTitle}
         />
         <TextInput
-          placeholder="Yazar"
+          placeholder={t("author")}
           style={styles.input}
           value={author}
           onChangeText={setAuthor}
         />
         <TextInput
-          placeholder="Kategori"
+          placeholder={t("category")}
           style={styles.input}
           value={category}
           onChangeText={setCategory}
         />
         <TextInput
-          placeholder="Kapak Görseli (opsiyonel)"
+          placeholder={t("cover_image_optional")}
           style={styles.input}
           value={coverImage}
           onChangeText={setCoverImage}
         />
 
         <Button
-          title={selectedFile ? selectedFile.name : "Dosya Seç"}
+          title={selectedFile ? selectedFile.name : t("choose_file")}
           onPress={handleFilePick}
           variant="outline"
           size="medium"
@@ -153,7 +156,7 @@ const AddBookScreen = ({ navigation }: any) => {
           style={{ marginBottom: 16 }}
         />
         <Button
-          title={loading ? "Yükleniyor..." : "Kaydet"}
+          title={loading ? t("loading") : t("save")}
           onPress={handleUploadPdf}
           variant="primary"
           size="large"

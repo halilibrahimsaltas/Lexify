@@ -18,6 +18,7 @@ import { Book } from "../types";
 import BookCard from "../components/BookCard";
 import { Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const BooksScreen = ({ navigation }: any) => {
   const [books, setBooks] = useState<Book[]>([]);
@@ -38,6 +39,7 @@ const BooksScreen = ({ navigation }: any) => {
     "success"
   );
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
+  const { t } = useLanguage();
 
   const showAlert = (
     title: string,
@@ -67,11 +69,7 @@ const BooksScreen = ({ navigation }: any) => {
       const userBooks = await bookService.getUserBooks();
       setBooks(userBooks);
     } catch (error: any) {
-      showAlert(
-        "Hata",
-        error.message || "Kitaplar yüklenirken bir hata oluştu",
-        "primary"
-      );
+      showAlert(t("error"), error.message || t("books_load_error"), "primary");
     } finally {
       setLoading(false);
     }
@@ -86,8 +84,8 @@ const BooksScreen = ({ navigation }: any) => {
   const handleDeleteBook = (bookId: number) => {
     setConfirmDeleteId(bookId);
     setAlertConfig({
-      title: "Kitabı Sil",
-      message: "Bu kitabı silmek istediğinizden emin misiniz?",
+      title: t("delete_book"),
+      message: t("delete_book_confirm"),
       type: "secondary",
     });
     setAlertVisible(true);
@@ -100,11 +98,11 @@ const BooksScreen = ({ navigation }: any) => {
     try {
       await bookService.deleteBook(confirmDeleteId);
       setBooks(books.filter((book) => book.id !== confirmDeleteId));
-      setToastMessage("Kitap başarıyla silindi");
+      setToastMessage(t("book_deleted_success"));
       setToastType("success");
       setToastVisible(true);
     } catch (error: any) {
-      setToastMessage(error.message || "Kitap silinirken bir hata oluştu");
+      setToastMessage(error.message || t("book_delete_error"));
       setToastType("error");
       setToastVisible(true);
     } finally {
@@ -123,11 +121,7 @@ const BooksScreen = ({ navigation }: any) => {
       const results = await bookService.searchBooks(search.trim());
       setSearchResults(results);
     } catch (error: any) {
-      showAlert(
-        "Hata",
-        error.message || "Arama sırasında hata oluştu",
-        "primary"
-      );
+      showAlert(t("error"), error.message || t("search_error"), "primary");
     }
   };
 
@@ -168,7 +162,7 @@ const BooksScreen = ({ navigation }: any) => {
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#4E2B1B" />
-          <Text style={styles.loadingText}>Kitaplar yükleniyor...</Text>
+          <Text style={styles.loadingText}>{t("books_loading")}</Text>
         </View>
       </SafeAreaView>
     );
@@ -179,7 +173,7 @@ const BooksScreen = ({ navigation }: any) => {
       <View style={styles.searchRow}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Kitap veya yazar ara..."
+          placeholder={t("search_book_or_author")}
           value={search}
           onChangeText={setSearch}
           onSubmitEditing={handleSearch}

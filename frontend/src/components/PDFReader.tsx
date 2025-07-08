@@ -8,6 +8,7 @@ import {
   Dimensions,
   ActivityIndicator,
 } from "react-native";
+import { useLanguage } from "../contexts/LanguageContext";
 
 interface PDFReaderProps {
   content: string;
@@ -32,6 +33,7 @@ const PDFReader: React.FC<PDFReaderProps> = ({
 }) => {
   const [fontSize, setFontSize] = React.useState(16);
   const [lineHeight, setLineHeight] = React.useState(24);
+  const { t } = useLanguage();
 
   const handleWordPress = (word: string) => {
     onWordSelect?.(word);
@@ -81,7 +83,7 @@ const PDFReader: React.FC<PDFReaderProps> = ({
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#4E2B1B" />
-        <Text style={styles.loadingText}>Sayfa yükleniyor...</Text>
+        <Text style={styles.loadingText}>{t("page_loading")}</Text>
       </View>
     );
   }
@@ -89,7 +91,7 @@ const PDFReader: React.FC<PDFReaderProps> = ({
   if (!content) {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>İçerik bulunamadı</Text>
+        <Text style={styles.emptyText}>{t("content_not_found")}</Text>
       </View>
     );
   }
@@ -115,7 +117,7 @@ const PDFReader: React.FC<PDFReaderProps> = ({
           onPress={() => onPageChange && onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
-          <Text style={styles.navButtonText}>← Önceki</Text>
+          <Text style={styles.navButtonText}>← {t("previous")}</Text>
         </TouchableOpacity>
 
         <View style={styles.pageIndicator}>
@@ -132,7 +134,7 @@ const PDFReader: React.FC<PDFReaderProps> = ({
           onPress={() => onPageChange && onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
-          <Text style={styles.navButtonText}>Sonraki →</Text>
+          <Text style={styles.navButtonText}>{t("next")} →</Text>
         </TouchableOpacity>
       </View>
     </View>
