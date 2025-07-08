@@ -235,7 +235,7 @@ const BookReaderScreen = ({ route }: any) => {
         {loading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#4E2B1B" />
-            <Text style={styles.loadingText}>Yükleniyor...</Text>
+            <Text style={styles.loadingText}>{t("loading")}</Text>
           </View>
         ) : (
           <>
@@ -261,7 +261,8 @@ const BookReaderScreen = ({ route }: any) => {
                   <Text>◀</Text>
                 </TouchableOpacity>
                 <Text>
-                  Bölüm {currentChapter + 1} / {chapters.length}
+                  {t("chapter")} {currentChapter + 1} {t("of")}{" "}
+                  {chapters.length}
                 </Text>
                 <TouchableOpacity
                   onPress={() =>

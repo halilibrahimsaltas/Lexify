@@ -16,17 +16,21 @@ const SettingsScreen = () => {
       <View style={styles.row}>
         <Text style={styles.label}>{t("language")}</Text>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={{ marginRight: 8 }}>
-            {t(isTR ? "turkish" : "english")}
+          <Text
+            style={{ marginRight: 8, fontWeight: isTR ? "bold" : "normal" }}
+          >
+            {t("turkish")}
           </Text>
           <Switch
             value={!isTR}
             onValueChange={handleToggle}
-            thumbColor={isTR ? "#F7C873" : "#32341f"}
+            thumbColor={!isTR ? "#32341f" : "#F7C873"}
             trackColor={{ false: "#f7e7c6", true: "#F7C873" }}
           />
-          <Text style={{ marginLeft: 8 }}>
-            {t(!isTR ? "turkish" : "english")}
+          <Text
+            style={{ marginLeft: 8, fontWeight: !isTR ? "bold" : "normal" }}
+          >
+            {t("english")}
           </Text>
         </View>
       </View>

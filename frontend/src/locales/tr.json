@@ -124,5 +124,20 @@
   "account_info": "Hesap Bilgileri",
   "edit_personal_info": "Kişisel bilgilerinizi düzenleyin",
   "view_added_books": "Eklediğiniz kitapları görüntüleyin",
-  "view_saved_words": "Kaydettiğiniz kelimeleri görün"
+  "view_saved_words": "Kaydettiğiniz kelimeleri görün",
+  "no_account_text": "Hesabınız yok mu?",
+  "have_account_text": "Zaten hesabınız var mı?",
+  "register_link": "Kayıt olun",
+  "login_link": "Giriş yapın",
+  "or": "veya",
+  "continue_with_email": "Email ile devam et",
+  "register": "Kayıt Ol",
+  "login_with_google": "Google ile giriş yap",
+  "continue_with_google": "Google ile devam et",
+  "email": "Email",
+  "password": "Şifre",
+  "name": "İsim",
+  "ok": "Tamam",
+  "chapter": "Bölüm",
+  "of": "/"
 }

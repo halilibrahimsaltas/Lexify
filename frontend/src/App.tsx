@@ -15,7 +15,7 @@ export default function App() {
     }
   }, [fontsLoaded]);
 
-  if (!fontsLoaded) return null;
+  if (!fontsLoaded) return null; // Fontlar yüklenmeden uygulama render edilmez
   return (
     <SafeAreaProvider>
       <LanguageProvider>

@@ -58,7 +58,17 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
             alignSelf: "center",
           }}
         />
-        <Text style={styles.drawerAppName}>{t("app_title")}</Text>
+        <Text
+          style={{
+            fontFamily: "Lobster_400Regular",
+            fontSize: 32,
+            color: "#4E2B1B",
+            textAlign: "center",
+            marginLeft: 18,
+          }}
+        >
+          {t("app_title")}
+        </Text>
       </View>
       {/* Main Menu */}
       <View style={styles.menuSection}>

@@ -180,7 +180,17 @@ const LoginScreen = () => {
               alignSelf: "center",
             }}
           />
-          <Text style={styles.title}>Lexify</Text>
+          <Text
+            style={{
+              fontFamily: "Lobster_400Regular",
+              fontSize: 38,
+              color: "#4E2B1B",
+              textAlign: "center",
+              marginBottom: 8,
+            }}
+          >
+            {t("app_title")}
+          </Text>
           <Text style={styles.subtitle}>
             {isLogin ? t("login_subtitle") : t("register_subtitle")}
           </Text>
@@ -236,26 +246,21 @@ const LoginScreen = () => {
               {loading ? t("loading") : isLogin ? t("login") : t("register")}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.toggleButton} onPress={toggleMode}>
-            <Text style={styles.toggleButtonText}>
-              {isLogin ? t("no_account") : t("have_account")}
-            </Text>
-          </TouchableOpacity>
         </View>
         {/* Alt Bağlantı */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            {isLogin ? "Hesabınız yok mu?" : "Zaten hesabınız var mı?"}
+            {isLogin ? t("no_account_text") : t("have_account_text")}
           </Text>
           <TouchableOpacity onPress={toggleMode} disabled={loading}>
             <Text style={styles.footerLink}>
-              {isLogin ? "Kayıt olun" : "Giriş yapın"}
+              {isLogin ? t("register_link") : t("login_link")}
             </Text>
           </TouchableOpacity>
         </View>
         {/* Sosyal Giriş */}
         <View style={styles.socialContainer}>
-          <Text style={styles.socialText}>veya</Text>
+          <Text style={styles.socialText}>{t("or")}</Text>
           <TouchableOpacity
             style={styles.socialButton}
             disabled={loading || googleLoading}
@@ -264,7 +269,9 @@ const LoginScreen = () => {
             {googleLoading ? (
               <ActivityIndicator color="#4E2B1B" />
             ) : (
-              <Text style={styles.socialButtonText}>Google ile devam et</Text>
+              <Text style={styles.socialButtonText}>
+                {t("continue_with_google")}
+              </Text>
             )}
           </TouchableOpacity>
         </View>
@@ -298,13 +305,6 @@ const styles = StyleSheet.create({
   logo: {
     fontSize: 60,
     marginBottom: 10,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#4E2B1B",
-    marginBottom: 8,
-    fontFamily: "Lobster_400Regular",
   },
   subtitle: {
     fontSize: 16,
@@ -377,6 +377,8 @@ const styles = StyleSheet.create({
     color: "#4E2B1B",
     fontSize: 14,
     fontFamily: "Roboto_400Regular",
+    marginRight: 5,
+    textAlign: "center",
   },
   footerLink: {
     color: "#4E2B1B",
