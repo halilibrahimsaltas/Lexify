@@ -1,0 +1,22 @@
+{
+    "build": {
+      "development": {
+        "developmentClient": true,
+        "distribution": "internal"
+      },
+      "preview": {
+        "distribution": "internal"
+      },
+      "production": {
+        "android": {
+          "buildType": "apk"
+        }
+      },
+      "release": {
+        "android": {
+          "buildType": "apk",
+          "gradleCommand": ":app:assembleRelease"
+        }
+      }
+    }
+  }
