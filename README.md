@@ -27,7 +27,9 @@ This repository contains both the **Lexify Frontend (React Native)** and the **L
 
 ## 🎬 Demo Video
 
-[![Lexify Demo](https://img.youtube.com/vi/-W6wL4JQOPc/0.jpg)](https://youtu.be/-W6wL4JQOPc "Lexify Demo Video ")
+<div align="center">
+  <video src="screenshot/presentation/Lexify.mp4" controls width="400"></video>
+</div>
 
 ## 📑 Table of Contents
 
