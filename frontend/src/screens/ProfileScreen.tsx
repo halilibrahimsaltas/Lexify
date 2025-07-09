@@ -197,25 +197,26 @@ const ProfileScreen = ({ navigation }: any) => {
     },
     {
       id: "4",
-      title: "Sözlük",
-      subtitle: "Kelime çeviri aracı",
+      title: t("dictionary"),
+      subtitle: t("dictionary_tool"),
       icon: <Ionicons name="book-outline" size={26} color="#FFF8E1" />,
-      onPress: () => navigation.navigate("MainDrawer", { screen: "Sözlük" }),
+      onPress: () =>
+        navigation.navigate("MainDrawer", { screen: t("dictionary") }),
     },
     {
       id: "6",
-      title: "Ayarlar",
-      subtitle: "Uygulama ayarlarını düzenleyin",
+      title: t("settings"),
+      subtitle: t("edit_app_settings"),
       icon: <Feather name="settings" size={26} color="#FFF8E1" />,
-      onPress: () => navigation.navigate("MainDrawer", { screen: "Ayarlar" }),
+      onPress: () =>
+        navigation.navigate("MainDrawer", { screen: t("settings") }),
     },
     {
       id: "7",
-      title: "Yardım",
-      subtitle: "Destek ve SSS",
+      title: t("help"),
+      subtitle: t("help_tooltip"),
       icon: <Feather name="help-circle" size={26} color="#FFF8E1" />,
-      onPress: () =>
-        showAlert("Bilgi", "Bu özellik yakında eklenecek", "primary"),
+      onPress: () => navigation.navigate("Help"),
     },
   ];
 
@@ -267,7 +268,7 @@ const ProfileScreen = ({ navigation }: any) => {
 
         {/* Çıkış Butonu */}
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutButtonText}>Çıkış Yap</Text>
+          <Text style={styles.logoutButtonText}>{t("logout")}</Text>
         </TouchableOpacity>
       </ScrollView>
 
@@ -298,7 +299,7 @@ const ProfileScreen = ({ navigation }: any) => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Profil Düzenle</Text>
+              <Text style={styles.modalTitle}>{t("edit_profile")}</Text>
               <TouchableOpacity onPress={() => setEditModalVisible(false)}>
                 <Text style={styles.modalClose}>✕</Text>
               </TouchableOpacity>
@@ -306,39 +307,41 @@ const ProfileScreen = ({ navigation }: any) => {
 
             <View style={styles.modalBody}>
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Ad Soyad</Text>
+                <Text style={styles.inputLabel}>{t("full_name")}</Text>
                 <TextInput
                   style={styles.input}
                   value={editForm.name}
                   onChangeText={(text) =>
                     setEditForm({ ...editForm, name: text })
                   }
-                  placeholder="Adınızı ve soyadınızı girin"
+                  placeholder={t("enter_full_name")}
                 />
               </View>
 
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Yeni Şifre (Opsiyonel)</Text>
+                <Text style={styles.inputLabel}>{t("new_password")}</Text>
                 <TextInput
                   style={styles.input}
                   value={editForm.password}
                   onChangeText={(text) =>
                     setEditForm({ ...editForm, password: text })
                   }
-                  placeholder="Yeni şifrenizi girin"
+                  placeholder={t("enter_new_password")}
                   secureTextEntry
                 />
               </View>
 
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Yeni Şifreyi Tekrar Girin</Text>
+                <Text style={styles.inputLabel}>
+                  {t("repeat_new_password")}
+                </Text>
                 <TextInput
                   style={styles.input}
                   value={editForm.passwordRepeat}
                   onChangeText={(text) =>
                     setEditForm({ ...editForm, passwordRepeat: text })
                   }
-                  placeholder="Yeni şifrenizi tekrar girin"
+                  placeholder={t("enter_repeat_new_password")}
                   secureTextEntry
                 />
               </View>
@@ -349,7 +352,7 @@ const ProfileScreen = ({ navigation }: any) => {
                 style={styles.modalButton}
                 onPress={() => setEditModalVisible(false)}
               >
-                <Text style={styles.modalButtonText}>İptal</Text>
+                <Text style={styles.modalButtonText}>{t("cancel")}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modalButton, styles.modalButtonPrimary]}
@@ -359,7 +362,7 @@ const ProfileScreen = ({ navigation }: any) => {
                 {editLoading ? (
                   <ActivityIndicator color="white" size="small" />
                 ) : (
-                  <Text style={styles.modalButtonPrimaryText}>Kaydet</Text>
+                  <Text style={styles.modalButtonPrimaryText}>{t("save")}</Text>
                 )}
               </TouchableOpacity>
             </View>

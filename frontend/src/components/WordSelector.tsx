@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
   },
   translationBox: {
     minWidth: 120, // azaltıldı
-    maxWidth: 200, // azaltıldı
+    maxWidth: 180, // azaltıldı
     padding: 6, // azaltıldı
     backgroundColor: "#32341f",
     borderRadius: 8, // azaltıldı

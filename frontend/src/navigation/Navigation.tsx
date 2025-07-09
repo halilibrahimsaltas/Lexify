@@ -29,6 +29,7 @@ import DictionaryScreen from "../screens/DictionaryScreen";
 import EditBookScreen from "../screens/EditBookScreen";
 import FeedbackScreen from "../screens/FeedbackScreen";
 import SettingsScreen from "../screens/SettingsScreen";
+import HelpScreen from "../screens/HelpScreen";
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -112,6 +113,15 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
           labelStyle={styles.menuLabel}
           focused={activeRoute === t("profile")}
         />
+        <DrawerItem
+          label={t("help")}
+          icon={({ size }) => (
+            <Feather name="help-circle" size={size} color="#4E2B1B" />
+          )}
+          onPress={() => props.navigation.navigate(t("help"))}
+          labelStyle={styles.menuLabel}
+          focused={activeRoute === t("help")}
+        />
       </View>
       {/* Divider */}
       <View style={styles.divider} />
@@ -185,6 +195,7 @@ const DrawerNavigator = () => {
       <Drawer.Screen name={t("settings")} component={SettingsScreen} />
       <Drawer.Screen name={t("logout")} component={LogoutScreen} />
       <Drawer.Screen name={t("feedback")} component={FeedbackScreen} />
+      <Drawer.Screen name={t("help")} component={HelpScreen} />
     </Drawer.Navigator>
   );
 };
@@ -214,6 +225,11 @@ const Navigation = () => {
             <Stack.Screen name="AddBook" component={AddBookScreen} />
             <Stack.Screen name="BookReader" component={BookReaderScreen} />
             <Stack.Screen name="EditBook" component={EditBookScreen} />
+            <Stack.Screen
+              name="Help"
+              component={HelpScreen}
+              options={{ headerShown: true, title: "Help" }}
+            />
           </>
         )}
       </Stack.Navigator>

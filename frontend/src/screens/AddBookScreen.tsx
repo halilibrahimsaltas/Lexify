@@ -162,6 +162,22 @@ const AddBookScreen = ({ navigation }: any) => {
           size="large"
           disabled={loading}
         />
+        <TouchableOpacity
+          style={{ marginTop: 24, alignItems: "center" }}
+          onPress={() => navigation.navigate("Help")}
+        >
+          <Text
+            style={{
+              color: "#4E2B1B",
+              fontWeight: "bold",
+              fontSize: 16,
+              textDecorationLine: "none",
+              textAlign: "center",
+            }}
+          >
+            {t("go_to_help_for_add_book")}
+          </Text>
+        </TouchableOpacity>
       </ScrollView>
 
       <Toast

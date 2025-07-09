@@ -74,13 +74,7 @@ export class TranslationService {
       entry.word.toLowerCase() === searchText
     );
 
-    // Eğer tam eşleşme yoksa, kısmi eşleşme ara
-    if (exactMatches.length === 0) {
-      exactMatches = this.dictionaryCache.filter(entry => 
-        entry.word.toLowerCase().includes(searchText) || 
-        searchText.includes(entry.word.toLowerCase())
-      );
-    }
+   
 
     // Sonuçları kategorilere göre grupla
     const groupedResults = this.groupByCategory(exactMatches);
