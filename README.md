@@ -1,14 +1,5 @@
 # Project Presentation
 
-<p align="center">
-  <img src="screenshot/presentation/pre_1.png" alt="Presentation 1" width="220"/>
-  <img src="screenshot/presentation/pre_2.png" alt="Presentation 2" width="220"/>
-  <img src="screenshot/presentation/pre_5.png" alt="Presentation 5" width="220"/>
-  <img src="screenshot/presentation/pre_7.png" alt="Presentation 7" width="220"/>
-</p>
-
----
-
 # 📚 Lexify Monorepo (Frontend & Backend)
 
 This repository contains both the **Lexify Frontend (React Native)** and the **Lexify Backend (NestJS)** projects.
@@ -18,15 +9,37 @@ This repository contains both the **Lexify Frontend (React Native)** and the **L
 
 ---
 
-## 🗂️ Project Structure
-
-```
-Lexify/
-├── frontend/   # React Native mobile app (see details below)
-├── backend/    # NestJS backend API (see details below)
-```
+<!-- Visual frame for presentation images -->
+<table align="center">
+  <tr>
+    <td><img src="screenshot/presentation/pre_1.png" alt="Presentation 1" width="220"/></td>
+    <td><img src="screenshot/presentation/pre_2.png" alt="Presentation 2" width="220"/></td>
+  </tr>
+  <tr>
+    <td><img src="screenshot/presentation/pre_5.png" alt="Presentation 5" width="220"/></td>
+    <td><img src="screenshot/presentation/pre_7.png" alt="Presentation 7" width="220"/></td>
+  </tr>
+</table>
 
 ---
+
+## 📑 Table of Contents
+
+- [Project Structure](#project-structure)
+- [Quick Start](#quick-start)
+- [Backend Architecture (NestJS)](#-backend-architecture-nestjs)
+- [Example Endpoints](#-example-endpoints)
+- [How to Run the Backend](#-how-to-run-the-backend)
+- [Frontend Features](#-features)
+- [Screenshots](#-screenshots)
+- [Folder Structure](#-folder-structure)
+- [Main Technologies](#-main-technologies)
+- [Installation](#-installation)
+- [Multi-language Support](#-multi-language-support)
+- [Main Screens & Flow](#-main-screens--flow)
+- [Design & Components](#-design--components)
+- [Links](#-links)
+- [License](#-license)
 
 ## 🚀 Quick Start
 
