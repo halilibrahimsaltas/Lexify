@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -37,9 +37,16 @@ const DictionaryScreen = () => {
     type: "primary" as "primary" | "secondary",
   });
   const { t } = useLanguage();
+  const alertTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     loadDictionaryStats();
+    return () => {
+      // Komponent unmount olduğunda timeout'u temizle
+      if (alertTimeoutRef.current) {
+        clearTimeout(alertTimeoutRef.current);
+      }
+    };
   }, []);
 
   const loadDictionaryStats = async () => {
@@ -63,7 +70,15 @@ const DictionaryScreen = () => {
         query: query.trim(),
         limit: 50,
       });
-      setWords(result.words);
+      // Önce tam eşleşenler, sonra diğerleri
+      const lowerQuery = query.trim().toLowerCase();
+      const exactMatches = result.words.filter(
+        (item: Word) => item.word.toLowerCase() === lowerQuery
+      );
+      const partialMatches = result.words.filter(
+        (item: Word) => item.word.toLowerCase() !== lowerQuery
+      );
+      setWords([...exactMatches, ...partialMatches]);
     } catch (error) {
       Alert.alert(t("error"), t("word_search_failed"));
       setWords([]);
@@ -89,6 +104,14 @@ const DictionaryScreen = () => {
   ) => {
     setAlertConfig({ title, message, type });
     setAlertVisible(true);
+    // Önceki timeout'u temizle
+    if (alertTimeoutRef.current) {
+      clearTimeout(alertTimeoutRef.current);
+    }
+    // 2.5 saniye sonra alert'i kapat
+    alertTimeoutRef.current = setTimeout(() => {
+      setAlertVisible(false);
+    }, 2500);
   };
 
   const handleAddFavorite = async (item: Word) => {

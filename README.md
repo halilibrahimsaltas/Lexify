@@ -1,6 +1,6 @@
-# Project Presentation
+# 📚 Lexify (Frontend & Backend)
 
-# 📚 Lexify Monorepo (Frontend & Backend)
+Lexify is a modern e-book and language learning application that enhances the reading experience by providing instant word translations, pronunciations, and vocabulary tracking. You can easily learn unknown words while reading, add them to your favorites, and track your language progress.
 
 This repository contains both the **Lexify Frontend (React Native)** and the **Lexify Backend (NestJS)** projects.
 
@@ -8,6 +8,8 @@ This repository contains both the **Lexify Frontend (React Native)** and the **L
 - **Backend:** RESTful API for user, book, word, and translation management (NestJS, PostgreSQL)
 
 ---
+
+# Project Presentation
 
 <!-- Visual frame for presentation images -->
 <table align="center">
@@ -22,6 +24,10 @@ This repository contains both the **Lexify Frontend (React Native)** and the **L
 </table>
 
 ---
+
+## 🎬 Demo Video
+
+[![Lexify Demo](https://img.youtube.com/vi/-W6wL4JQOPc/0.jpg)](https://youtu.be/-W6wL4JQOPc "Lexify Demo Video ")
 
 ## 📑 Table of Contents
 

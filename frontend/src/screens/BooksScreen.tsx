@@ -225,14 +225,14 @@ const BooksScreen = ({ navigation }: any) => {
         onClose={handleCloseAlert}
         buttons={[
           {
-            text: "İptal",
+            text: t("cancel"),
             onPress: () => setAlertVisible(false),
             variant: "secondary",
             iconName: "close",
             iconFamily: "MaterialIcons",
           },
           {
-            text: "Sil",
+            text: t("delete"),
             onPress: confirmDelete,
             variant: "primary",
             iconName: "delete",
