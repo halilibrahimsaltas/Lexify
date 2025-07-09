@@ -18,6 +18,7 @@ import { Book } from "../types";
 import bookService from "../services/book.service";
 import wordService from "../services/word.service";
 import { useLanguage } from "../contexts/LanguageContext";
+import LoadingScreen from "../components/LoadingScreen";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
@@ -234,10 +235,7 @@ const BookReaderScreen = ({ route }: any) => {
     <SafeAreaView style={styles.container}>
       <View style={{ flex: 1 }} onTouchStart={handleScreenTouch}>
         {loading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#4E2B1B" />
-            <Text style={styles.loadingText}>{t("loading")}</Text>
-          </View>
+          <LoadingScreen />
         ) : (
           <>
             <View {...panResponder.panHandlers} style={styles.contentWrapper}>

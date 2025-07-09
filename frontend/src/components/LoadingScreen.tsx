@@ -1,10 +1,16 @@
 import React from "react";
-import { View, ActivityIndicator, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
+import LottieView from "lottie-react-native";
 
 export default function LoadingScreen() {
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="large" color="#4E2B1B" />
+      <LottieView
+        source={require("../assets/lottie/lexify-animation.json")}
+        autoPlay
+        loop
+        style={{ width: 150, height: 150 }}
+      />
     </View>
   );
 }
@@ -14,6 +20,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: "#FFF8E1",
   },
 });

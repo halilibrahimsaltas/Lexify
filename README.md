@@ -1,3 +1,14 @@
+# Project Presentation
+
+<p align="center">
+  <img src="screenshot/presentation/pre_1.png" alt="Presentation 1" width="220"/>
+  <img src="screenshot/presentation/pre_2.png" alt="Presentation 2" width="220"/>
+  <img src="screenshot/presentation/pre_5.png" alt="Presentation 5" width="220"/>
+  <img src="screenshot/presentation/pre_7.png" alt="Presentation 7" width="220"/>
+</p>
+
+---
+
 # 📚 Lexify Monorepo (Frontend & Backend)
 
 This repository contains both the **Lexify Frontend (React Native)** and the **Lexify Backend (NestJS)** projects.
@@ -35,6 +46,107 @@ See [backend/README.md](backend/README.md) for full documentation.
 
 ---
 
+## 🏗️ Backend Architecture (NestJS)
+
+Lexify backend is a modular, scalable RESTful API built with [NestJS](https://nestjs.com/) and PostgreSQL. It provides all business logic, authentication, user/book/word management, translation, and file processing for the mobile app.
+
+### Main Modules & Responsibilities
+
+- **AuthModule:**
+
+  - Handles user authentication (JWT, local, Google), login, logout, and profile endpoints.
+  - Guards and strategies ensure secure access to protected resources.
+
+- **UserModule:**
+
+  - User registration, profile management, update/delete, and admin user listing.
+  - Users have roles (admin/user) and are related to books, words, and progress.
+
+- **BookModule:**
+
+  - Book upload (PDF/EPUB), metadata management, per-user book listing, search, update, and delete.
+  - Handles book content extraction and page/chapter management.
+
+- **BookProgressModule:**
+
+  - Tracks and updates the user's current page in each book.
+  - Allows resuming reading from where the user left off.
+
+- **WordModule (Favorites):**
+
+  - Manages user's favorite words (add, list, remove).
+  - Words are linked to users and have source/target language, translation, type, and category.
+
+- **TranslationModule:**
+
+  - Provides translation and dictionary lookup using a large local dictionary file.
+  - Supports word search, translation, and dictionary statistics.
+
+- **DictionaryModule:**
+
+  - Exposes endpoints for searching the dictionary and retrieving stats.
+
+- **FileModule:**
+
+  - Handles file uploads (PDFs, images) and storage.
+
+- **FeedbackModule:**
+  - Allows users to submit feedback, which can be listed, updated, or deleted by admins.
+
+### Entities & Data Model
+
+- **User:**
+
+  - id, name, email, password, role, provider
+  - Relations: books, words (favorites), bookProgress
+
+- **Book:**
+
+  - id, title, author, coverImage, filePath, category, userId
+  - Relations: user, pages, progress
+
+- **Word:**
+
+  - id, originalText, translatedText, sourceLanguage, targetLanguage, type, category
+  - Relations: users (favorites)
+
+- **BookProgress:**
+  - Tracks current page per user per book
+
+### API & Middleware
+
+- **Global ValidationPipe:** Ensures DTO validation and request sanitization.
+- **Global Exception Filter:** Handles and logs all unhandled exceptions, returns consistent error responses.
+- **Swagger API Docs:** Available at `/api` after starting the backend.
+- **CORS Enabled:** Allows frontend/mobile app to communicate securely.
+
+### Configuration
+
+- **TypeORM** for PostgreSQL connection and entity management.
+- **ConfigModule** for environment variable management.
+- **Entities** are auto-loaded and migrations are supported.
+
+---
+
+## 📑 Example Endpoints
+
+- `POST /auth/login` — User login
+- `GET /users/:id` — Get user profile
+- `POST /books/upload/pdf` — Upload a new book (PDF)
+- `GET /books` — List user's books
+- `GET /books/:id/content?page=1` — Get book content by page
+- `POST /favorites` — Add a word to favorites
+- `GET /dictionary/search?query=word` — Search dictionary
+- `POST /feedback` — Submit feedback
+
+---
+
+## 🗂️ How to Run the Backend
+
+See [backend/README.md](backend/README.md) for full setup and environment instructions.
+
+---
+
 # 📚 Lexify Frontend (React Native)
 
 Lexify is a mobile application that makes language learning fun and efficient, focusing on books and vocabulary. This repository contains the **React Native-based mobile interface** of the app.
@@ -55,9 +167,15 @@ Lexify is a mobile application that makes language learning fun and efficient, f
 
 ## 🖼️ Screenshots
 
-| Login                          | Books                          | Book Reader                              | Help                         |
-| ------------------------------ | ------------------------------ | ---------------------------------------- | ---------------------------- |
-| ![Login](screenshot/login.png) | ![Books](screenshot/Books.png) | ![BookReader](screenshot/bookreader.png) | ![Help](screenshot/help.png) |
+App Flow: Login → Register → Navbar → Books → Add Book → Book Reader → Word Selector → Favorites → Profile → Dictionary → Settings → Help
+
+| Login                                    | Register                                  | Navbar                                        | Books                                  |
+| ---------------------------------------- | ----------------------------------------- | --------------------------------------------- | -------------------------------------- |
+| ![Login](screenshot/login.png)           | ![Register](screenshot/register.png)      | ![Navbar](screenshot/navbar.png)              | ![Books](screenshot/Books.png)         |
+| Add to Book                              | Book Reader                               | Word Selector                                 | Favorites                              |
+| ![Add to Book](screenshot/addtobook.png) | ![Book Reader](screenshot/bookreader.png) | ![Word Selector](screenshot/wordselector.png) | ![Favorites](screenshot/favorites.png) |
+| Profile                                  | Dictionary                                | Settings                                      | Help                                   |
+| ![Profile](screenshot/profile.png)       | ![Dictionary](screenshot/dictionary.png)  | ![Settings](screenshot/settings.png)          | ![Help](screenshot/help.png)           |
 
 ---
 
@@ -138,15 +256,40 @@ frontend/
 
 ## 🧩 Main Screens & Flow
 
-- **LoginScreen / RegisterScreen:** User login and registration
-- **BooksScreen:** Book list and add book
-- **BookReaderScreen:** Read books and select words
-- **SavedWordsScreen:** Favorite words
-- **DictionaryScreen:** Dictionary and translation
-- **ProfileScreen:** User profile and statistics
-- **SettingsScreen:** Language and app settings
-- **HelpScreen:** Public domain book guide and help
-- **FeedbackScreen:** Send feedback
+- **BooksScreen**
+
+  - Lists all books added by the user.
+  - Features search, delete, edit, and add new book (navigates to AddBookScreen).
+  - Shows reading progress for each book.
+  - Uses a modern BookCard component for a visually rich list.
+
+- **AddBookScreen**
+
+  - Lets users enter book title, author, category, and cover image.
+  - Allows selecting and uploading PDF or EPUB files.
+  - Provides status feedback and error handling during upload.
+  - Offers a direct link to the HelpScreen for book adding or public domain guide.
+
+- **BookReaderScreen**
+
+  - Enables reading the selected book page by page or by chapters.
+  - Allows word selection for instant translation and saving to favorites.
+  - Automatically saves reading progress.
+  - Easy navigation between pages/chapters (swipe and buttons).
+  - Includes user-friendly pagination and an interactive WordSelector.
+
+- **SavedWordsScreen**
+
+  - Lists all words saved as favorites by the user.
+  - Allows deleting words, viewing details, and sorts by date.
+  - Shows translation with source and target languages.
+  - Displays helpful messages when the list is empty.
+
+- **DictionaryScreen**
+  - Provides fast word search and translation.
+  - Allows adding search results to favorites.
+  - Shows total word count and dictionary statistics.
+  - User-friendly interface with error handling.
 
 ---
 
