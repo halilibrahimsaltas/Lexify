@@ -27,9 +27,8 @@ This repository contains both the **Lexify Frontend (React Native)** and the **L
 
 ## 🎬 Demo Video
 
-[<div align="center">
-  [<video src="screenshot/presentation/Lexify.mp4" controls width="400"></video>](https://github.com/user-attachments/assets/4b23c274-ac25-4602-b535-6ad567f2ff8c)
-</div>](https://github.com/halilibrahimsaltas/Lexify/issues/1#issue-3216833598)
+https://github.com/user-attachments/assets/9db5aa3f-1698-4d1b-a7ab-ec0f1de6f66d
+
 
 ## 📑 Table of Contents
 
