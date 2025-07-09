@@ -1,250 +1,175 @@
-# 📚 Lexify Backend (NestJS)
+# 📚 Lexify Monorepo (Frontend & Backend)
 
-Lexify is a word learning application that makes language learning fun. This repository contains the **NestJS-based backend API** that serves the mobile application.
+This repository contains both the **Lexify Frontend (React Native)** and the **Lexify Backend (NestJS)** projects.
 
-![Image](https://github.com/user-attachments/assets/16d242a3-36c0-4c79-a961-50adba7f8efd)
-
----
-
-## 🚀 Purpose
-
-To develop a secure and scalable backend that provides users with:
-
-- Registration and login
-- Word addition and management
-- Word translation updates
-- Word list viewing
-- Word search and filtering
-- English to Turkish translation
-- Text extraction from PDF files
-- Book creation from PDFs
+- **Frontend:** Mobile app for book-based language learning (React Native, Expo)
+- **Backend:** RESTful API for user, book, word, and translation management (NestJS, PostgreSQL)
 
 ---
 
-## 🛠 Technology Stack
-
-| Technology        | Description                   |
-| ----------------- | ----------------------------- |
-| NestJS            | Backend application framework |
-| PostgreSQL        | Main database                 |
-| TypeORM           | ORM (Database interaction)    |
-| JWT               | Authentication                |
-| Docker            | Development environment       |
-| Swagger           | API documentation             |
-| Class Validator   | Data validation               |
-| Class Transformer | DTO transformations           |
-| LibreTranslate    | Translation service           |
-| Cache Manager     | Cache management              |
-| PDF-Parse         | PDF processing                |
-| Multer            | File upload                   |
-
----
-
-## 📁 Project Structure
+## 🗂️ Project Structure
 
 ```
-lexify-backend/
+Lexify/
+├── frontend/   # React Native mobile app (see details below)
+├── backend/    # NestJS backend API (see details below)
+```
+
+---
+
+## 🚀 Quick Start
+
+### Frontend (React Native)
+
+See full details below in this README.
+
+- Go to `frontend/` and follow the installation steps.
+- Run with `expo start`.
+
+### Backend (NestJS)
+
+See [backend/README.md](backend/README.md) for full documentation.
+
+- Go to `backend/` and follow the installation steps.
+- Run with `npm run start:dev` or use Docker.
+
+---
+
+# 📚 Lexify Frontend (React Native)
+
+Lexify is a mobile application that makes language learning fun and efficient, focusing on books and vocabulary. This repository contains the **React Native-based mobile interface** of the app.
+
+---
+
+## 🚀 Features
+
+- 📖 **Book Reading:** Add and read books in PDF and EPUB formats.
+- ⭐ **Save Words:** Select and save words as favorites while reading.
+- 📚 **Dictionary & Translation:** Fast word search and translation support.
+- 📝 **Profile & Statistics:** Track your personal progress and favorite words.
+- 🌐 **Multi-language Support:** English and Turkish interface.
+- 🖼️ **Modern & User-Friendly Design:** Stylish cards, icons, and themes.
+- 🗂️ **Feedback & Settings:** Collect user feedback and manage app settings.
+
+---
+
+## 🖼️ Screenshots
+
+| Login                          | Books                          | Book Reader                              | Help                         |
+| ------------------------------ | ------------------------------ | ---------------------------------------- | ---------------------------- |
+| ![Login](screenshot/login.png) | ![Books](screenshot/Books.png) | ![BookReader](screenshot/bookreader.png) | ![Help](screenshot/help.png) |
+
+---
+
+## 📁 Folder Structure
+
+```
+frontend/
 ├── src/
-│   ├── auth/           # Authentication operations
-│   ├── user/           # User management
-│   ├── word/           # Word operations
-│   ├── translation/    # Translation operations
-│   ├── book/           # Book operations
-│   │   ├── dto/        # Book DTOs
-│   │   └── entities/   # Book entities
-│   ├── file/           # File operations
-│   ├── common/         # Shared code
-│   │   ├── enum/       # Enum definitions
-│   │   ├── filters/    # Exception filters
-│   │   ├── guards/     # Auth guards
-│   │   ├── interceptors/# Interceptors
-│   │   └── types/      # Type definitions
-│   ├── app.module.ts   # Main module
-│   └── main.ts         # Application entry point
-├── test/               # Test files
-├── uploads/           # Uploaded files
-├── docker-compose.yml  # Docker configuration
-├── .env               # Environment variables
-└── README.md          # Project documentation
+│   ├── assets/           # Images, icons, book covers
+│   ├── components/       # UI components (BookCard, Button, Toast, etc.)
+│   ├── contexts/         # Contexts for auth and language management
+│   ├── hooks/            # Custom React hooks
+│   ├── locales/          # Multi-language files (tr.json, en.json)
+│   ├── navigation/       # Navigation (Drawer, Stack)
+│   ├── screens/          # All screens (Books, AddBook, Help, etc.)
+│   ├── services/         # API and data services
+│   ├── types/            # Type definitions
+│   └── config/           # App configuration
+├── App.tsx               # Entry point
+└── README.md             # This file
 ```
 
 ---
 
-## 🔧 Installation
+## 🛠️ Main Technologies
 
-### 1. Requirements
-
-- Node.js (v16 or higher)
-- PostgreSQL
-- Docker (optional)
-- LibreTranslate (optional)
-
-### 2. Clone the repository
-
-```bash
-git clone https://github.com/your-username/lexify-backend.git
-cd lexify-backend
-```
-
-### 3. Install dependencies
-
-```bash
-npm install
-```
-
-### 4. Configure environment variables
-
-Create `.env` file and set the following variables:
-
-```env
-# Database
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=your_password
-POSTGRES_DB=lexify
-
-# JWT
-JWT_SECRET=your_jwt_secret
-JWT_EXPIRATION=1d
-
-# LibreTranslate
-LIBRETRANSLATE_API_URL=http://libretranslate:5000
-
-# App
-PORT=3000
-NODE_ENV=development
-```
-
-### 5. Create database
-
-```bash
-# Create database in PostgreSQL
-createdb lexify
-```
-
-### 6. Start the application
-
-```bash
-# Development mode
-npm run start:dev
-
-# Production mode
-npm run build
-npm run start:prod
-```
-
-### 7. Run with Docker (optional)
-
-```bash
-docker-compose up -d
-```
+- **React Native** (Expo)
+- **React Navigation** (Drawer + Stack)
+- **Context API** (Auth, Language management)
+- **TypeScript** support
+- **Custom Hooks & Components**
+- **Vector Icons** (Ionicons, MaterialCommunityIcons)
+- **PDF/EPUB Reader**
+- **REST API** connection to backend
 
 ---
 
-## 📚 API Documentation
+## ⚙️ Installation
 
-Access Swagger documentation after starting the application:
+1. **Requirements:**
 
-```
-http://localhost:3000/api
-```
+   - Node.js (v16+)
+   - npm or yarn
+   - Expo CLI (`npm install -g expo-cli`)
 
-### API Endpoints
+2. **Clone the project:**
 
-#### User Operations
+   ```bash
+   git clone https://github.com/your-username/lexify-frontend.git
+   cd lexify-frontend
+   ```
 
-- `POST /users` - Create new user (Admin)
-- `GET /users` - List all users (Admin)
-- `GET /users/:id` - View user details (User/Admin)
-- `PUT /users/:id` - Update user information (User/Admin)
-- `DELETE /users/:id` - Delete user (Admin)
+3. **Install dependencies:**
 
-#### Word Operations
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
 
-- `POST /words` - Add new word
-- `GET /words` - List user's words
-- `PUT /words/:id` - Update word
-- `DELETE /words/:id` - Delete word
+4. **Start the app:**
 
-#### Translation Operations
+   ```bash
+   expo start
+   ```
 
-- `POST /translation/translate` - Translate text
-- `POST /translation/save-word` - Save translated word
-
-#### File Operations
-
-- `POST /files/upload/pdf` - Upload PDF file and extract text
-
-#### Book Operations
-
-- `POST /books/upload/pdf` - Create book from PDF
-- `POST /books` - Create new book
-- `GET /books` - List user's books
-- `GET /books/:id` - View book details
-- `DELETE /books/:id` - Delete book
+5. **Test on mobile device:**  
+   Scan the QR code with the Expo Go app or run on an emulator.
 
 ---
 
-## 🧪 Testing
+## 🌍 Multi-language Support
 
-```bash
-# Unit tests
-npm run test
-
-# E2E tests
-npm run test:e2e
-
-# Test coverage
-npm run test:cov
-```
+- English and Turkish interface with `src/locales/en.json` and `src/locales/tr.json` files.
+- Language can be changed from the settings screen.
 
 ---
 
-## 🚀 Future Development Plans
+## 🧩 Main Screens & Flow
 
-### Mobile Application
+- **LoginScreen / RegisterScreen:** User login and registration
+- **BooksScreen:** Book list and add book
+- **BookReaderScreen:** Read books and select words
+- **SavedWordsScreen:** Favorite words
+- **DictionaryScreen:** Dictionary and translation
+- **ProfileScreen:** User profile and statistics
+- **SettingsScreen:** Language and app settings
+- **HelpScreen:** Public domain book guide and help
+- **FeedbackScreen:** Send feedback
 
-- [ ] React Native mobile app development
-- [ ] Offline mode support
-- [ ] Push notifications
-- [ ] Mobile-specific optimizations
-- [ ] Deep linking support
+---
 
-### AI Integration
+## 🖼️ Design & Components
 
-- [ ] OpenAI integration for advanced translations
-- [ ] AI-powered word suggestions
-- [ ] Smart review system
-- [ ] Personalized learning paths
-- [ ] Speech recognition for pronunciation
+- **BookCard:** Card component for books
+- **WordSelector:** Select and save words in the reader
+- **Toast & Alert:** Notifications and alerts
+- **Custom Button & Input:** Custom button and input components
 
-### Enhanced Features
+---
 
-- [ ] Spaced repetition system
-- [ ] Gamification elements
-- [ ] Social features (friends, leaderboards)
-- [ ] Multiple language support
-- [ ] Advanced statistics and progress tracking
+## 🔗 Links
 
-### Performance & Security
-
-- [ ] Rate limiting
-- [ ] Advanced caching strategies
-- [ ] WebSocket support for real-time features
-- [ ] Enhanced security measures
-- [ ] Performance optimizations
-
-### Infrastructure
-
-- [ ] CI/CD pipeline setup
-- [ ] Automated testing
-- [ ] Monitoring and logging
-- [ ] Scalability improvements
-- [ ] Cloud deployment
+- [Backend API (NestJS)](backend/README.md)
+- [User Guide & Public Domain Books](https://www.gutenberg.org/), [Standard Ebooks](https://standardebooks.org/), [Manybooks](https://manybooks.net/)
 
 ---
 
 ## 📝 License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+MIT
+
+---
+
+For more information or contributions, please contact the project maintainer or open an issue on GitHub.

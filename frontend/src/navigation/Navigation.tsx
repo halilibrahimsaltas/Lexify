@@ -228,7 +228,18 @@ const Navigation = () => {
             <Stack.Screen
               name="Help"
               component={HelpScreen}
-              options={{ headerShown: true, title: "Help" }}
+              options={{
+                headerShown: true,
+                title: "Help",
+                headerStyle: { backgroundColor: "rgb(248, 204, 123)" },
+                headerTintColor: "#4E2B1B",
+                headerTitleStyle: {
+                  fontWeight: "bold",
+                  fontSize: 20,
+                  fontFamily: "Roboto_500Medium",
+                  color: "#4E2B1B",
+                },
+              }}
             />
           </>
         )}

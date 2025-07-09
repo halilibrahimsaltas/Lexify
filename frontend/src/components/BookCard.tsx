@@ -46,7 +46,7 @@ const BookCard: React.FC<BookCardProps> = ({
       />
       <View style={styles.info}>
         <View style={styles.headerRow}>
-          <Text style={styles.title} numberOfLines={1}>
+          <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">
             {book.title}
           </Text>
           <View style={{ alignItems: "center", flexDirection: "row" }}>
@@ -113,6 +113,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "flex-start",
     marginRight: 8,
+    minHeight: 90,
+    maxHeight: 90,
   },
   headerRow: {
     flexDirection: "row",

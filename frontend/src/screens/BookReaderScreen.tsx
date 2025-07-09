@@ -10,6 +10,7 @@ import {
   findNodeHandle,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Toast from "../components/Toast";
 import { SafeAreaView } from "react-native-safe-area-context";
 import WordSelector from "../components/WordSelector";
@@ -284,6 +285,20 @@ const BookReaderScreen = ({ route }: any) => {
                     styles.navButton,
                     currentPage === 1 && styles.disabled,
                   ]}
+                  onPress={() => setCurrentPage(1)}
+                  disabled={currentPage === 1}
+                >
+                  <MaterialCommunityIcons
+                    name="chevron-double-left"
+                    size={22}
+                    color={currentPage === 1 ? "#bdbdbd" : "#32341f"}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.navButton,
+                    currentPage === 1 && styles.disabled,
+                  ]}
                   onPress={() => goToPage("prev")}
                   disabled={currentPage === 1}
                 >
@@ -306,6 +321,20 @@ const BookReaderScreen = ({ route }: any) => {
                 >
                   <Ionicons
                     name="chevron-forward"
+                    size={22}
+                    color={currentPage === totalPages ? "#bdbdbd" : "#32341f"}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.navButton,
+                    currentPage === totalPages && styles.disabled,
+                  ]}
+                  onPress={() => setCurrentPage(totalPages)}
+                  disabled={currentPage === totalPages}
+                >
+                  <MaterialCommunityIcons
+                    name="chevron-double-right"
                     size={22}
                     color={currentPage === totalPages ? "#bdbdbd" : "#32341f"}
                   />
