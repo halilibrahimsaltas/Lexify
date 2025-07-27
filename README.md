@@ -187,7 +187,7 @@ Lexify is a mobile application that makes language learning fun and efficient, f
 
 ## 🖼️ Screenshots
 
-App Flow: Login → Register → Navbar → Books → Add Book → Book Reader → Word Selector → Favorites → Profile → Dictionary → Settings → Help
+
 
 | Login                                    | Register                                  | Navbar                                        | Books                                  |
 | ---------------------------------------- | ----------------------------------------- | --------------------------------------------- | -------------------------------------- |
